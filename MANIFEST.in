@@ -1,0 +1,17 @@
+# Include necessary package files
+include README.md
+include LICENSE
+include pyproject.toml
+include setup.py
+recursive-include ollama_api *.py
+recursive-include docs *.md
+recursive-include examples *.py
+
+# Exclude developer-specific files
+exclude publish.py
+exclude publish_to_pypi.sh
+exclude init_repo.sh
+exclude update_parent_gitignore.sh
+exclude activate_venv.sh
+exclude development.sh
+exclude .gitignore
