@@ -3,5 +3,5 @@
 
 from setuptools import setup
 
-# Using setuptools-scm to get version from git tags
-setup(use_scm_version=True)
+# Remove the use_scm_version as it's causing issues
+setup()

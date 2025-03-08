@@ -6,9 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "ollama_api"
 version = "0.1.0"
 description = "A comprehensive Python client for the Ollama API"
-readme = "README.md"
 authors = [
-    {name = "Lloyd Handyside", email = "ace1928@gmail.com"}
+    { name = "Lloyd Handyside", email = "ace1928@gmail.com" }
 ]
 license = {text = "MIT"}
 classifiers = [
@@ -49,13 +48,11 @@ docs = [
 "Bug Tracker" = "https://github.com/Ace1928/ollama_api/issues"
 
 [tool.setuptools]
-package-dir = {"" = "."}
-packages = ["ollama_api"]
-include-package-data = true
-exclude = [
-    "*.sh",
-    "publish.py",
-    "publish_to_pypi.sh"
+py-modules = [
+    "ollama_api", 
+    "cli", 
+    "client", 
+    "exceptions"
 ]
 
 [tool.black]

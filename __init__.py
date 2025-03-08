@@ -1,38 +1,59 @@
 """
 Ollama API client package for Python.
 
-This package provides a convenient interface to interact with the Ollama API.
+This package provides a convenient interface to interact with the Ollama API,
+elevated to peak Eidosian perfection.
 """
 
-# Import version info
 __version__ = "0.1.0"
 __author__ = "Lloyd Handyside"
 __email__ = "ace1928@gmail.com"
 
-# Import directly from local directories
+# Utilities
 from .utils.common import (
-    print_header, print_success, print_error, print_warning,
-    print_info, print_json, make_api_request, DEFAULT_OLLAMA_API_URL
+    print_header,
+    print_success,
+    print_error,
+    print_warning,
+    print_info,
+    print_json,
+    make_api_request,
+    DEFAULT_OLLAMA_API_URL
 )
 
-# Import client
+# Client
 from .client import OllamaClient
 
-# Import exceptions
+# Exceptions
 from .exceptions import (
-    OllamaAPIError, ConnectionError, TimeoutError,
-    ModelNotFoundError, ServerError, InvalidRequestError
+    OllamaAPIError,
+    OllamaConnectionError,
+    OllamaModelNotFoundError,
+    OllamaServerError,
+    ConnectionError,
+    TimeoutError,
+    ModelNotFoundError,
+    ServerError,
+    InvalidRequestError
 )
 
 __all__ = [
-    # Common utilities
-    "print_header", "print_success", "print_error", "print_warning",
-    "print_info", "print_json", "make_api_request", "DEFAULT_OLLAMA_API_URL",
-    
-    # Client class
+    "print_header",
+    "print_success",
+    "print_error",
+    "print_warning",
+    "print_info",
+    "print_json",
+    "make_api_request",
+    "DEFAULT_OLLAMA_API_URL",
     "OllamaClient",
-    
-    # Exceptions
-    "OllamaAPIError", "ConnectionError", "TimeoutError",
-    "ModelNotFoundError", "ServerError", "InvalidRequestError"
+    "OllamaAPIError",
+    "OllamaConnectionError",
+    "OllamaModelNotFoundError",
+    "OllamaServerError",
+    "ConnectionError",
+    "TimeoutError",
+    "ModelNotFoundError",
+    "ServerError",
+    "InvalidRequestError",
 ]
