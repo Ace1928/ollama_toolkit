@@ -19,6 +19,14 @@ class OllamaServerError(OllamaAPIError):
     """Raised when the Ollama server returns an error."""
     pass
 
+class EndpointNotFoundError(OllamaAPIError):
+    """Exception raised when an API endpoint is not found."""
+    pass
+
+class ModelCompatibilityError(OllamaAPIError):
+    """Exception raised when a model doesn't support a specific operation."""
+    pass
+
 # Aliases for backward compatibility
 ConnectionError = OllamaConnectionError
 TimeoutError = OllamaConnectionError  # Specific timeout errors inherit from connection errors
@@ -36,4 +44,12 @@ class ParseError(OllamaAPIError):
 
 class AuthenticationError(OllamaAPIError):
     """Exception raised when authentication fails."""
+    pass
+
+class TimeoutError(OllamaConnectionError):
+    """Raised when a request times out."""
+    pass
+
+class StreamingTimeoutError(TimeoutError):
+    """Raised when a streaming response times out."""
     pass

@@ -105,10 +105,10 @@ def make_api_request(
     endpoint: str,
     data: Optional[Dict[str, Any]] = None,
     base_url: str = DEFAULT_OLLAMA_API_URL,
-    timeout: int = 60,
+    timeout: int = 300,  # Changed from 60 to 300 seconds
 ) -> Optional[requests.Response]:
     """
-    Make an API request to the Ollama Toolkit
+    Make an API request to the Ollama Toolkit with enhanced anti-hanging protection.
 
     Args:
         method: HTTP method (GET, POST, etc.)
@@ -127,7 +127,22 @@ def make_api_request(
         if data:
             logger.debug(f"Request data: {json.dumps(data)}")
 
-        response = requests.request(method=method, url=url, json=data, timeout=timeout)
+        # Use a session for better timeout control
+        session = requests.Session()
+        session.mount('http://', requests.adapters.HTTPAdapter(
+            max_retries=1  # Minimal retries
+        ))
+        
+        # Use separate connect and read timeouts
+        connect_timeout = min(30, timeout/10)  # Connect timeout (max 30s, was 5s)
+        read_timeout = timeout - connect_timeout  # Remaining time for reading
+        
+        response = session.request(
+            method=method, 
+            url=url, 
+            json=data, 
+            timeout=(connect_timeout, read_timeout)
+        )
         response.raise_for_status()
         return response
 
@@ -178,7 +193,7 @@ async def async_make_api_request(
     endpoint: str,
     data: Optional[Dict[str, Any]] = None,
     base_url: str = DEFAULT_OLLAMA_API_URL,
-    timeout: int = 60,
+    timeout: int = 300,  # Changed from 60 to 300 seconds
 ) -> Dict[str, Any]:
     """
     Asynchronously make an API request to the Ollama Toolkit
@@ -417,3 +432,21 @@ def ensure_ollama_running() -> Tuple[bool, str]:
 
     except Exception as e:
         return False, f"Error starting Ollama: {str(e)}"
+
+
+def format_traceback(e: Exception) -> str:
+    """
+    Format an exception traceback for logging or display.
+    
+    Args:
+        e: The exception to format
+        
+    Returns:
+        Formatted traceback string
+    """
+    import traceback
+    from io import StringIO
+    
+    tb_io = StringIO()
+    traceback.print_exception(type(e), e, e.__traceback__, file=tb_io)
+    return tb_io.getvalue()

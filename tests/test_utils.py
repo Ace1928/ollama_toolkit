@@ -75,14 +75,17 @@ class TestUtils(unittest.TestCase):
         self.assertIn("ℹ", output)  # Info symbol
         self.assertIn("⚠", output)  # Warning symbol
 
-    @patch("ollama_toolkit.utils.common.requests.request")
-    def test_make_api_request_success(self, mock_request: Any) -> None:
+    @patch("requests.Session")
+    def test_make_api_request_success(self, mock_session: Any) -> None:
         """Test successful API requests."""
-        # Setup mock
+        # Setup mock session and response
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.raise_for_status = Mock()
-        mock_request.return_value = mock_response
+        
+        # Set up the mock session instance
+        session_instance = mock_session.return_value
+        session_instance.request.return_value = mock_response
 
         # Call function
         result = make_api_request(
@@ -90,17 +93,20 @@ class TestUtils(unittest.TestCase):
         )
 
         # Assert results
-        mock_request.assert_called_once()
+        session_instance.request.assert_called_once()
         self.assertEqual(result, mock_response)
 
-    @patch("ollama_toolkit.utils.common.requests.request")
-    def test_make_api_request_with_data(self, mock_request: Any) -> None:
+    @patch("requests.Session")
+    def test_make_api_request_with_data(self, mock_session: Any) -> None:
         """Test API requests with data payload."""
-        # Setup mock
+        # Setup mock session and response
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.raise_for_status = Mock()
-        mock_request.return_value = mock_response
+        
+        # Set up the mock session instance
+        session_instance = mock_session.return_value
+        session_instance.request.return_value = mock_response
 
         # Test data
         test_data: Dict[str, Any] = {"model": "test-model", "prompt": "test prompt"}
@@ -111,23 +117,27 @@ class TestUtils(unittest.TestCase):
         )
 
         # Assert results - patch deeper mocking
-        mock_request.assert_called_once()
+        session_instance.request.assert_called_once()
         self.assertEqual(result, mock_response)
 
-    @patch("requests.request")
-    def test_make_api_request(self, mock_request):
+    @patch("requests.Session")
+    def test_make_api_request(self, mock_session):
         """Test make_api_request function."""
-        # Setup mock
+        # Setup mock session and response
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_request.return_value = mock_response
+        mock_response.raise_for_status = Mock()
+        
+        # Set up the mock session instance
+        session_instance = mock_session.return_value
+        session_instance.request.return_value = mock_response
         
         # Call function
         result = make_api_request("GET", "/test")
         
         # Verify result
         self.assertEqual(result, mock_response)
-        mock_request.assert_called_once()
+        session_instance.request.assert_called_once()
     
     @patch("ollama_toolkit.utils.common.subprocess.run")
     def test_check_ollama_running(self, mock_run):

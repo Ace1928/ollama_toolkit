@@ -66,7 +66,7 @@ class OllamaClient:
     def __init__(
         self, 
         base_url: str = DEFAULT_OLLAMA_API_URL,
-        timeout: int = 60,
+        timeout: int = 300,  # Increased from 60 to 300 seconds (5 minutes)
         max_retries: int = 3,
         retry_delay: float = 1.0,
         cache_enabled: bool = False,
@@ -221,7 +221,7 @@ class OllamaClient:
         options: Optional[Dict[str, Any]] = None
     ) -> Union[Dict[str, Any], Generator[Dict[str, Any], None, None]]:
         """
-        Send a chat request to the model.
+        Send a chat request to the model with robust anti-hanging protection.
         
         Args:
             model: The model to use
@@ -232,38 +232,211 @@ class OllamaClient:
         Returns:
             Response dictionary or generator for streaming responses
         """
+        # Create a copy of options to avoid modifying the input
+        opt = dict(options or {})
+        
+        # Set reasonable timeouts
+        timeout = min(opt.get("timeout", self.timeout), 600)  # Max 10 minutes
+        
+        # Check if this is potentially an embedding-only model
+        if self._is_likely_embedding_model(model):
+            error_msg = f"Model '{model}' appears to be an embedding-only model and doesn't support chat"
+            logger.error(error_msg)
+            if stream:
+                return self._error_generator(error_msg)
+            else:
+                return {"error": error_msg, "code": "model_compatibility_error"}
+        
+        # Basic data payload
         data = {"model": model, "messages": messages, "stream": stream}
+        if opt:
+            data.update(opt)
         
-        # Add options to data if provided
-        if isinstance(options, dict):
-            data.update(options)
-        
+        # Attempt the request with aggressive anti-hanging measures
         if stream:
-            # Handle streaming response
-            response = self._with_retry(lambda: requests.post(
-                f"{self.base_url}/api/chat",
-                json=data,
-                stream=True,
-                timeout=self.timeout
-            ))
-            
-            def response_generator():
-                for line in response.iter_lines():
-                    if line:
-                        yield json.loads(line)
-            
-            return response_generator()
+            # Stream mode - use a safer streaming approach
+            try:
+                # Create session with explicit socket timeout
+                session = requests.Session()
+                
+                # Configure session with timeouts at every level
+                session.mount('http://', requests.adapters.HTTPAdapter(
+                    max_retries=1  # Only retry once
+                ))
+                
+                # Use POST with carefully controlled timeouts
+                response = session.post(
+                    f"{self.base_url.rstrip('/')}/api/chat",
+                    json=data,
+                    stream=True,
+                    timeout=(30.0, timeout - 30.0)
+                )
+                
+                # Handle 400 error explicitly for better feedback
+                if response.status_code == 400:
+                    error_message = "Bad request - the model may not support chat functionality"
+                    try:
+                        # Try to get more specific error from response
+                        error_data = json.loads(response.content)
+                        if "error" in error_data:
+                            error_message = error_data["error"]
+                    except:
+                        pass
+                    logger.error(f"Chat API error: {error_message}")
+                    return self._error_generator(error_message)
+                
+                # Check other response codes
+                if response.status_code != 200:
+                    logger.error(f"Chat API error: {response.status_code}")
+                    return self._error_generator(f"HTTP error {response.status_code}")
+                
+                # Return a carefully controlled generator that can't hang
+                return self._safe_stream_generator(response, timeout)
+                
+            except Exception as e:
+                logger.error(f"Chat request error: {str(e)}")
+                return self._error_generator(str(e))
         else:
-            # Handle non-streaming response using make_api_request
-            response = make_api_request(
-                "POST", 
-                "/api/chat", 
-                data=data,
-                base_url=self.base_url,
-                timeout=self.timeout
-            )
-            return response.json()
+            # Non-streaming mode - use make_api_request for better test compatibility
+            try:
+                response = make_api_request(
+                    "POST", 
+                    "/api/chat", 
+                    data=data,
+                    base_url=self.base_url,
+                    timeout=min(timeout, 300)
+                )
+                return response.json()
+            except Exception as e:
+                logger.error(f"Chat request error: {str(e)}")
+                return {"error": str(e)}
+    
+    def _is_likely_embedding_model(self, model_name: str) -> bool:
+        """
+        Check if a model is likely to be an embedding-only model based on name patterns.
+        
+        Args:
+            model_name: Name of the model to check
             
+        Returns:
+            True if the model is likely embedding-only, False otherwise
+        """
+        # Common patterns in embedding model names
+        embedding_patterns = [
+            "embed", "embedding", "text-embedding", "nomic-embed", 
+            "all-minilm", "e5-", "bge-", "instructor-", "sentence-"
+        ]
+        
+        model_name_lower = model_name.lower()
+        for pattern in embedding_patterns:
+            if pattern in model_name_lower:
+                return True
+        
+        return False
+        
+    def _error_generator(self, error_msg: str) -> Generator[Dict[str, Any], None, None]:
+        """
+        Create a generator that reports an error and completes.
+        
+        Args:
+            error_msg: The error message
+            
+        Returns:
+            Generator yielding an error and completion
+        """
+        yield {"error": error_msg}
+        yield {"done": True}
+
+    def _safe_stream_generator(self, response, timeout: int) -> Generator[Dict[str, Any], None, None]:
+        """
+        Process a streaming response with anti-hanging protection.
+        
+        Args:
+            response: The streaming response
+            timeout: Maximum time to wait (seconds)
+            
+        Returns:
+            Generator yielding processed chunks
+        """
+        start_time = time.time()
+        error_reported = False
+        
+        try:
+            # Get the raw response iterator
+            raw_iter = response.iter_lines(chunk_size=8192, decode_unicode=False)
+            
+            # Process with timeout protection
+            for i, line in enumerate(raw_iter):
+                # Emergency timeout check - only check every 20 chunks to allow longer processing
+                if i % 20 == 0 and (time.time() - start_time) > timeout:
+                    yield {"error": "Response timeout exceeded", "timeout": True}
+                    return
+                    
+                # Skip empty lines
+                if not line:
+                    continue
+                    
+                # Process the line
+                try:
+                    chunk = json.loads(line)
+                    yield chunk
+                    
+                    # Exit if done to avoid hanging
+                    if chunk.get("done", False):
+                        return
+                        
+                except json.JSONDecodeError:
+                    # Handle non-JSON content
+                    try:
+                        text = line.decode('utf-8', errors='replace')
+                        yield {"message": {"content": text}, "raw": True}
+                    except Exception as e:
+                        if not error_reported:  # Only report once to avoid spam
+                            logger.error(f"Stream decoding error: {str(e)}")
+                            error_reported = True
+                
+                # Add heartbeat timeout check every 20 chunks instead of every 5
+                if i % 20 == 0 and (time.time() - start_time) > timeout:
+                    yield {"error": "Response timeout exceeded", "timeout": True}
+                    return
+                    
+        except Exception as e:
+            # Catch and report any errors in the iterator
+            yield {"error": f"Stream processing error: {str(e)}"}
+            
+        # Always yield final done message to prevent hanging in consumer code
+        yield {"done": True}
+        
+    def _messages_to_prompt(self, messages: List[Dict[str, str]]) -> str:
+        """
+        Convert chat messages to a unified prompt string for models that don't support chat format.
+        
+        Args:
+            messages: List of message dictionaries with 'role' and 'content'
+            
+        Returns:
+            A formatted prompt string
+        """
+        prompt_parts = []
+        
+        for message in messages:
+            role = message.get("role", "").lower()
+            content = message.get("content", "")
+            
+            if role == "system":
+                prompt_parts.append(f"[SYSTEM]: {content}")
+            elif role == "user":
+                prompt_parts.append(f"[USER]: {content}")
+            elif role == "assistant":
+                prompt_parts.append(f"[ASSISTANT]: {content}")
+            else:
+                prompt_parts.append(f"[{role.upper()}]: {content}")
+        
+        # Add final assistant prompt
+        prompt_parts.append("[ASSISTANT]:")
+        
+        return "\n\n".join(prompt_parts)
+    
     async def achat(
         self,
         model: str,
@@ -401,8 +574,53 @@ class OllamaClient:
         Returns:
             Either a dictionary with the status or an iterator of status updates
         """
-        # Implementation would go here
-        pass
+        data = {"model": model}
+        
+        if stream:
+            # Handle streaming response
+            try:
+                response = self._with_retry(lambda: requests.post(
+                    f"{self.base_url}/api/pull",
+                    json=data,
+                    stream=True,
+                    timeout=self.timeout
+                ))
+                
+                def response_generator():
+                    try:
+                        for line in response.iter_lines():
+                            if line:
+                                try:
+                                    yield json.loads(line)
+                                except json.JSONDecodeError as e:
+                                    # Skip invalid JSON lines instead of failing
+                                    logger.warning(f"Skipping invalid JSON in stream: {e}")
+                                    yield {"status": "parsing_error", "error": str(e)}
+                    except Exception as ex:
+                        # Catch any errors during iteration
+                        logger.error(f"Error in pull stream: {str(ex)}")
+                        yield {"status": "error", "error": str(ex)}
+                
+                return response_generator()
+            except Exception as e:
+                logger.error(f"Error pulling model {model}: {str(e)}")
+                # Return a generator with error information
+                def error_generator():
+                    yield {"status": "error", "error": str(e)}
+                return error_generator()
+        else:
+            try:
+                response = make_api_request(
+                    "POST", 
+                    "/api/pull", 
+                    data=data,
+                    base_url=self.base_url,
+                    timeout=self.timeout
+                )
+                return response.json()
+            except Exception as e:
+                logger.error(f"Error pulling model {model}: {str(e)}")
+                return {"status": "error", "error": str(e)}
     
     def delete_model(self, model: str) -> bool:
         """

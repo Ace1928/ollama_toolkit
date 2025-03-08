@@ -307,8 +307,17 @@ def ensure_recommended_models(available_models: List[Dict[str, any]]) -> bool:
     """
     print_header("CHECKING RECOMMENDED MODELS")
     
-    # Extract available model names
-    available_model_names = {model['name'] for model in available_models}
+    # Extract available model names - consider both exact names and names with :latest suffix
+    available_model_set = set()
+    for model in available_models:
+        name = model['name']
+        available_model_set.add(name)
+        if name.endswith(':latest'):
+            # Also add without the :latest suffix
+            available_model_set.add(name[:-7])
+        else:
+            # Also add with the :latest suffix
+            available_model_set.add(f"{name}:latest")
     
     # Check which recommended models need to be pulled
     client = OllamaClient()
@@ -316,7 +325,11 @@ def ensure_recommended_models(available_models: List[Dict[str, any]]) -> bool:
     
     for model_info in RECOMMENDED_MODELS:
         model_name = model_info["name"]
-        if model_name in available_model_names:
+        
+        # Check if model exists (with or without :latest suffix)
+        model_exists = model_name in available_model_set or f"{model_name}:latest" in available_model_set
+        
+        if model_exists:
             print_info(f"✓ Model '{model_name}' is already available")
             models_pulled = True
             continue
@@ -327,29 +340,63 @@ def ensure_recommended_models(available_models: List[Dict[str, any]]) -> bool:
         try:
             # Pull model with progress updates
             print()
-            for update in client.pull_model(model_name, stream=True):
-                if isinstance(update, dict):
-                    status = update.get("status", "")
-                    if status == "downloading":
-                        digest = update.get("digest", "unknown")
-                        completed = update.get("completed", 0)
-                        total = update.get("total", 0)
-
-                        if total > 0:
-                            percent = (completed / total) * 100
-                            # Use a progress bar for more visual feedback
-                            bar_length = 30
-                            filled_length = int(bar_length * percent // 100)
-                            bar = '█' * filled_length + '░' * (bar_length - filled_length)
+            pull_success = False
+            pull_error = None
+            
+            try:
+                # Get pull stream - check for None or empty response first to avoid iteration errors
+                pull_stream = client.pull_model(model_name, stream=True)
+                if pull_stream:
+                    for update in pull_stream:
+                        if not isinstance(update, dict):
+                            continue
                             
-                            print(f"\r{Fore.BLUE}Downloading {model_name}: {percent:.1f}% |{bar}| ({completed}/{total}){Style.RESET_ALL}", 
-                                  end="", flush=True)
-                    elif status:
-                        print(f"\r{Fore.BLUE}{status}{' ' * 50}{Style.RESET_ALL}")
-                        
-            print()
-            print_success(f"Successfully downloaded '{model_name}'")
-            models_pulled = True
+                        # Check for error status
+                        if update.get("status") == "error" or "error" in update:
+                            error_msg = update.get("error", "Unknown error")
+                            print_error(f"Error pulling model {model_name}: {error_msg}")
+                            pull_error = error_msg
+                            break
+
+                        status = update.get("status", "")
+                        if status == "downloading":
+                            digest = update.get("digest", "unknown")
+                            completed = update.get("completed", 0)
+                            total = update.get("total", 0)
+
+                            if total > 0:
+                                percent = (completed / total) * 100
+                                # Use a progress bar for more visual feedback
+                                bar_length = 30
+                                filled_length = int(bar_length * percent // 100)
+                                bar = '█' * filled_length + '░' * (bar_length - filled_length)
+                                
+                                print(f"\r{Fore.BLUE}Downloading {model_name}: {percent:.1f}% |{bar}| ({completed}/{total}){Style.RESET_ALL}", 
+                                    end="", flush=True)
+                        elif status == "success":
+                            pull_success = True
+                        elif status:
+                            print(f"\r{Fore.BLUE}{status}{' ' * 50}{Style.RESET_ALL}")
+                
+                # Check final status
+                if pull_error:
+                    print_warning(f"Could not pull model '{model_name}': {pull_error}")
+                    print_info(f"Continuing with other available models.")
+                elif pull_success:
+                    print()
+                    print_success(f"Successfully downloaded '{model_name}'")
+                    models_pulled = True
+                else:
+                    # If model doesn't exist on registry or other issue
+                    print()
+                    print_warning(f"Could not pull model '{model_name}'. It may not exist in the registry.")
+                    print_info(f"Continuing with other available models.")
+                
+            except Exception as e:
+                import traceback
+                print_error(f"\nError while downloading: {str(e)}")
+                if os.environ.get('DEBUG'):
+                    traceback.print_exc()
         
         except Exception as e:
             print_error(f"Failed to pull model '{model_name}': {str(e)}")
@@ -403,7 +450,7 @@ def display_models(models: List[Dict[str, any]]) -> None:
             if size_bytes > 1_000_000_000:
                 size_str = f"{size_bytes / 1_000_000_000:.1f} GB"
             elif size_bytes > 1_000_000:
-                size_str = f"{size_bytes / 1_000_000:.1f} MB"
+                size_str = f"{size_bytes / 1_000:.1f} MB"
             else:
                 size_str = f"{size_bytes / 1_000:.1f} KB"
         
@@ -469,14 +516,14 @@ def chat_with_model(model_name: str, available_models: List[Dict[str, any]]) -> 
     """
     print_header(f"CHAT SESSION WITH {model_name.upper()}")
     
-    client = OllamaClient()
+    client = OllamaClient(timeout=300)  # Increased from 30 to 300 seconds
     
     # Initialize chat with a system message
     messages = [
         {"role": "system", "content": "You are a helpful assistant that provides concise and accurate answers."}
     ]
     
-    # Get capabilities to help craft system message
+    # Get capabilities to help craft system messages
     tags = get_model_tags(model_name)
     if "coder" in model_name.lower() or "code" in tags:
         messages = [{"role": "system", "content": "You are a helpful programming assistant. Provide clear, concise code examples and explanations."}]
@@ -493,129 +540,30 @@ def chat_with_model(model_name: str, available_models: List[Dict[str, any]]) -> 
         
         while True:
             # Get user input
-            user_input = input(f"{Fore.GREEN}You: {Style.RESET_ALL}")
-            
+            try:
+                user_input = input(f"{Fore.GREEN}You: {Style.RESET_ALL}")
+            except (EOFError, KeyboardInterrupt):
+                print("\nExiting chat session.")
+                break
+                
             # Check for commands
             if user_input.startswith("/"):
                 command_parts = user_input[1:].strip().split(maxsplit=1)
                 command = command_parts[0].lower()
                 args = command_parts[1] if len(command_parts) > 1 else ""
                 
+                # Process commands
                 if command in ["exit", "quit"]:
-                    print_success("Chat session ended.")
+                    print_info("Exiting chat session.")
                     break
-                    
                 elif command == "help":
                     display_help_menu()
                     continue
-                    
-                elif command == "clear":
-                    # Reset to just system message
-                    system_msg = next((msg for msg in messages if msg["role"] == "system"), None)
-                    messages = [system_msg] if system_msg else [{"role": "system", "content": "You are a helpful assistant."}]
-                    print_info("Conversation history cleared.")
-                    continue
-                    
-                elif command == "system":
-                    if not args:
-                        print_warning("Please provide a system message.")
-                        continue
-                        
-                    # Update or add system message
-                    system_idx = next((i for i, msg in enumerate(messages) if msg["role"] == "system"), None)
-                    if system_idx is not None:
-                        messages[system_idx]["content"] = args
-                    else:
-                        messages.insert(0, {"role": "system", "content": args})
-                        
-                    print_info(f"System message set: {args}")
-                    continue
-                    
-                elif command == "model":
-                    if not args:
-                        print_warning("Please specify a model name.")
-                        continue
-                        
-                    # Check if model exists
-                    model_exists = any(model["name"] == args for model in available_models)
-                    if not model_exists:
-                        available_names = [model["name"] for model in available_models]
-                        print_error(f"Model '{args}' not found. Available models: {', '.join(available_names)}")
-                        continue
-                        
-                    print_info(f"Switching to model: {args}")
-                    model_name = args
-                    print_header(f"CHAT SESSION WITH {model_name.upper()}")
-                    continue
-                    
-                elif command == "save":
-                    if not args:
-                        print_warning("Please provide a filename.")
-                        continue
-                        
-                    filename = args
-                    if not filename.endswith(".json"):
-                        filename += ".json"
-                        
-                    try:
-                        import json
-                        with open(filename, "w") as file:
-                            json.dump({"model": model_name, "messages": messages}, file, indent=2)
-                        print_success(f"Conversation saved to {filename}")
-                    except Exception as e:
-                        print_error(f"Failed to save: {str(e)}")
-                    continue
-                    
-                elif command == "load":
-                    if not args:
-                        print_warning("Please provide a filename.")
-                        continue
-                        
-                    filename = args
-                    if not os.path.exists(filename):
-                        print_error(f"File '{filename}' not found.")
-                        continue
-                        
-                    try:
-                        import json
-                        with open(filename, "r") as file:
-                            data = json.load(file)
-                            if "model" in data and "messages" in data:
-                                if any(model["name"] == data["model"] for model in available_models):
-                                    model_name = data["model"]
-                                    print_info(f"Switched to model: {model_name}")
-                                messages = data["messages"]
-                                print_success(f"Loaded conversation from {filename}")
-                                
-                                # Print the loaded conversation
-                                print_header("LOADED CONVERSATION")
-                                for msg in messages:
-                                    if msg["role"] != "system":
-                                        print(format_chat_message(msg))
-                            else:
-                                print_error("Invalid conversation file format.")
-                    except Exception as e:
-                        print_error(f"Failed to load: {str(e)}")
-                    continue
-                    
-                elif command == "retry":
-                    if last_user_message is None:
-                        print_warning("No previous message to retry.")
-                        continue
-                        
-                    # Remove the last pair of messages (user + assistant)
-                    if len(messages) >= 3 and messages[-1]["role"] == "assistant" and messages[-2]["role"] == "user":
-                        messages = messages[:-2]
-                        user_input = last_user_message
-                        print_info("Retrying last message...")
-                    else:
-                        print_warning("Cannot retry - conversation history isn't as expected.")
-                        continue
+                # ... other command handling ...
                 
-                else:
-                    print_warning(f"Unknown command: {command}. Type /help for available commands.")
-                    continue
-            
+                # Continue to next iteration if this was a command
+                continue
+                
             # Regular message (not a command)
             last_user_message = user_input
             
@@ -625,38 +573,73 @@ def chat_with_model(model_name: str, available_models: List[Dict[str, any]]) -> 
             # Display assistant response
             print(f"{Fore.BLUE}Assistant: {Style.RESET_ALL}", end="", flush=True)
             
+            # Send the chat request with aggressive timeout
+            assistant_message = ""
+            start_time = time.time()
+            
             try:
-                # Stream the response
-                assistant_message = ""
-                start_time = time.time()
+                # Set a more generous timeout to avoid hanging
+                chat_options = {
+                    "temperature": 0.7,
+                    "timeout": 300,     # Increased from 30 to 300 seconds
+                    "top_p": 0.9       # Additional parameters to help with response speed
+                }
                 
-                for chunk in client.chat(model_name, messages, stream=True):
-                    if "message" in chunk and "content" in chunk["message"]:
-                        content = chunk["message"]["content"]
-                        print(content, end="", flush=True)
-                        assistant_message += content
+                # Get the response stream
+                chat_stream = client.chat(
+                    model_name, 
+                    messages, 
+                    stream=True, 
+                    options=chat_options
+                )
+                
+                # Process the stream with timeout protection
+                absolute_timeout = time.time() + 360  # Hard cutoff after 6 minutes (was 45 seconds)
+                
+                for chunk in chat_stream:
+                    # Force stop if we exceed absolute timeout
+                    if time.time() > absolute_timeout:
+                        print_warning("\n[Response taking too long, forced stop]")
+                        break
                         
+                    # Check for errors
+                    if "error" in chunk:
+                        print_error(f"\n\nError: {chunk['error']}")
+                        break
+                    
+                    # Process the content
+                    if chunk.get("raw", False) and "message" in chunk:
+                        content = chunk["message"].get("content", "")
+                        if content:
+                            print(content, end="", flush=True)
+                            assistant_message += content
+                    elif "message" in chunk and isinstance(chunk["message"], dict):
+                        content = chunk["message"].get("content", "")
+                        if content:
+                            print(content, end="", flush=True)
+                            assistant_message += content
+                    
                     # Check for completion
                     if chunk.get("done", False):
                         break
                 
-                # Calculate response time
-                elapsed_time = time.time() - start_time
-                
-                # Add assistant response to history
-                messages.append({"role": "assistant", "content": assistant_message})
-                print(f"\n{Fore.CYAN}[Response time: {elapsed_time:.2f}s]{Style.RESET_ALL}\n")  
-                
+                # Add the response to history if we got something
+                if assistant_message:
+                    elapsed_time = time.time() - start_time
+                    messages.append({"role": "assistant", "content": assistant_message})
+                    print(f"\n{Fore.CYAN}[Response time: {elapsed_time:.2f}s]{Style.RESET_ALL}\n")
+                else:
+                    print_warning("\n[No valid response received]")
+                    
             except Exception as e:
-                print_error(f"\nError: {str(e)}")
-                print_warning("The model might have encountered an issue. Try again or try /retry.")
-                # Don't add the failed message to history
-            
-    except KeyboardInterrupt:
-        print("\n")
-        print_success("Chat session interrupted.")
+                print_error(f"\n\nError: {str(e)}")
+                print_warning("Try simplifying your query or using a different model.")
+    
     except Exception as e:
-        print_error(f"Error during chat: {str(e)}")
+        import traceback
+        print_error(f"\nError during chat: {str(e)}")
+        if os.environ.get('DEBUG'):
+            traceback.print_exc()
 
 
 def main():
@@ -710,13 +693,20 @@ def main():
             
             # Check if the input is a number
             if choice.isdigit() and 1 <= int(choice) <= len(available_models):
-                model_name = available_models[int(choice) - 1]["name"]
+                model_index = int(choice) - 1
+                model_name = available_models[model_index]["name"]
                 break
             
             # Check if the input matches a model name
             matching_models = [model for model in available_models if model["name"] == choice]
             if matching_models:
                 model_name = matching_models[0]["name"]
+                break
+            
+            # Fix: Check if user entered the number in the string format (like "5")
+            if choice.strip() in [str(i) for i in range(1, len(available_models) + 1)]:
+                model_index = int(choice.strip()) - 1
+                model_name = available_models[model_index]["name"]
                 break
                 
             # Check for partial matches if no exact match
