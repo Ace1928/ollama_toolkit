@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Ollama API: Embedding Example
+Ollama Toolkit: Embedding Example
 
 This script demonstrates how to use the Ollama Embedding API to create text embeddings.
 """
@@ -19,7 +19,7 @@ init()
 
 # Try to import as a package first, then try relative imports
 try:
-    from ollama_api.utils.common import (
+    from ollama_toolkit.utils.common import (
         DEFAULT_OLLAMA_API_URL,
         print_error,
         print_header,
@@ -27,7 +27,7 @@ try:
         print_success,
         print_warning,
     )
-    from ollama_api.utils.model_constants import (
+    from ollama_toolkit.utils.model_constants import (
         BACKUP_EMBEDDING_MODEL,
         DEFAULT_EMBEDDING_MODEL,
     )
@@ -37,7 +37,7 @@ except ImportError:
         0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
     )
     try:
-        from ollama_api.utils.common import (
+        from ollama_toolkit.utils.common import (
             DEFAULT_OLLAMA_API_URL,
             print_error,
             print_header,
@@ -45,13 +45,13 @@ except ImportError:
             print_success,
             print_warning,
         )
-        from ollama_api.utils.model_constants import (
+        from ollama_toolkit.utils.model_constants import (
             BACKUP_EMBEDDING_MODEL,
             DEFAULT_EMBEDDING_MODEL,
         )
     except ImportError as e:
         print(f"Error importing required modules: {e}")
-        print("Please install the package using: pip install -e /path/to/ollama_api")
+        print("Please install the package using: pip install -e /path/to/ollama_toolkit")
         sys.exit(1)
 
 
@@ -69,7 +69,7 @@ def create_embedding(
         model: The model name
         text: The text to create an embedding for
         options: Additional model parameters
-        base_url: The base URL for the Ollama API
+        base_url: The base URL for the Ollama Toolkit
         use_fallback: Whether to try the backup model if primary fails
 
     Returns:

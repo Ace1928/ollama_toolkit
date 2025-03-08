@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Ollama API: Version Example
+Ollama Toolkit: Version Example
 
 This script demonstrates how to fetch the Ollama version.
 """
@@ -18,7 +18,7 @@ init()
 
 # Try to import as a package first, then try relative imports
 try:
-    from ollama_api.utils.common import (
+    from ollama_toolkit.utils.common import (
         DEFAULT_OLLAMA_API_URL,
         print_error,
         print_header,
@@ -31,7 +31,7 @@ except ImportError:
         0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
     )
     try:
-        from ollama_api.utils.common import (
+        from ollama_toolkit.utils.common import (
             DEFAULT_OLLAMA_API_URL,
             print_error,
             print_header,
@@ -40,7 +40,7 @@ except ImportError:
         )
     except ImportError as e:
         print(f"Error importing required modules: {e}")
-        print("Please install the package using: pip install -e /path/to/ollama_api")
+        print("Please install the package using: pip install -e /path/to/ollama_toolkit")
         sys.exit(1)
 
 
@@ -51,13 +51,13 @@ def get_ollama_version(
     Get the current Ollama version
 
     Args:
-        base_url: The base URL for the Ollama API
+        base_url: The base URL for the Ollama Toolkit
 
     Returns:
         The version information as a dictionary or None if failed
     """
     print_header("Fetching Ollama version")
-    print_info(f"Connecting to Ollama API at {base_url}")
+    print_info(f"Connecting to Ollama Toolkit at {base_url}")
 
     try:
         # Make the API request
@@ -69,7 +69,7 @@ def get_ollama_version(
         )
         return result
     except requests.exceptions.RequestException as e:
-        print_error(f"Error connecting to Ollama API: {e}")
+        print_error(f"Error connecting to Ollama Toolkit: {e}")
         return None
 
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Custom exceptions for the Ollama API client.
+Custom exceptions for the Ollama Toolkit client.
 """
 
 class OllamaAPIError(Exception):
-    """Base exception class for all Ollama API errors."""
+    """Base exception class for all Ollama Toolkit errors."""
     pass
 
 class OllamaConnectionError(OllamaAPIError):

@@ -1,13 +1,13 @@
 # API Reference
 
-This page documents the key classes and methods provided by the Ollama API client.
+This page documents the key classes and methods provided by the Ollama Toolkit client.
 
 ## OllamaClient
 
-The main class for interacting with the Ollama API.
+The main class for interacting with the Ollama Toolkit.
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 client = OllamaClient(
     base_url="http://localhost:11434/",
@@ -20,7 +20,7 @@ client = OllamaClient(
 
 ### Constructor Parameters
 
-- `base_url` (str): The base URL of the Ollama API server. Default: "http://localhost:11434/"
+- `base_url` (str): The base URL of the Ollama Toolkit server. Default: "http://localhost:11434/"
 - `timeout` (int): Default timeout for API requests in seconds. Default: 60
 - `max_retries` (int): Maximum number of retry attempts for failed requests. Default: 3
 - `retry_delay` (float): Delay between retry attempts in seconds. Default: 1.0
@@ -267,7 +267,7 @@ version = await client.aget_version()
 
 The package provides several exception types for better error handling:
 
-- `OllamaAPIError`: Base exception class for all Ollama API errors
+- `OllamaAPIError`: Base exception class for all Ollama Toolkit errors
 - `ConnectionError`: Raised when connection to the API fails
 - `TimeoutError`: Raised when an API request times out
 - `ModelNotFoundError`: Raised when a requested model is not found
@@ -279,7 +279,7 @@ The package provides several exception types for better error handling:
 
 ## Utility Functions
 
-The package provides several utility functions in `ollama_api.utils.common`:
+The package provides several utility functions in `ollama_toolkit.utils.common`:
 
 - `print_header(title)`: Print a formatted header
 - `print_success(message)`: Print a success message

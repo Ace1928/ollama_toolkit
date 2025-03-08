@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Command-line interface for the Ollama API client.
+Command-line interface for the Ollama Toolkit client.
 """
 
 import argparse
@@ -11,9 +11,9 @@ from typing import Any, Dict, List
 
 from colorama import Fore, Style, init
 
-from ollama_api.client import OllamaClient
-from ollama_api.exceptions import ConnectionError, ModelNotFoundError, OllamaAPIError
-from ollama_api.utils.common import (
+from ollama_toolkit.client import OllamaClient
+from ollama_toolkit.exceptions import ConnectionError, ModelNotFoundError, OllamaAPIError
+from ollama_toolkit.utils.common import (
     print_error,
     print_header,
     print_info,
@@ -315,11 +315,11 @@ def copy_command(args: argparse.Namespace) -> None:
 def main() -> None:
     """Main entry point for the CLI."""
     parser = argparse.ArgumentParser(
-        description="Ollama API Command Line Interface",
+        description="Ollama Toolkit Command Line Interface",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
-        "--api-url", default="http://localhost:11434", help="Ollama API URL"
+        "--api-url", default="http://localhost:11434", help="Ollama Toolkit URL"
     )
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable verbose output"
@@ -417,7 +417,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.version:
-        from ollama_api import __version__
+        from ollama_toolkit import __version__
 
         print(f"ollama-api version {__version__}")
         return

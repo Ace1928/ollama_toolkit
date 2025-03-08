@@ -1,10 +1,10 @@
 """
-Model constants used throughout the Ollama API client.
+Model constants used throughout the Ollama Toolkit client.
 """
 
 from typing import Dict, List, Optional
 
-# Default models that should be available in the Ollama API
+# Default models that should be available in the Ollama Toolkit
 DEFAULT_CHAT_MODEL = "llama2"
 BACKUP_CHAT_MODEL = "qwen2.5:0.5b"
 DEFAULT_EMBEDDING_MODEL = "nomic-embed-text"

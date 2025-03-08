@@ -1,1 +1,1 @@
-"""Test package for the ollama_api package."""
+"""Test package for the ollama_toolkit package."""

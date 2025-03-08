@@ -1,6 +1,6 @@
-# Ollama API Conventions
+# Ollama Toolkit Conventions
 
-This document outlines the conventions used across the Ollama API.
+This document outlines the conventions used across the Ollama Toolkit.
 
 ## Model Names
 

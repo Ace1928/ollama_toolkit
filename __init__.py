@@ -1,7 +1,7 @@
 """
-Ollama API client package for Python.
+Ollama Toolkit client package for Python.
 
-This package provides a convenient interface to interact with the Ollama API,
+This package provides a convenient interface to interact with the Ollama Toolkit,
 elevated to peak Eidosian perfection.
 """
 

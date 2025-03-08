@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Basic example showing how to use the Ollama API client.
+Basic example showing how to use the Ollama Toolkit client.
 """
 
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 def main():
-    """Run a basic example of the Ollama API client."""
+    """Run a basic example of the Ollama Toolkit client."""
     # Initialize the client
     client = OllamaClient()
     

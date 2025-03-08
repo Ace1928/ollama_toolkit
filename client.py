@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Core client functionality for interacting with Ollama API
+Core client functionality for interacting with Ollama Toolkit
 """
 
 import asyncio
@@ -51,13 +51,13 @@ CacheValue = Tuple[float, Any]
 
 class OllamaClient:
     """
-    Client for interacting with the Ollama API.
+    Client for interacting with the Ollama Toolkit.
     
-    This class provides a convenient interface for all Ollama API endpoints,
+    This class provides a convenient interface for all Ollama Toolkit endpoints,
     including model management, generation, embeddings, and more.
     
     Attributes:
-        base_url: The base URL of the Ollama API server
+        base_url: The base URL of the Ollama Toolkit server
         timeout: Default timeout for API requests in seconds
         max_retries: Maximum number of retry attempts for failed requests
         retry_delay: Delay between retry attempts in seconds
@@ -76,7 +76,7 @@ class OllamaClient:
         Initialize the Ollama client.
         
         Args:
-            base_url: The base URL of the Ollama API
+            base_url: The base URL of the Ollama Toolkit
             timeout: Default timeout for API requests in seconds
             max_retries: Maximum number of retry attempts for failed requests
             retry_delay: Delay between retry attempts in seconds

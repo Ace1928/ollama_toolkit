@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Example of using the Ollama API client for chat interactions.
+Example of using the Ollama Toolkit client for chat interactions.
 """
 
 import argparse
@@ -27,7 +27,7 @@ import_success = False
 
 # Try package import first (when installed via pip or in development with -e)
 try:
-    from ollama_api.utils.common import (
+    from ollama_toolkit.utils.common import (
         DEFAULT_OLLAMA_API_URL,
         print_error,
         print_header,
@@ -35,7 +35,7 @@ try:
         print_success,
         print_warning,
     )
-    from ollama_api.utils.model_constants import (
+    from ollama_toolkit.utils.model_constants import (
         BACKUP_CHAT_MODEL,
         DEFAULT_CHAT_MODEL,
     )
@@ -51,7 +51,7 @@ except ImportError:
         sys.path.insert(0, parent_dir)
     
     try:
-        from ollama_api.utils.common import (
+        from ollama_toolkit.utils.common import (
             DEFAULT_OLLAMA_API_URL,
             print_error,
             print_header,
@@ -59,7 +59,7 @@ except ImportError:
             print_success,
             print_warning,
         )
-        from ollama_api.utils.model_constants import (
+        from ollama_toolkit.utils.model_constants import (
             BACKUP_CHAT_MODEL,
             DEFAULT_CHAT_MODEL,
         )
@@ -73,7 +73,7 @@ except ImportError:
             sys.path.insert(0, grandparent_dir)
         
         try:
-            from ollama_api.utils.common import (
+            from ollama_toolkit.utils.common import (
                 DEFAULT_OLLAMA_API_URL,
                 print_error,
                 print_header,
@@ -81,7 +81,7 @@ except ImportError:
                 print_success,
                 print_warning,
             )
-            from ollama_api.utils.model_constants import (
+            from ollama_toolkit.utils.model_constants import (
                 BACKUP_CHAT_MODEL,
                 DEFAULT_CHAT_MODEL,
             )
@@ -90,7 +90,7 @@ except ImportError:
         except ImportError as e:
             print(f"Error importing required modules: {e}")
             print(f"Current sys.path: {sys.path}")
-            print("Please install the package using: pip install -e /path/to/ollama_api")
+            print("Please install the package using: pip install -e /path/to/ollama_toolkit")
             sys.exit(1)
 
 if not import_success:
@@ -163,13 +163,13 @@ def chat(
     use_fallback: bool = True,
 ) -> Optional[Dict[str, Any]]:
     """
-    Send a chat request to the Ollama API
+    Send a chat request to the Ollama Toolkit
 
     Args:
         model: The model name
         messages: List of message dictionaries with 'role' and 'content' keys
         options: Additional model parameters
-        base_url: The base URL for the Ollama API
+        base_url: The base URL for the Ollama Toolkit
         use_fallback: Whether to try the backup model if primary fails
 
     Returns:
@@ -282,13 +282,13 @@ def chat_streaming(
     use_fallback: bool = True,
 ) -> Tuple[bool, Optional[Dict[str, str]]]:
     """
-    Stream a chat response from the Ollama API.
+    Stream a chat response from the Ollama Toolkit.
     
     Args:
         model: The name of the model to use
         messages: List of message objects with role and content
         options: Optional dictionary of model parameters
-        base_url: The base URL of the Ollama API
+        base_url: The base URL of the Ollama Toolkit
         use_fallback: Whether to try the backup model if the primary fails
         
     Returns:

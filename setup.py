@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Setup script for the ollama_api package."""
+"""Setup script for the ollama_toolkit package."""
 
 from setuptools import setup
 

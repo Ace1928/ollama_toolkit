@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 # Now try imports
 try:
-    from ollama_api.utils.common import (
+    from ollama_toolkit.utils.common import (
         DEFAULT_OLLAMA_API_URL,
         async_make_api_request,
         make_api_request,
@@ -75,7 +75,7 @@ class TestUtils(unittest.TestCase):
         self.assertIn("ℹ", output)  # Info symbol
         self.assertIn("⚠", output)  # Warning symbol
 
-    @patch("ollama_api.utils.common.requests.request")
+    @patch("ollama_toolkit.utils.common.requests.request")
     def test_make_api_request_success(self, mock_request: Any) -> None:
         """Test successful API requests."""
         # Setup mock
@@ -93,7 +93,7 @@ class TestUtils(unittest.TestCase):
         mock_request.assert_called_once()
         self.assertEqual(result, mock_response)
 
-    @patch("ollama_api.utils.common.requests.request")
+    @patch("ollama_toolkit.utils.common.requests.request")
     def test_make_api_request_with_data(self, mock_request: Any) -> None:
         """Test API requests with data payload."""
         # Setup mock
@@ -129,7 +129,7 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(result, mock_response)
         mock_request.assert_called_once()
     
-    @patch("ollama_api.utils.common.subprocess.run")
+    @patch("ollama_toolkit.utils.common.subprocess.run")
     def test_check_ollama_running(self, mock_run):
         """Test check_ollama_running function."""
         # Setup mock for running Ollama

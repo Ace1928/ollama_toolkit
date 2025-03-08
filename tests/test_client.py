@@ -17,9 +17,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 # Now try imports
 try:
-    from ollama_api.client import OllamaClient
-    from ollama_api.exceptions import ModelNotFoundError, OllamaAPIError
-    from ollama_api.utils.model_constants import (
+    from ollama_toolkit.client import OllamaClient
+    from ollama_toolkit.exceptions import ModelNotFoundError, OllamaAPIError
+    from ollama_toolkit.utils.model_constants import (
         BACKUP_CHAT_MODEL,
         BACKUP_EMBEDDING_MODEL,
         DEFAULT_CHAT_MODEL,
@@ -38,7 +38,7 @@ class TestOllamaClient(unittest.TestCase):
         """Set up test fixtures."""
         self.client = OllamaClient()
 
-    @patch("ollama_api.client.make_api_request")
+    @patch("ollama_toolkit.client.make_api_request")
     def test_get_version(self, mock_request: Any) -> None:
         """Test getting the Ollama version."""
         # Setup mock
@@ -58,7 +58,7 @@ class TestOllamaClient(unittest.TestCase):
         )
         self.assertEqual(result, {"version": "0.1.0"})
 
-    @patch("ollama_api.client.make_api_request")
+    @patch("ollama_toolkit.client.make_api_request")
     def test_generate_non_streaming(self, mock_request: Any) -> None:
         """Test generating text (non-streaming)."""
         # Setup mock
@@ -138,7 +138,7 @@ class TestOllamaClient(unittest.TestCase):
 
         # Call the method directly - no need for additional patching
         with patch(
-            "ollama_api.client.requests.post", return_value=mock_response
+            "ollama_toolkit.client.requests.post", return_value=mock_response
         ) as mock_client_post:
             result = self.client.generate(
                 DEFAULT_CHAT_MODEL, "test prompt", stream=True
@@ -158,7 +158,7 @@ class TestOllamaClient(unittest.TestCase):
                 ],
             )
 
-    @patch("ollama_api.client.make_api_request")
+    @patch("ollama_toolkit.client.make_api_request")
     def test_list_models(self, mock_request: Any) -> None:
         """Test listing available models."""
         # Setup mock
@@ -178,7 +178,7 @@ class TestOllamaClient(unittest.TestCase):
         )
         self.assertEqual(result, {"models": [{"name": "test-model"}]})
 
-    @patch("ollama_api.client.make_api_request")
+    @patch("ollama_toolkit.client.make_api_request")
     def test_delete_model_success(self, mock_request: Any) -> None:
         """Test deleting a model successfully."""
         # Setup mock
@@ -199,7 +199,7 @@ class TestOllamaClient(unittest.TestCase):
         )
         self.assertTrue(result)
 
-    @patch("ollama_api.client.make_api_request")
+    @patch("ollama_toolkit.client.make_api_request")
     def test_delete_model_not_found(self, mock_request: Any) -> None:
         """Test deleting a non-existent model."""
         # Setup mock to raise the exception directly
@@ -211,7 +211,7 @@ class TestOllamaClient(unittest.TestCase):
         with self.assertRaises(ModelNotFoundError):
             self.client.delete_model("nonexistent-model")
 
-    @patch("ollama_api.client.make_api_request")
+    @patch("ollama_toolkit.client.make_api_request")
     def test_create_embedding(self, mock_request: Any) -> None:
         """Test creating embeddings."""
         # Setup mock
@@ -232,7 +232,7 @@ class TestOllamaClient(unittest.TestCase):
         )
         self.assertEqual(result, {"embedding": [0.1, 0.2, 0.3]})
 
-    @patch("ollama_api.client.make_api_request")
+    @patch("ollama_toolkit.client.make_api_request")
     def test_chat(self, mock_request: Any) -> None:
         """Test chat completion."""
         # Setup mock
@@ -257,7 +257,7 @@ class TestOllamaClient(unittest.TestCase):
         self.assertEqual(result["message"]["content"], "Hello!")
 
     @pytest.mark.xfail(reason="Known issue with mock setup")
-    @patch("ollama_api.client.OllamaClient.generate")
+    @patch("ollama_toolkit.client.OllamaClient.generate")
     def test_generate_with_fallback(self, mock_generate: Any) -> None:
         """Test fallback to backup model when primary model fails."""
         # Setup mock

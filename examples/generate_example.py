@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Ollama API: Generate Example
+Ollama Toolkit: Generate Example
 
 This script demonstrates how to use the Ollama Generate API to create completions.
 """
@@ -20,14 +20,14 @@ init()
 
 # Try to import as a package first, then try relative imports
 try:
-    from ollama_api.utils.common import (
+    from ollama_toolkit.utils.common import (
         DEFAULT_OLLAMA_API_URL,
         print_error,
         print_header,
         print_info,
         print_success,
     )
-    from ollama_api.utils.model_constants import (
+    from ollama_toolkit.utils.model_constants import (
         BACKUP_CHAT_MODEL,
         DEFAULT_CHAT_MODEL,
     )
@@ -37,20 +37,20 @@ except ImportError:
         0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
     )
     try:
-        from ollama_api.utils.common import (
+        from ollama_toolkit.utils.common import (
             DEFAULT_OLLAMA_API_URL,
             print_error,
             print_header,
             print_info,
             print_success,
         )
-        from ollama_api.utils.model_constants import (
+        from ollama_toolkit.utils.model_constants import (
             BACKUP_CHAT_MODEL,
             DEFAULT_CHAT_MODEL,
         )
     except ImportError as e:
         print(f"Error importing required modules: {e}")
-        print("Please install the package using: pip install -e /path/to/ollama_api")
+        print("Please install the package using: pip install -e /path/to/ollama_toolkit")
         sys.exit(1)
 
 
@@ -68,7 +68,7 @@ def generate_streaming(
         model: The model name
         prompt: The prompt to generate a response for
         options: Additional model parameters
-        base_url: The base URL for the Ollama API
+        base_url: The base URL for the Ollama Toolkit
         use_fallback: Whether to try the backup model if primary fails
 
     Returns:
@@ -147,7 +147,7 @@ def generate_non_streaming(
         model: The model name
         prompt: The prompt to generate a response for
         options: Additional model parameters
-        base_url: The base URL for the Ollama API
+        base_url: The base URL for the Ollama Toolkit
         use_fallback: Whether to try the backup model if primary fails
 
     Returns:

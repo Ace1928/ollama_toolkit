@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Common utilities for Ollama API examples and client.
+Common utilities for Ollama Toolkit examples and client.
 """
 
 import asyncio
@@ -27,7 +27,7 @@ from exceptions import (
 # Configure logger
 logger = logging.getLogger(__name__)
 
-# Default Ollama API URL
+# Default Ollama Toolkit URL
 DEFAULT_OLLAMA_API_URL = "http://localhost:11434/"
 
 # Default model to use across the package
@@ -108,7 +108,7 @@ def make_api_request(
     timeout: int = 60,
 ) -> Optional[requests.Response]:
     """
-    Make an API request to the Ollama API
+    Make an API request to the Ollama Toolkit
 
     Args:
         method: HTTP method (GET, POST, etc.)
@@ -133,7 +133,7 @@ def make_api_request(
 
     except requests.exceptions.ConnectionError as e:
         logger.error(f"Connection error: {str(e)}")
-        print_error(f"Connection error: Could not connect to Ollama API at {base_url}")
+        print_error(f"Connection error: Could not connect to Ollama Toolkit at {base_url}")
         print_info("Make sure Ollama is running and accessible.")
         raise ConnectionError(f"Failed to connect to {base_url}: {str(e)}")
 
@@ -181,7 +181,7 @@ async def async_make_api_request(
     timeout: int = 60,
 ) -> Dict[str, Any]:
     """
-    Asynchronously make an API request to the Ollama API
+    Asynchronously make an API request to the Ollama Toolkit
 
     Args:
         method: HTTP method (GET, POST, etc.)

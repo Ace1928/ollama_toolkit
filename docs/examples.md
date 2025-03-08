@@ -1,13 +1,13 @@
 # Examples
 
-This page contains examples of how to use the Ollama API client for various tasks.
+This page contains examples of how to use the Ollama Toolkit client for various tasks.
 
 ## Basic Usage
 
 Here's a simple example of getting the version and listing available models:
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 # Initialize the client
 client = OllamaClient()
@@ -28,7 +28,7 @@ for model in models.get("models", []):
 ### Non-streaming Generation
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 client = OllamaClient()
 response = client.generate(
@@ -48,7 +48,7 @@ print(response["response"])
 ### Streaming Generation
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 client = OllamaClient()
 for chunk in client.generate(
@@ -67,7 +67,7 @@ for chunk in client.generate(
 
 ```python
 import asyncio
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 async def main():
     client = OllamaClient()
@@ -86,7 +86,7 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 async def main():
     client = OllamaClient()
@@ -108,7 +108,7 @@ asyncio.run(main())
 ### Simple Chat
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 client = OllamaClient()
 messages = [
@@ -128,7 +128,7 @@ print(response["message"]["content"])
 ### Interactive Chat
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 from typing import List, Dict
 
 def chat_session(model: str = "llama2"):
@@ -168,7 +168,7 @@ if __name__ == "__main__":
 ### Create Embeddings
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 client = OllamaClient()
 embedding = client.create_embedding(
@@ -184,7 +184,7 @@ print(f"First few values: {embedding['embedding'][:5]}...")
 
 ```python
 import numpy as np
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
@@ -209,7 +209,7 @@ print(f"Similarity: {similarity:.4f}")
 ### Pull a Model
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 client = OllamaClient()
 
@@ -226,7 +226,7 @@ for update in client.pull_model("mistral", stream=True):
 ### Copy a Model
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 client = OllamaClient()
 result = client.copy_model("llama2", "my-llama2-copy")
@@ -236,7 +236,7 @@ print(f"Model copied: {result}")
 ### Delete a Model
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 client = OllamaClient()
 success = client.delete_model("my-llama2-copy")
@@ -246,7 +246,7 @@ print(f"Model deleted: {success}")
 ## Error Handling
 
 ```python
-from ollama_api import OllamaClient, ModelNotFoundError, OllamaAPIError, ConnectionError
+from ollama_toolkit import OllamaClient, ModelNotFoundError, OllamaAPIError, ConnectionError
 
 client = OllamaClient()
 
@@ -264,7 +264,7 @@ except OllamaAPIError as e:
 ## Automatic Ollama Installation
 
 ```python
-from ollama_api.utils.common import ensure_ollama_running, check_ollama_installed
+from ollama_toolkit.utils.common import ensure_ollama_running, check_ollama_installed
 
 # Check if Ollama is installed
 is_installed, install_message = check_ollama_installed()

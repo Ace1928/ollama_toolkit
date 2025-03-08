@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Centralized test runner for the Ollama API client.
+Centralized test runner for the Ollama Toolkit client.
 
 This script discovers and runs all tests in the tests directory.
 It can be run directly or through pytest.
@@ -96,7 +96,7 @@ def run_all_tests(
 
 def main() -> None:
     """Parse command line arguments and run tests."""
-    parser = argparse.ArgumentParser(description="Run all Ollama API tests")
+    parser = argparse.ArgumentParser(description="Run all Ollama Toolkit tests")
     parser.add_argument(
         "--verbosity", "-v", type=int, default=2, help="Verbosity level (1-3)"
     )

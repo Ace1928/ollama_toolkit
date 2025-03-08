@@ -1,5 +1,5 @@
 """
-Utility modules for the Ollama API client.
+Utility modules for the Ollama Toolkit client.
 """
 
 # Import common utilities directly using relative imports

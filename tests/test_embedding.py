@@ -16,11 +16,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 # Now try imports
 try:
-    from ollama_api.examples.embedding_example import (
+    from ollama_toolkit.examples.embedding_example import (
         calculate_similarity,
         create_embedding,
     )
-    from ollama_api.utils.model_constants import (
+    from ollama_toolkit.utils.model_constants import (
         BACKUP_EMBEDDING_MODEL,
         DEFAULT_EMBEDDING_MODEL,
     )

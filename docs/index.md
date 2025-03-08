@@ -1,6 +1,6 @@
-# Ollama API Python Client Documentation
+# Ollama Toolkit Python Client Documentation
 
-Welcome to the documentation for the Ollama API Python client.
+Welcome to the documentation for the Ollama Toolkit Python client.
 
 ## Installation
 
@@ -11,7 +11,7 @@ pip install ollama-api
 ## Basic Usage
 
 ```python
-from ollama_api import OllamaClient
+from ollama_toolkit import OllamaClient
 
 client = OllamaClient()
 response = client.generate(model="llama2", prompt="Hello, world!")

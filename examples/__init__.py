@@ -1,3 +1,3 @@
 """
-Example scripts for using the ollama_api package.
+Example scripts for using the ollama_toolkit package.
 """

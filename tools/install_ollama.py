@@ -15,7 +15,7 @@ from typing import Tuple
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 try:
-    from ollama_api.utils.common import (
+    from ollama_toolkit.utils.common import (
         DEFAULT_OLLAMA_API_URL,
         check_ollama_installed,
         check_ollama_running,
@@ -57,7 +57,7 @@ def run_ollama() -> bool:
     if not is_installed:
         print_error(f"Ollama is not installed: {install_message}")
         print_info(
-            "Install Ollama first with: python -m ollama_api.tools.install_ollama --install"
+            "Install Ollama first with: python -m ollama_toolkit.tools.install_ollama --install"
         )
         return False
 
@@ -305,7 +305,7 @@ def main() -> None:
         else:
             print_error(f"Ollama is not installed: {install_message}")
             print_info(
-                "To install Ollama, run: python -m ollama_api.tools.install_ollama --install"
+                "To install Ollama, run: python -m ollama_toolkit.tools.install_ollama --install"
             )
             print_info("Or visit https://ollama.com/download")
             return
@@ -318,7 +318,7 @@ def main() -> None:
         else:
             print_warning(f"Ollama server is not running: {run_message}")
             print_info(
-                "To start Ollama server, run: python -m ollama_api.tools.install_ollama --start"
+                "To start Ollama server, run: python -m ollama_toolkit.tools.install_ollama --start"
             )
 
     elif args.install:
