@@ -284,20 +284,23 @@ def check_ollama_installed() -> Tuple[bool, str]:
 
 def check_ollama_running() -> Tuple[bool, str]:
     """
-    Check if Ollama server is running.
-
+    Check if the Ollama server is running.
+    
     Returns:
-        Tuple of (is_running, error_message_or_empty)
+        Tuple of (is_running, message)
     """
     try:
-        response = requests.get(f"{DEFAULT_OLLAMA_API_URL}/api/version", timeout=2)
-        if response.status_code == 200:
-            data = response.json()
-            return True, data.get("version", "Unknown version")
+        # Try to get the Ollama version
+        cmd = ["ollama", "version"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        
+        if result.returncode == 0:
+            version = result.stdout.strip()
+            return True, f"Ollama server is running (version: {version})"
         else:
-            return False, f"Ollama server returned status code {response.status_code}"
-    except requests.RequestException as e:
-        return False, str(e)
+            return False, "Ollama server is not running"
+    except Exception as e:
+        return False, f"Failed to check Ollama status: {str(e)}"
 
 
 def install_ollama() -> Tuple[bool, str]:

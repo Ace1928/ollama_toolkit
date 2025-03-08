@@ -9,9 +9,10 @@ import time
 from typing import (
     Any, Dict, List, Optional, Iterator, Union, 
     Callable, TypeVar, Awaitable, AsyncIterator, 
-    AsyncGenerator, cast, Tuple
+    AsyncGenerator, cast, Tuple, Generator  # Add Generator here
 )
 import os
+import json
 
 import requests
 import aiohttp
@@ -90,6 +91,25 @@ class OllamaClient:
         self.cache_ttl = cache_ttl
         self._response_cache: Dict[CacheKey, CacheValue] = {}
 
+    def _with_retry(self, func: Callable[[], T]) -> T:
+        """
+        Execute a function with retry logic.
+        
+        Args:
+            func: The function to execute
+            
+        Returns:
+            The result of the function
+        """
+        for attempt in range(self.max_retries):
+            try:
+                return func()
+            except (ConnectionError, TimeoutError) as e:
+                if attempt < self.max_retries - 1:
+                    time.sleep(self.retry_delay)
+                else:
+                    raise e
+
     def get_version(self) -> Dict[str, Any]:
         """
         Get the Ollama version.
@@ -120,27 +140,57 @@ class OllamaClient:
         )
 
     def generate(
-        self,
-        model: str,
-        prompt: str,
-        options: Optional[Dict[str, Any]] = None,
+        self, 
+        model: str, 
+        prompt: str, 
+        options: Optional[Dict[str, Any]] = None, 
         stream: bool = False
-    ) -> Union[Dict[str, Any], Iterator[Dict[str, Any]]]:
+    ) -> Union[Dict[str, Any], Generator[Dict[str, Any], None, None]]:
         """
-        Generate a completion for the prompt.
+        Generate a response from the model.
         
         Args:
-            model: The model name to use for generation
-            prompt: The prompt to generate a response for
+            model: The model to use
+            prompt: The prompt to send
             options: Additional model parameters
             stream: Whether to stream the response
             
         Returns:
-            Either a dictionary with the response or an iterator of response chunks
+            Response dictionary or generator for streaming responses
         """
-        # Implementation would go here
-        pass
-    
+        data = {"model": model, "prompt": prompt, "stream": stream}
+        
+        # Add options to data if provided
+        if isinstance(options, dict):
+            for key, value in options.items():
+                data[key] = value
+        
+        if stream:
+            # Handle streaming response
+            response = self._with_retry(lambda: requests.post(
+                f"{self.base_url}/api/generate",
+                json=data,
+                stream=True,
+                timeout=self.timeout
+            ))
+            
+            def response_generator():
+                for line in response.iter_lines():
+                    if line:
+                        yield json.loads(line)
+            
+            return response_generator()
+        else:
+            # Handle non-streaming response using make_api_request
+            response = make_api_request(
+                "POST", 
+                "/api/generate", 
+                data=data,
+                base_url=self.base_url,
+                timeout=self.timeout
+            )
+            return response.json()
+            
     async def agenerate(
         self,
         model: str,
@@ -164,27 +214,56 @@ class OllamaClient:
         pass
     
     def chat(
-        self,
-        model: str,
-        messages: List[Dict[str, str]],
-        options: Optional[Dict[str, Any]] = None,
-        stream: bool = False
-    ) -> Union[Dict[str, Any], Iterator[Dict[str, Any]]]:
+        self, 
+        model: str, 
+        messages: List[Dict[str, str]], 
+        stream: bool = True,
+        options: Optional[Dict[str, Any]] = None
+    ) -> Union[Dict[str, Any], Generator[Dict[str, Any], None, None]]:
         """
-        Generate a chat response for the given messages.
+        Send a chat request to the model.
         
         Args:
-            model: The model name to use for generation
-            messages: List of message dictionaries with 'role' and 'content'
-            options: Additional model parameters
+            model: The model to use
+            messages: List of message dictionaries
             stream: Whether to stream the response
+            options: Additional model parameters
             
         Returns:
-            Either a dictionary with the response or an iterator of response chunks
+            Response dictionary or generator for streaming responses
         """
-        # Implementation would go here
-        pass
-    
+        data = {"model": model, "messages": messages, "stream": stream}
+        
+        # Add options to data if provided
+        if isinstance(options, dict):
+            data.update(options)
+        
+        if stream:
+            # Handle streaming response
+            response = self._with_retry(lambda: requests.post(
+                f"{self.base_url}/api/chat",
+                json=data,
+                stream=True,
+                timeout=self.timeout
+            ))
+            
+            def response_generator():
+                for line in response.iter_lines():
+                    if line:
+                        yield json.loads(line)
+            
+            return response_generator()
+        else:
+            # Handle non-streaming response using make_api_request
+            response = make_api_request(
+                "POST", 
+                "/api/chat", 
+                data=data,
+                base_url=self.base_url,
+                timeout=self.timeout
+            )
+            return response.json()
+            
     async def achat(
         self,
         model: str,
@@ -208,24 +287,36 @@ class OllamaClient:
         pass
     
     def create_embedding(
-        self,
-        model: str,
-        prompt: str,
+        self, 
+        model: str, 
+        prompt: str, 
         options: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
-        Create an embedding vector for the given text.
+        Create embeddings for the given prompt.
         
         Args:
-            model: The model name to use for embedding
-            prompt: The text to create an embedding for
+            model: The model to use
+            prompt: The text to embed
             options: Additional model parameters
             
         Returns:
-            Dictionary containing the embedding
+            Response dictionary with embeddings
         """
-        # Implementation would go here
-        pass
+        data = {"model": model, "prompt": prompt}
+        
+        # Add options to data if provided
+        if isinstance(options, dict):
+            data.update(options)
+        
+        response = make_api_request(
+            "POST", 
+            "/api/embed", 
+            data=data,
+            base_url=self.base_url,
+            timeout=self.timeout
+        )
+        return response.json()
     
     async def acreate_embedding(
         self,

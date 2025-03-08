@@ -152,7 +152,7 @@ class TestChat(unittest.TestCase):
         # Assert results - should fail gracefully
         self.assertFalse(success)
         self.assertIsNone(response)
-        mock_post.assert_called_once()
+        self.assertEqual(mock_post.call_count, 2)  # Called twice: once for primary, once for fallback
 
     def test_initialize_chat(self) -> None:
         """Test chat initialization."""

@@ -10,6 +10,7 @@ authors = [
     { name = "Lloyd Handyside", email = "ace1928@gmail.com" }
 ]
 license = {text = "MIT"}
+
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
@@ -54,6 +55,8 @@ py-modules = [
     "client", 
     "exceptions"
 ]
+# Removed the license_files property as it's not valid here
+# The LICENSE file is already included via MANIFEST.in
 
 [tool.black]
 line-length = 88

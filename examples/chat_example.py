@@ -16,7 +16,16 @@ from colorama import Fore, Style, init
 # Initialize colorama for cross-platform colored terminal output
 init()
 
-# Try to import as a package first, then try relative imports
+# Import strategy:
+# 1. Try direct package import (works when installed or in PYTHONPATH)
+# 2. Try relative import by adjusting path (works when run directly)
+# 3. Provide clear error if both fail
+
+# Store original path to restore later if needed
+original_sys_path = sys.path.copy()
+import_success = False
+
+# Try package import first (when installed via pip or in development with -e)
 try:
     from ollama_api.utils.common import (
         DEFAULT_OLLAMA_API_URL,
@@ -24,16 +33,23 @@ try:
         print_header,
         print_info,
         print_success,
+        print_warning,
     )
     from ollama_api.utils.model_constants import (
         BACKUP_CHAT_MODEL,
         DEFAULT_CHAT_MODEL,
     )
+    import_success = True
+    print_info("Imported modules from installed package")
 except ImportError:
+    # Reset path before trying the next approach
+    sys.path = original_sys_path
+    
     # Add parent directory to path for direct execution
-    sys.path.insert(
-        0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-    )
+    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+    if parent_dir not in sys.path:
+        sys.path.insert(0, parent_dir)
+    
     try:
         from ollama_api.utils.common import (
             DEFAULT_OLLAMA_API_URL,
@@ -41,18 +57,68 @@ except ImportError:
             print_header,
             print_info,
             print_success,
+            print_warning,
         )
         from ollama_api.utils.model_constants import (
             BACKUP_CHAT_MODEL,
             DEFAULT_CHAT_MODEL,
         )
+        import_success = True
+        print_info(f"Imported modules using path adjustment to {parent_dir}")
     except ImportError as e:
-        print(f"Error importing required modules: {e}")
-        print("Please install the package using: pip install -e /path/to/ollama_api")
-        sys.exit(1)
+        # Try one more approach - going up two directories
+        sys.path = original_sys_path
+        grandparent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+        if grandparent_dir not in sys.path:
+            sys.path.insert(0, grandparent_dir)
+        
+        try:
+            from ollama_api.utils.common import (
+                DEFAULT_OLLAMA_API_URL,
+                print_error,
+                print_header,
+                print_info,
+                print_success,
+                print_warning,
+            )
+            from ollama_api.utils.model_constants import (
+                BACKUP_CHAT_MODEL,
+                DEFAULT_CHAT_MODEL,
+            )
+            import_success = True
+            print_info(f"Imported modules using path adjustment to {grandparent_dir}")
+        except ImportError as e:
+            print(f"Error importing required modules: {e}")
+            print(f"Current sys.path: {sys.path}")
+            print("Please install the package using: pip install -e /path/to/ollama_api")
+            sys.exit(1)
+
+if not import_success:
+    print("Failed to import required modules despite multiple attempts")
+    sys.exit(1)
 
 # Define message type for better type checking
 Message = Dict[str, str]
+
+
+def initialize_chat(model: str, system_message: Optional[str] = None) -> List[Message]:
+    """
+    Initialize a chat session with optional system message.
+    
+    Args:
+        model: The model to use for chat
+        system_message: Optional system message to set context
+        
+    Returns:
+        List of initial messages
+    """
+    messages: List[Message] = []
+    
+    # Add system message if provided
+    if system_message:
+        messages.append({"role": "system", "content": system_message})
+        
+    return messages
 
 
 def parse_json_stream(line: bytes) -> Generator[Dict[str, Any], None, None]:
@@ -206,6 +272,92 @@ def chat(
                 BACKUP_CHAT_MODEL, messages, options, base_url, use_fallback=False
             )
         return None
+
+
+def chat_streaming(
+    model: str,
+    messages: List[Message],
+    options: Optional[Dict[str, Any]] = None,
+    base_url: str = DEFAULT_OLLAMA_API_URL,
+    use_fallback: bool = True,
+) -> Tuple[bool, Optional[Dict[str, str]]]:
+    """
+    Stream a chat response from the Ollama API.
+    
+    Args:
+        model: The name of the model to use
+        messages: List of message objects with role and content
+        options: Optional dictionary of model parameters
+        base_url: The base URL of the Ollama API
+        use_fallback: Whether to try the backup model if the primary fails
+        
+    Returns:
+        Tuple of (success boolean, response dictionary or None)
+    """
+    print_header(f"Starting streaming chat with model: {model}")
+    
+    # Prepare the request data
+    data = {
+        "model": model,
+        "messages": messages,
+        "stream": True,
+    }
+    
+    if options:
+        data["options"] = options
+    
+    # Initialize variables to collect streaming response
+    full_content = ""
+    response: Dict[str, str] = {"role": "assistant", "content": ""}
+    
+    try:
+        # Make the API request
+        url = f"{base_url}/api/chat"
+        resp = requests.post(url, json=data, stream=True)
+        resp.raise_for_status()
+        
+        # Process the streaming response
+        print_info("Receiving streaming response...")
+        
+        for line in resp.iter_lines():
+            if line:
+                try:
+                    # Parse the JSON chunk
+                    chunks = parse_json_stream(line)
+                    for chunk in chunks:
+                        if chunk.get("message", {}).get("content"):
+                            content = chunk["message"]["content"]
+                            full_content += content
+                            print(content, end="", flush=True)
+                        
+                        # Update the response with the final content
+                        if chunk.get("done", False):
+                            response["content"] = full_content
+                            print()  # End the line
+                            print_success("Chat streaming completed successfully!")
+                            return True, response
+                
+                except json.JSONDecodeError:
+                    print_error(f"Failed to parse response: {line.decode('utf-8')}")
+        
+        # If we get here without returning, the stream ended without a done message
+        if full_content:
+            response["content"] = full_content
+            return True, response
+        
+        return False, None
+        
+    except Exception as e:  # Catch all exceptions, not just RequestException
+        print_error(f"Error with model {model}: {str(e)}")
+        
+        # Try fallback model if enabled and not already using it
+        if use_fallback and model != BACKUP_CHAT_MODEL:
+            print_info(f"Attempting fallback to backup model: {BACKUP_CHAT_MODEL}")
+            return chat_streaming(
+                BACKUP_CHAT_MODEL, messages, options, base_url, use_fallback=False
+            )
+        
+        return False, None
 
 
 def main() -> None:
