@@ -5,7 +5,7 @@ This package provides a convenient interface to interact with the Ollama Toolkit
 elevated to peak Eidosian perfection.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.5"
 __author__ = "Lloyd Handyside"
 __email__ = "ace1928@gmail.com"
 
