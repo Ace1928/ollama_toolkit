@@ -1,5 +1,5 @@
 const DOCUMENTATION_OPTIONS = {
-    VERSION: '0.1.0',
+    VERSION: '0.1.8',  // Update from 0.1.0 to 0.1.8
     LANGUAGE: 'en',
     COLLAPSE_INDEX: false,
     BUILDER: 'html',

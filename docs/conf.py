@@ -8,7 +8,8 @@ sys.path.insert(0, os.path.abspath('..'))  # Add project root to path
 project = 'Ollama Toolkit'
 copyright = '2025, Lloyd Handyside'
 author = 'Lloyd Handyside'
-release = '0.1.0'
+version = '0.1.8'
+release = '0.1.8'
 
 # Extensions
 extensions = [
@@ -20,7 +21,7 @@ extensions = [
 ]
 
 # HTML output settings
-html_theme = 'sphinx_rtd_theme'  # Use the default Alabaster theme
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -42,5 +43,3 @@ source_suffix = {
     '.md': 'markdown',
 }
 
-# Other settings
-autodoc_member_order = 'bysource'

@@ -5,10 +5,13 @@ Ollama Toolkit: Embedding Example
 This script demonstrates how to use the Ollama Embedding API to create text embeddings.
 """
 
-import argparse
+# Standard library imports first
 import os
 import sys
-from typing import Any, Dict, List, Optional
+import argparse
+import json
+import logging
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import requests
@@ -25,17 +28,16 @@ try:
         print_header,
         print_info,
         print_success,
-        print_warning,
     )
     from ollama_toolkit.utils.model_constants import (
-        BACKUP_EMBEDDING_MODEL,
-        DEFAULT_EMBEDDING_MODEL,
+        DEFAULT_CHAT_MODEL,
+        BACKUP_CHAT_MODEL,
     )
 except ImportError:
     # Add parent directory to path for direct execution
-    sys.path.insert(
-        0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-    )
+    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    if parent_dir not in sys.path:
+        sys.path.insert(0, parent_dir)
     try:
         from ollama_toolkit.utils.common import (
             DEFAULT_OLLAMA_API_URL,
@@ -43,7 +45,6 @@ except ImportError:
             print_header,
             print_info,
             print_success,
-            print_warning,
         )
         from ollama_toolkit.utils.model_constants import (
             BACKUP_EMBEDDING_MODEL,

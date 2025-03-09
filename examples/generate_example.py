@@ -5,12 +5,13 @@ Ollama Toolkit: Generate Example
 This script demonstrates how to use the Ollama Generate API to create completions.
 """
 
-import argparse
-import json
+# Standard library imports first
 import os
 import sys
-import time
-from typing import Any, Dict, Optional, Tuple
+import argparse
+import json
+import logging
+from typing import Dict, List, Optional, Tuple
 
 import requests
 from colorama import Fore, Style, init
@@ -22,31 +23,23 @@ init()
 try:
     from ollama_toolkit.utils.common import (
         DEFAULT_OLLAMA_API_URL,
-        print_error,
-        print_header,
-        print_info,
-        print_success,
+        print_error, print_header, print_info, print_success
     )
     from ollama_toolkit.utils.model_constants import (
-        BACKUP_CHAT_MODEL,
-        DEFAULT_CHAT_MODEL,
+        DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL
     )
 except ImportError:
     # Add parent directory to path for direct execution
-    sys.path.insert(
-        0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-    )
+    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    if parent_dir not in sys.path:
+        sys.path.insert(0, parent_dir)
     try:
         from ollama_toolkit.utils.common import (
             DEFAULT_OLLAMA_API_URL,
-            print_error,
-            print_header,
-            print_info,
-            print_success,
+            print_error, print_header, print_info, print_success
         )
         from ollama_toolkit.utils.model_constants import (
-            BACKUP_CHAT_MODEL,
-            DEFAULT_CHAT_MODEL,
+            DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL
         )
     except ImportError as e:
         print(f"Error importing required modules: {e}")

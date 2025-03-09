@@ -14,13 +14,45 @@ Following EIDOSIAN principles of excellence:
 - Flow Like a River: Seamless transitions between stages
 """
 
+# Standard library imports first
 import os
 import sys
+import argparse
+import json
+import logging
+from typing import Dict, List, Optional, Tuple
+
+# Try to import as a package first, then try relative imports
+try:
+    from ollama_toolkit.utils.common import (
+        DEFAULT_OLLAMA_API_URL,
+        print_error, print_header, print_info, print_success
+    )
+    from ollama_toolkit.utils.model_constants import (
+        DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL
+    )
+except ImportError:
+    # Add parent directory to path for direct execution
+    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    if parent_dir not in sys.path:
+        sys.path.insert(0, parent_dir)
+    try:
+        from ollama_toolkit.utils.common import (
+            DEFAULT_OLLAMA_API_URL,
+            print_error, print_header, print_info, print_success
+        )
+        from ollama_toolkit.utils.model_constants import (
+            DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL
+        )
+    except ImportError as e:
+        print(f"Error importing required modules: {e}")
+        print("Please install the package using: pip install -e /path/to/ollama_toolkit")
+        sys.exit(1)
+
 import time
 import socket
 import requests
 import subprocess
-from typing import Dict, List, Set, Optional, Tuple
 from colorama import Fore, Style, init
 
 # Initialize colorama for cross-platform color support
@@ -34,8 +66,7 @@ import_success = False
 
 # Try approach 1: Direct import (when the package is installed)
 try:
-    from ollama_toolkit import OllamaClient, print_header, print_error, print_success, print_info, print_warning
-    from ollama_toolkit.utils.common import ensure_ollama_running, check_ollama_running, check_ollama_installed
+    from ollama_toolkit import OllamaClient, print_warning
     import_success = True
     print_info("Using installed ollama_toolkit package")
 except ImportError:
@@ -48,8 +79,7 @@ except ImportError:
         if parent_dir not in sys.path:
             sys.path.insert(0, parent_dir)
         
-        from ollama_toolkit import OllamaClient, print_header, print_error, print_success, print_info, print_warning
-        from ollama_toolkit.utils.common import ensure_ollama_running, check_ollama_running, check_ollama_installed
+        from ollama_toolkit import OllamaClient, print_warning
         import_success = True
         print_info(f"Using ollama_toolkit from: {parent_dir}")
     except ImportError:
@@ -61,8 +91,7 @@ except ImportError:
             if grandparent_dir not in sys.path:
                 sys.path.insert(0, grandparent_dir)
             
-            from ollama_toolkit import OllamaClient, print_header, print_error, print_success, print_info, print_warning
-            from ollama_toolkit.utils.common import ensure_ollama_running, check_ollama_running, check_ollama_installed
+            from ollama_toolkit import OllamaClient, print_warning
             import_success = True
             print_info(f"Using ollama_toolkit from: {grandparent_dir}")
         except ImportError:

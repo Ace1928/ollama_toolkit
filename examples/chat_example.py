@@ -3,12 +3,12 @@
 Example of using the Ollama Toolkit client for chat interactions.
 """
 
-import argparse
-import json
 import os
 import sys
-import time
-from typing import Any, Dict, Generator, List, Optional, Tuple, cast
+import argparse
+import json
+import logging
+from typing import Dict, List, Optional, Tuple
 
 import requests
 from colorama import Fore, Style, init
@@ -16,86 +16,32 @@ from colorama import Fore, Style, init
 # Initialize colorama for cross-platform colored terminal output
 init()
 
-# Import strategy:
-# 1. Try direct package import (works when installed or in PYTHONPATH)
-# 2. Try relative import by adjusting path (works when run directly)
-# 3. Provide clear error if both fail
-
-# Store original path to restore later if needed
-original_sys_path = sys.path.copy()
-import_success = False
-
-# Try package import first (when installed via pip or in development with -e)
+# Try to import as a package first, then try relative imports
 try:
     from ollama_toolkit.utils.common import (
         DEFAULT_OLLAMA_API_URL,
-        print_error,
-        print_header,
-        print_info,
-        print_success,
-        print_warning,
+        print_error, print_header, print_info, print_success
     )
     from ollama_toolkit.utils.model_constants import (
-        BACKUP_CHAT_MODEL,
-        DEFAULT_CHAT_MODEL,
+        DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL
     )
-    import_success = True
-    print_info("Imported modules from installed package")
 except ImportError:
-    # Reset path before trying the next approach
-    sys.path = original_sys_path
-    
     # Add parent directory to path for direct execution
-    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
     if parent_dir not in sys.path:
         sys.path.insert(0, parent_dir)
-    
     try:
         from ollama_toolkit.utils.common import (
             DEFAULT_OLLAMA_API_URL,
-            print_error,
-            print_header,
-            print_info,
-            print_success,
-            print_warning,
+            print_error, print_header, print_info, print_success
         )
         from ollama_toolkit.utils.model_constants import (
-            BACKUP_CHAT_MODEL,
-            DEFAULT_CHAT_MODEL,
+            DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL
         )
-        import_success = True
-        print_info(f"Imported modules using path adjustment to {parent_dir}")
     except ImportError as e:
-        # Try one more approach - going up two directories
-        sys.path = original_sys_path
-        grandparent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-        if grandparent_dir not in sys.path:
-            sys.path.insert(0, grandparent_dir)
-        
-        try:
-            from ollama_toolkit.utils.common import (
-                DEFAULT_OLLAMA_API_URL,
-                print_error,
-                print_header,
-                print_info,
-                print_success,
-                print_warning,
-            )
-            from ollama_toolkit.utils.model_constants import (
-                BACKUP_CHAT_MODEL,
-                DEFAULT_CHAT_MODEL,
-            )
-            import_success = True
-            print_info(f"Imported modules using path adjustment to {grandparent_dir}")
-        except ImportError as e:
-            print(f"Error importing required modules: {e}")
-            print(f"Current sys.path: {sys.path}")
-            print("Please install the package using: pip install -e /path/to/ollama_toolkit")
-            sys.exit(1)
-
-if not import_success:
-    print("Failed to import required modules despite multiple attempts")
-    sys.exit(1)
+        print(f"Error importing required modules: {e}")
+        print("Please install the package using: pip install -e /path/to/ollama_toolkit")
+        sys.exit(1)
 
 # Define message type for better type checking
 Message = Dict[str, str]
