@@ -122,6 +122,7 @@ changelog
 ```{toctree}
 :maxdepth: 1
 :caption: 🧩 API Endpoints
+:hidden:
 
 version
 generate
