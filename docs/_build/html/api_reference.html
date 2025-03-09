@@ -1,0 +1,585 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference &mdash; Ollama Toolkit 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ollama Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">API Reference</a><ul>
+<li><a class="reference internal" href="#ollamaclient">OllamaClient</a><ul>
+<li><a class="reference internal" href="#constructor-parameters">Constructor Parameters</a></li>
+<li><a class="reference internal" href="#core-methods">Core Methods</a><ul>
+<li><a class="reference internal" href="#text-generation">Text Generation</a><ul>
+<li><a class="reference internal" href="#generate">generate</a></li>
+<li><a class="reference internal" href="#agenerate">agenerate</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#chat-completion">Chat Completion</a><ul>
+<li><a class="reference internal" href="#chat">chat</a></li>
+<li><a class="reference internal" href="#achat">achat</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#embeddings">Embeddings</a><ul>
+<li><a class="reference internal" href="#create-embedding">create_embedding</a></li>
+<li><a class="reference internal" href="#acreate-embedding">acreate_embedding</a></li>
+<li><a class="reference internal" href="#batch-embeddings">batch_embeddings</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#model-management">Model Management</a><ul>
+<li><a class="reference internal" href="#list-models">list_models</a></li>
+<li><a class="reference internal" href="#get-model-info">get_model_info</a></li>
+<li><a class="reference internal" href="#pull-model">pull_model</a></li>
+<li><a class="reference internal" href="#delete-model">delete_model</a></li>
+<li><a class="reference internal" href="#copy-model">copy_model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#miscellaneous">Miscellaneous</a><ul>
+<li><a class="reference internal" href="#get-version">get_version</a></li>
+<li><a class="reference internal" href="#aget-version">aget_version</a></li>
+<li><a class="reference internal" href="#messages-to-prompt">_messages_to_prompt</a></li>
+<li><a class="reference internal" href="#is-likely-embedding-model">_is_likely_embedding_model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eidosian-note">Eidosian Note</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exception-classes">Exception Classes</a></li>
+<li><a class="reference internal" href="#utility-functions">Utility Functions</a><ul>
+<li><a class="reference internal" href="#display-functions">Display Functions</a></li>
+<li><a class="reference internal" href="#api-utilities">API Utilities</a></li>
+<li><a class="reference internal" href="#ollama-management">Ollama Management</a></li>
+<li><a class="reference internal" href="#model-constants">Model Constants</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ollama Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api_reference.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<p>This document—a precision-engineered blueprint—details all classes and methods provided by the Ollama Toolkit client.</p>
+<section id="ollamaclient">
+<h2>OllamaClient<a class="headerlink" href="#ollamaclient" title="Link to this heading"></a></h2>
+<p>The main class for interacting with the Ollama Toolkit, designed with contextual integrity and recursive refinement.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ollama_toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">OllamaClient</span>
+
+<span class="c1"># Initialize with optimal defaults - each parameter carefully calibrated</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">OllamaClient</span><span class="p">(</span>
+    <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;http://localhost:11434/&quot;</span><span class="p">,</span>  <span class="c1"># Foundational connection point</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>                         <span class="c1"># Generous yet bounded timeout window</span>
+    <span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>                       <span class="c1"># Optimal retry balance for resilience</span>
+    <span class="n">retry_delay</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>                     <span class="c1"># Mathematically sound exponential backoff</span>
+    <span class="n">cache_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                 <span class="c1"># Toggle for performance optimization</span>
+    <span class="n">cache_ttl</span><span class="o">=</span><span class="mf">300.0</span>                      <span class="c1"># Time-bounded memory efficiency</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<section id="constructor-parameters">
+<h3>Constructor Parameters<a class="headerlink" href="#constructor-parameters" title="Link to this heading"></a></h3>
+<p>Each parameter precisely tuned for maximum effect:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">base_url</span></code> (str): The base URL of the Ollama Toolkit server. Default: “http://localhost:11434/”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">timeout</span></code> (int): Default timeout for API requests in seconds. Default: 300</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_retries</span></code> (int): Maximum number of retry attempts for failed requests. Default: 3</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">retry_delay</span></code> (float): Delay between retry attempts in seconds. Default: 1.0</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cache_enabled</span></code> (bool): Whether to cache API responses. Default: False</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cache_ttl</span></code> (float): Cache time-to-live in seconds. Default: 300.0 (5 minutes)</p></li>
+</ul>
+</section>
+<section id="core-methods">
+<h3>Core Methods<a class="headerlink" href="#core-methods" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>generate / agenerate — Text generation with precision</p></li>
+<li><p>chat / achat — Conversational flow with structure</p></li>
+<li><p>create_embedding / acreate_embedding — Vector transformation with mathematical elegance</p></li>
+<li><p>list_models / pull_model / delete_model — Model lifecycle management</p></li>
+<li><p>get_version / check_ollama_installed / ensure_ollama_running — System verification</p></li>
+</ul>
+<p>For maximum compatibility with autodoc systems, each function uses a Google-style docstring format with a brief summary, argument descriptions, and return values.</p>
+<section id="text-generation">
+<h4>Text Generation<a class="headerlink" href="#text-generation" title="Link to this heading"></a></h4>
+<section id="generate">
+<h5>generate<a class="headerlink" href="#generate" title="Link to this heading"></a></h5>
+<p>Generate a completion for the given prompt with recursive refinement.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;llama2&quot;</span><span class="p">,</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="s2">&quot;Explain quantum computing in simple terms&quot;</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">},</span>  <span class="c1"># Precisely tuned randomness</span>
+    <span class="n">stream</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> (str): The model name to use for generation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prompt</span></code> (str): The prompt to generate a response for</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">options</span></code> (dict, optional): Additional model parameters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stream</span></code> (bool, optional): Whether to stream the response. Default: False</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">stream=False</span></code>: A dictionary containing the response</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">stream=True</span></code>: An iterator yielding response chunks</p></li>
+</ul>
+<p><strong>Options Dictionary Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">temperature</span></code> (float): Controls randomness in generation. Higher values (e.g., 0.8) make output more random, lower values (e.g., 0.2) make it more deterministic</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">top_p</span></code> (float): Controls diversity via nucleus sampling. Default: 1.0</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">top_k</span></code> (int): Limits token selection to top K options. Default: -1 (disabled)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_tokens</span></code> (int): Maximum number of tokens to generate. Default varies by model</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">presence_penalty</span></code> (float): Penalty for token repetition. Default: 0.0</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frequency_penalty</span></code> (float): Penalty based on frequency in text. Default: 0.0</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stop</span></code> (list): Sequences where the API will stop generating further tokens</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seed</span></code> (int): Random number seed for reproducible outputs</p></li>
+</ul>
+</section>
+<section id="agenerate">
+<h5>agenerate<a class="headerlink" href="#agenerate" title="Link to this heading"></a></h5>
+<p>Asynchronous version of <code class="docutils literal notranslate"><span class="pre">generate</span></code>. <em>(Note: This method is planned but not fully implemented in the current version)</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">agenerate</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;llama2&quot;</span><span class="p">,</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="s2">&quot;Explain quantum computing in simple terms&quot;</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">},</span>
+    <span class="n">stream</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">stream=False</span></code>: A dictionary containing the response</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">stream=True</span></code>: An async iterator yielding response chunks</p></li>
+</ul>
+</section>
+</section>
+<section id="chat-completion">
+<h4>Chat Completion<a class="headerlink" href="#chat-completion" title="Link to this heading"></a></h4>
+<section id="chat">
+<h5>chat<a class="headerlink" href="#chat" title="Link to this heading"></a></h5>
+<p>Generate a chat response for the given messages.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;You are a helpful assistant.&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Tell me about neural networks.&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;llama2&quot;</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">},</span>
+    <span class="n">stream</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> (str): The model name to use for generation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">messages</span></code> (list): List of message dictionaries with ‘role’ and ‘content’ keys</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">options</span></code> (dict, optional): Additional model parameters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stream</span></code> (bool, optional): Whether to stream the response. Default: True</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">stream=False</span></code>: A dictionary containing the response</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">stream=True</span></code>: An iterator yielding response chunks</p></li>
+</ul>
+<p><strong>Message Object Structure</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">role</span></code> (str): The role of the message - “system”, “user”, “assistant”, or “tool”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">content</span></code> (str): The content of the message</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">images</span></code> (list, optional): For multimodal models, a list of image data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tool_calls</span></code> (list, optional): For function calling, a list of tool call objects</p></li>
+</ul>
+</section>
+<section id="achat">
+<h5>achat<a class="headerlink" href="#achat" title="Link to this heading"></a></h5>
+<p>Asynchronous version of <code class="docutils literal notranslate"><span class="pre">chat</span></code>. <em>(Note: This method is planned but not fully implemented in the current version)</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">achat</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;llama2&quot;</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">},</span>
+    <span class="n">stream</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="embeddings">
+<h4>Embeddings<a class="headerlink" href="#embeddings" title="Link to this heading"></a></h4>
+<section id="create-embedding">
+<h5>create_embedding<a class="headerlink" href="#create-embedding" title="Link to this heading"></a></h5>
+<p>Create an embedding vector for the given text.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">embedding</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_embedding</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;nomic-embed-text&quot;</span><span class="p">,</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="s2">&quot;This is a sample text for embedding.&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> (str): The model name to use for embedding</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prompt</span></code> (str): The text to create an embedding for</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">options</span></code> (dict, optional): Additional model parameters</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>A dictionary containing the embedding vector</p></li>
+</ul>
+<p><strong>Response Structure</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> (str): The model name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">embedding</span></code> (list): The embedding vector (array of floats)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">total_duration</span></code> (int): Time spent generating embeddings (nanoseconds)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prompt_eval_count</span></code> (int): Number of tokens processed</p></li>
+</ul>
+</section>
+<section id="acreate-embedding">
+<h5>acreate_embedding<a class="headerlink" href="#acreate-embedding" title="Link to this heading"></a></h5>
+<p>Asynchronous version of <code class="docutils literal notranslate"><span class="pre">create_embedding</span></code>. <em>(Note: This method is planned but not fully implemented in the current version)</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">embedding</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">acreate_embedding</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;nomic-embed-text&quot;</span><span class="p">,</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="s2">&quot;This is a sample text for embedding.&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="batch-embeddings">
+<h5>batch_embeddings<a class="headerlink" href="#batch-embeddings" title="Link to this heading"></a></h5>
+<p>Create embeddings for multiple prompts efficiently. <em>(Note: This method is planned but not fully implemented in the current version)</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">embeddings</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">batch_embeddings</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;nomic-embed-text&quot;</span><span class="p">,</span>
+    <span class="n">prompts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Text one&quot;</span><span class="p">,</span> <span class="s2">&quot;Text two&quot;</span><span class="p">,</span> <span class="s2">&quot;Text three&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> (str): The model name to use for embedding</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prompts</span></code> (list): List of texts to create embeddings for</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">options</span></code> (dict, optional): Additional model parameters</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>A list of dictionaries containing embeddings</p></li>
+</ul>
+</section>
+</section>
+<section id="model-management">
+<h4>Model Management<a class="headerlink" href="#model-management" title="Link to this heading"></a></h4>
+<section id="list-models">
+<h5>list_models<a class="headerlink" href="#list-models" title="Link to this heading"></a></h5>
+<p>List available models.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">models</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">list_models</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>A dictionary containing the list of available models</p></li>
+</ul>
+<p><strong>Response Structure</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">models</span></code> (list): A list of model objects containing:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> (str): The model name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">size</span></code> (int): Size in bytes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">modified_at</span></code> (str): Timestamp of last modification</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">digest</span></code> (str): Model digest</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">details</span></code> (object): Additional model details</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="get-model-info">
+<h5>get_model_info<a class="headerlink" href="#get-model-info" title="Link to this heading"></a></h5>
+<p>Get information about a specific model. <em>(Note: This method is planned but not fully implemented in the current version)</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_info</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_model_info</span><span class="p">(</span><span class="s2">&quot;llama2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> (str): The model name</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>A dictionary containing model information</p></li>
+</ul>
+</section>
+<section id="pull-model">
+<h5>pull_model<a class="headerlink" href="#pull-model" title="Link to this heading"></a></h5>
+<p>Pull a model from the Ollama registry.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Non-streaming</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">pull_model</span><span class="p">(</span><span class="s2">&quot;llama2&quot;</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Streaming with progress updates</span>
+<span class="k">for</span> <span class="n">update</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">pull_model</span><span class="p">(</span><span class="s2">&quot;llama2&quot;</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Progress: </span><span class="si">{</span><span class="n">update</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> (str): The model name to pull</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stream</span></code> (bool, optional): Whether to stream the download progress. Default: False</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">stream=False</span></code>: A dictionary with the status</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">stream=True</span></code>: An iterator of status updates</p></li>
+</ul>
+<p><strong>Stream Update Structure</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code> (str): Status message like “downloading”, “processing”, “success”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">completed</span></code> (int): Bytes downloaded (present during downloading)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">total</span></code> (int): Total bytes to download (present during downloading)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">digest</span></code> (str): Model digest (present during downloading)</p></li>
+</ul>
+</section>
+<section id="delete-model">
+<h5>delete_model<a class="headerlink" href="#delete-model" title="Link to this heading"></a></h5>
+<p>Delete a model.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">success</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete_model</span><span class="p">(</span><span class="s2">&quot;llama2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> (str): The model name to delete</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>A boolean indicating success or failure</p></li>
+</ul>
+</section>
+<section id="copy-model">
+<h5>copy_model<a class="headerlink" href="#copy-model" title="Link to this heading"></a></h5>
+<p>Copy a model to a new name. <em>(Note: This method is planned but not fully implemented in the current version)</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">copy_model</span><span class="p">(</span><span class="s2">&quot;llama2&quot;</span><span class="p">,</span> <span class="s2">&quot;my-llama2-copy&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code> (str): The source model name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destination</span></code> (str): The destination model name</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>A dictionary containing the status</p></li>
+</ul>
+</section>
+</section>
+<section id="miscellaneous">
+<h4>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Link to this heading"></a></h4>
+<section id="get-version">
+<h5>get_version<a class="headerlink" href="#get-version" title="Link to this heading"></a></h5>
+<p>Get the Ollama version.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">version</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ollama version: </span><span class="si">{</span><span class="n">version</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>A dictionary containing version information</p></li>
+</ul>
+</section>
+<section id="aget-version">
+<h5>aget_version<a class="headerlink" href="#aget-version" title="Link to this heading"></a></h5>
+<p>Asynchronous version of <code class="docutils literal notranslate"><span class="pre">get_version</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">version</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">aget_version</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="messages-to-prompt">
+<h5>_messages_to_prompt<a class="headerlink" href="#messages-to-prompt" title="Link to this heading"></a></h5>
+<p>Convert chat messages to a unified prompt string for models that don’t support chat format.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">_messages_to_prompt</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">messages</span></code> (list): List of message dictionaries</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p>A formatted prompt string</p></li>
+</ul>
+</section>
+<section id="is-likely-embedding-model">
+<h5>_is_likely_embedding_model<a class="headerlink" href="#is-likely-embedding-model" title="Link to this heading"></a></h5>
+<p>Check if a model is likely to be an embedding-only model based on name patterns.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">is_embedding</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">_is_likely_embedding_model</span><span class="p">(</span><span class="s2">&quot;nomic-embed-text&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model_name</span></code> (str): Name of the model to check</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the model is likely embedding-only, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="eidosian-note">
+<h3>Eidosian Note<a class="headerlink" href="#eidosian-note" title="Link to this heading"></a></h3>
+<p>We strive for recursive excellence:</p>
+<ul class="simple">
+<li><p><strong>Recursive Refinement:</strong> Each function evolves toward perfection through rigorous testing and user feedback</p></li>
+<li><p><strong>Humor as Cognitive Leverage:</strong> Error messages enlighten through carefully calibrated wit</p></li>
+<li><p><strong>Structure as Control:</strong> Every parameter and return type forms a precise architectural blueprint</p></li>
+<li><p><strong>Velocity as Intelligence:</strong> Functions optimized for lightning-fast execution without sacrificing depth</p></li>
+</ul>
+</section>
+</section>
+<section id="exception-classes">
+<h2>Exception Classes<a class="headerlink" href="#exception-classes" title="Link to this heading"></a></h2>
+<p>The package provides precisely engineered exception types for clear error handling:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OllamaAPIError</span></code>: Base exception class for all Ollama Toolkit errors</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConnectionError</span></code>: Raised when connection to the API fails</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TimeoutError</span></code>: Raised when an API request times out</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ModelNotFoundError</span></code>: Raised when a requested model is not found</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ServerError</span></code>: Raised when the API server returns a 5xx error</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">InvalidRequestError</span></code>: Raised when the API server returns a 4xx error</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">StreamingError</span></code>: Raised when there’s an error during streaming responses</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ParseError</span></code>: Raised when there’s an error parsing API responses</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AuthenticationError</span></code>: Raised when authentication fails</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">EndpointNotFoundError</span></code>: Raised when an API endpoint is not found</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ModelCompatibilityError</span></code>: Raised when a model doesn’t support an operation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">StreamingTimeoutError</span></code>: Raised when a streaming response times out</p></li>
+</ul>
+</section>
+<section id="utility-functions">
+<h2>Utility Functions<a class="headerlink" href="#utility-functions" title="Link to this heading"></a></h2>
+<p>The package provides several utility functions in <code class="docutils literal notranslate"><span class="pre">ollama_toolkit.utils.common</span></code>:</p>
+<section id="display-functions">
+<h3>Display Functions<a class="headerlink" href="#display-functions" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">print_header(title)</span></code>: Print a formatted header</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">print_success(message)</span></code>: Print a success message in green</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">print_error(message)</span></code>: Print an error message in red</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">print_warning(message)</span></code>: Print a warning message in yellow</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">print_info(message)</span></code>: Print an information message in blue</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">print_json(data)</span></code>: Print formatted JSON data</p></li>
+</ul>
+</section>
+<section id="api-utilities">
+<h3>API Utilities<a class="headerlink" href="#api-utilities" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">make_api_request(method,</span> <span class="pre">endpoint,</span> <span class="pre">data=None,</span> <span class="pre">base_url=DEFAULT_OLLAMA_API_URL,</span> <span class="pre">timeout=300)</span></code>: Make a synchronous API request</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">async_make_api_request(method,</span> <span class="pre">endpoint,</span> <span class="pre">data=None,</span> <span class="pre">base_url=DEFAULT_OLLAMA_API_URL,</span> <span class="pre">timeout=300)</span></code>: Make an asynchronous API request</p></li>
+</ul>
+</section>
+<section id="ollama-management">
+<h3>Ollama Management<a class="headerlink" href="#ollama-management" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">check_ollama_installed()</span></code>: Check if Ollama is installed on the system</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">check_ollama_running()</span></code>: Check if Ollama server is running</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">install_ollama()</span></code>: Attempt to install Ollama</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ensure_ollama_running()</span></code>: Ensure Ollama is installed and running</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">format_traceback(e)</span></code>: Format an exception traceback for logging or display</p></li>
+</ul>
+</section>
+<section id="model-constants">
+<h3>Model Constants<a class="headerlink" href="#model-constants" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">ollama_toolkit.utils.model_constants</span></code> module provides:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DEFAULT_CHAT_MODEL</span></code>: Default model for chat completions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BACKUP_CHAT_MODEL</span></code>: Fallback model for chat completions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DEFAULT_EMBEDDING_MODEL</span></code>: Default model for embeddings</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BACKUP_EMBEDDING_MODEL</span></code>: Fallback model for embeddings</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolve_model_alias(alias)</span></code>: Convert model alias to actual model name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_fallback_model(model_name)</span></code>: Get the appropriate fallback model</p></li>
+</ul>
+<p>Refer to the examples in <code class="docutils literal notranslate"><span class="pre">/examples</span></code> for real-world usage.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lloyd Handyside.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

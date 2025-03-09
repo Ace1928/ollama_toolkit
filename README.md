@@ -16,6 +16,12 @@ A comprehensive Python client library and command-line tools for interacting wit
 - 📊 **Embeddings Support**: Easy creation and manipulation of embeddings
 - 🧪 **Well-Tested**: Comprehensive test suite for reliability
 
+## EIDOSIAN Excellence
+Every part of this toolkit embraces Eidosian Principles, ensuring:
+- Precision for style, humor for clarity
+- A seamless flow in usage
+- Self-awareness to continually refine your process
+
 ## Installation
 
 ### Prerequisites
@@ -37,6 +43,15 @@ git clone https://github.com/lloydhd/ollama_toolkit.git
 cd ollama_toolkit
 pip install -e .
 ```
+
+- From PyPI:  
+  ```bash
+  pip install ollama-toolkit
+  ```
+- For development:  
+  ```bash
+  pip install -e /path/to/ollama_toolkit
+  ```
 
 ## Verifying Installation
 
@@ -258,6 +273,17 @@ Run the examples directly from the examples directory:
 python -m ollama_toolkit.examples.basic_usage
 ```
 
+Use the scripts in the examples folder:
+```bash
+python -m ollama_toolkit.examples.quickstart
+python -m ollama_toolkit.examples.basic_usage
+python -m ollama_toolkit.examples.generate_example
+python -m ollama_toolkit.examples.chat_example
+python -m ollama_toolkit.examples.embedding_example
+```
+
+Review each example for the latest usage patterns, including fallback mechanisms, streaming modes, and updated model names (e.g. `deepseek-r1:1.5b`).
+
 ## Project Structure
 
 ```
@@ -334,6 +360,22 @@ The `ollama_toolkit` package provides a convenient interface to interact with th
 - Utility functions for common operations
 - Comprehensive error handling
 - Detailed examples and documentation
+
+## Automated Documentation
+
+To build the documentation locally:
+1. Install or update documentation tools:
+   ```bash
+   pip install sphinx sphinx-autobuild sphinx-rtd-theme
+   ```
+2. Navigate into the docs folder (or project root if you have a docs/ directory there).
+3. Build the docs (for example with Sphinx):
+   ```bash
+   sphinx-build -b html . _build/html
+   ```
+4. Open the generated HTML files under `_build/html` in your browser.
+
+Our docstrings follow a Google-style or reStructuredText format (compatible with autodoc systems). For more advanced usage, you can integrate with other popular doc generators (MkDocs, pdoc, etc.).
 
 ## License
 

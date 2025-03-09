@@ -9,6 +9,7 @@ import platform
 import subprocess
 import sys
 import time
+import logging
 from typing import Tuple
 
 # Add parent directory to path for direct execution
@@ -43,7 +44,13 @@ except ImportError:
 
 
 def run_ollama() -> bool:
-    """Start the Ollama service."""
+    """
+    Start the Ollama service if it is not already running.
+
+    Returns:
+        bool: True if the Ollama server was successfully started or
+              is already running, otherwise False.
+    """
     print_header("Starting Ollama Server")
 
     # First check if already running
@@ -138,7 +145,14 @@ def stop_ollama() -> bool:
 
 
 def check_ollama_installed() -> Tuple[bool, str]:
-    """Check if Ollama is installed."""
+    """
+    Check if Ollama is installed by attempting to locate it.
+
+    Returns:
+        Tuple[bool, str]: A tuple containing:
+          - A boolean indicating installation status
+          - Version string or error message
+    """
     try:
         if platform.system() == "Windows":
             result = subprocess.run(
@@ -180,7 +194,14 @@ def check_ollama_running() -> Tuple[bool, str]:
 
 
 def install_ollama() -> Tuple[bool, str]:
-    """Install Ollama on the system."""
+    """
+    Install Ollama on the system.
+
+    Returns:
+        Tuple[bool, str]: A tuple containing:
+          - A boolean indicating if the installation was successful
+          - A message describing the result
+    """
     system = platform.system().lower()
 
     try:
@@ -274,7 +295,8 @@ def ensure_ollama_running() -> Tuple[bool, str]:
 
 
 def main() -> None:
-    """Main entry point."""
+    """Main entry point for Ollama installation and management."""
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(
         description="Ollama installation and management tool"
     )
@@ -297,6 +319,7 @@ def main() -> None:
 
     if args.check:
         print_header("Ollama Status Check")
+        logging.info("Checking Ollama status...")
 
         # Check if installed
         is_installed, install_message = check_ollama_installed()

@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generate a Chat Completion &mdash; Ollama Toolkit 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ollama Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Generate a Chat Completion</a><ul>
+<li><a class="reference internal" href="#endpoint">Endpoint</a></li>
+<li><a class="reference internal" href="#parameters">Parameters</a><ul>
+<li><a class="reference internal" href="#message-object">Message Object</a></li>
+<li><a class="reference internal" href="#advanced-parameters-optional">Advanced Parameters (Optional)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#response">Response</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#chat-request-streaming">Chat Request (Streaming)</a><ul>
+<li><a class="reference internal" href="#request">Request</a></li>
+<li><a class="reference internal" href="#id1">Response</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ollama Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Generate a Chat Completion</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/chat.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="generate-a-chat-completion">
+<h1>Generate a Chat Completion<a class="headerlink" href="#generate-a-chat-completion" title="Link to this heading"></a></h1>
+<p>Generate the next message in a chat with a provided model. This is a streaming endpoint, so there will be a series of responses. Streaming can be disabled using “stream”: false. The final response object will include statistics and additional data from the request.</p>
+<section id="endpoint">
+<h2>Endpoint<a class="headerlink" href="#endpoint" title="Link to this heading"></a></h2>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Required</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>model</p></td>
+<td><p>string</p></td>
+<td><p>The model name</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>messages</p></td>
+<td><p>array</p></td>
+<td><p>The messages of the chat, used to keep chat memory</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p>tools</p></td>
+<td><p>array</p></td>
+<td><p>List of tools in JSON for the model to use if supported</p></td>
+<td><p>No</p></td>
+</tr>
+</tbody>
+</table>
+<section id="message-object">
+<h3>Message Object<a class="headerlink" href="#message-object" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Required</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>role</p></td>
+<td><p>string</p></td>
+<td><p>The role of the message: “system”, “user”, “assistant”, or “tool”</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>content</p></td>
+<td><p>string</p></td>
+<td><p>The content of the message</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p>images</p></td>
+<td><p>array</p></td>
+<td><p>A list of images to include in the message (for multimodal models)</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>tool_calls</p></td>
+<td><p>array</p></td>
+<td><p>A list of tools in JSON that the model wants to use</p></td>
+<td><p>No</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="advanced-parameters-optional">
+<h3>Advanced Parameters (Optional)<a class="headerlink" href="#advanced-parameters-optional" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>format</p></td>
+<td><p>string/object</p></td>
+<td><p>The format to return a response in. Can be “json” or a JSON schema</p></td>
+</tr>
+<tr class="row-odd"><td><p>options</p></td>
+<td><p>object</p></td>
+<td><p>Additional model parameters (temperature, etc.)</p></td>
+</tr>
+<tr class="row-even"><td><p>stream</p></td>
+<td><p>boolean</p></td>
+<td><p>If false, the response will be returned as a single object rather than a stream</p></td>
+</tr>
+<tr class="row-odd"><td><p>keep_alive</p></td>
+<td><p>string</p></td>
+<td><p>Controls how long the model will stay loaded into memory (default: 5m)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="response">
+<h2>Response<a class="headerlink" href="#response" title="Link to this heading"></a></h2>
+<p>The API returns a stream of JSON objects by default. Each object contains:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>model</p></td>
+<td><p>string</p></td>
+<td><p>The model name</p></td>
+</tr>
+<tr class="row-odd"><td><p>created_at</p></td>
+<td><p>string</p></td>
+<td><p>The timestamp when the response was created</p></td>
+</tr>
+<tr class="row-even"><td><p>message</p></td>
+<td><p>object</p></td>
+<td><p>Contains role, content, and other message data</p></td>
+</tr>
+<tr class="row-odd"><td><p>done</p></td>
+<td><p>boolean</p></td>
+<td><p>Whether the generation is complete</p></td>
+</tr>
+</tbody>
+</table>
+<p>The final response in the stream includes additional statistics:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>total_duration</p></td>
+<td><p>number</p></td>
+<td><p>Time spent generating the response (nanoseconds)</p></td>
+</tr>
+<tr class="row-odd"><td><p>load_duration</p></td>
+<td><p>number</p></td>
+<td><p>Time spent loading the model (nanoseconds)</p></td>
+</tr>
+<tr class="row-even"><td><p>prompt_eval_count</p></td>
+<td><p>number</p></td>
+<td><p>Number of tokens in the prompt</p></td>
+</tr>
+<tr class="row-odd"><td><p>prompt_eval_duration</p></td>
+<td><p>number</p></td>
+<td><p>Time spent evaluating the prompt (nanoseconds)</p></td>
+</tr>
+<tr class="row-even"><td><p>eval_count</p></td>
+<td><p>number</p></td>
+<td><p>Number of tokens in the response</p></td>
+</tr>
+<tr class="row-odd"><td><p>eval_duration</p></td>
+<td><p>number</p></td>
+<td><p>Time spent generating the response (nanoseconds)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<section id="chat-request-streaming">
+<h3>Chat Request (Streaming)<a class="headerlink" href="#chat-request-streaming" title="Link to this heading"></a></h3>
+<section id="request">
+<h4>Request<a class="headerlink" href="#request" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>http://localhost:11434/api/chat<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">  &quot;model&quot;: &quot;llama3.2&quot;,</span>
+<span class="s1">  &quot;messages&quot;: [</span>
+<span class="s1">    {</span>
+<span class="s1">      &quot;role&quot;: &quot;user&quot;,</span>
+<span class="s1">      &quot;content&quot;: &quot;why is the sky blue?&quot;</span>
+<span class="s1">    },</span>
+<span class="s1">    {</span>
+<span class="s1">      &quot;role&quot;: &quot;assistant&quot;,</span>
+<span class="s1">      &quot;content&quot;: &quot;due to rayleigh scattering.&quot;</span>
+<span class="s1">    },</span>
+<span class="s1">    {</span>
+<span class="s1">      &quot;role&quot;: &quot;user&quot;,</span>
+<span class="s1">      &quot;content&quot;: &quot;how is that different than mie scattering?&quot;</span>
+<span class="s1">    }</span>
+<span class="s1">  ]</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h4>Response<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;llama3.2&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2023-08-04T08:52:19.385406455-07:00&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;The&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;images&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;done&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;llama3.2&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2023-08-04T19:22:45.499127Z&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;done&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;total_duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4883583458</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;load_duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1334875</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;prompt_eval_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">26</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;prompt_eval_duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">342546000</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;eval_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">282</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;eval_duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4535599000</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lloyd Handyside.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

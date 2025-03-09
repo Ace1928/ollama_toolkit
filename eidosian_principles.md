@@ -593,3 +593,9 @@ def synergy_demo(n: int) -> int:
 
 print("synergy_demo(5) =", synergy_demo(5))
 ```
+
+### Practical Updates
+- Maintain short, clear function docstrings aligned with “Exhaustive But Concise.”
+- Ensure new code samples reflect “Flow Like a River” by chaining operations logically.
+- Encourage “Precision as Style” by removing ambiguous variable names.
+- Always keep “Velocity as Intelligence” in mind—prefer efficient methods and decisive language.

@@ -104,23 +104,21 @@ def make_api_request(
     method: str,
     endpoint: str,
     data: Optional[Dict[str, Any]] = None,
-    base_url: str = DEFAULT_OLLAMA_API_URL,
-    timeout: int = 300,  # Changed from 60 to 300 seconds
-) -> Optional[requests.Response]:
+    **kwargs: Any
+) -> Dict[str, Any]:
     """
-    Make an API request to the Ollama Toolkit with enhanced anti-hanging protection.
+    Make a synchronous request to the Ollama API.
 
     Args:
-        method: HTTP method (GET, POST, etc.)
-        endpoint: API endpoint path
-        data: Optional request data
-        base_url: Base URL for the API
-        timeout: Request timeout in seconds
+        method: The HTTP method (GET, POST, etc.).
+        endpoint: The API endpoint path.
+        data: Request payload, if any.
+        **kwargs: Additional request parameters.
 
     Returns:
-        Response object or None if request failed
+        Dict[str, Any]: Parsed JSON response from the Ollama API.
     """
-    url = f"{base_url.rstrip('/')}{endpoint}"
+    url = f"{DEFAULT_OLLAMA_API_URL.rstrip('/')}{endpoint}"
 
     try:
         logger.debug(f"Making {method} request to {url}")
@@ -134,8 +132,8 @@ def make_api_request(
         ))
         
         # Use separate connect and read timeouts
-        connect_timeout = min(30, timeout/10)  # Connect timeout (max 30s, was 5s)
-        read_timeout = timeout - connect_timeout  # Remaining time for reading
+        connect_timeout = min(30, kwargs.get('timeout', 300)/10)  # Connect timeout (max 30s, was 5s)
+        read_timeout = kwargs.get('timeout', 300) - connect_timeout  # Remaining time for reading
         
         response = session.request(
             method=method, 
@@ -144,18 +142,18 @@ def make_api_request(
             timeout=(connect_timeout, read_timeout)
         )
         response.raise_for_status()
-        return response
+        return response.json()
 
     except requests.exceptions.ConnectionError as e:
         logger.error(f"Connection error: {str(e)}")
-        print_error(f"Connection error: Could not connect to Ollama Toolkit at {base_url}")
+        print_error(f"Connection error: Could not connect to Ollama Toolkit at {DEFAULT_OLLAMA_API_URL}")
         print_info("Make sure Ollama is running and accessible.")
-        raise ConnectionError(f"Failed to connect to {base_url}: {str(e)}")
+        raise ConnectionError(f"Failed to connect to {DEFAULT_OLLAMA_API_URL}: {str(e)}")
 
     except requests.exceptions.Timeout as e:
         logger.error(f"Timeout error: {str(e)}")
         print_error(
-            f"Timeout error: Request to {url} timed out after {timeout} seconds"
+            f"Timeout error: Request to {url} timed out after {kwargs.get('timeout', 300)} seconds"
         )
         raise TimeoutError(f"Request timed out: {str(e)}")
 
@@ -371,10 +369,16 @@ def install_ollama() -> Tuple[bool, str]:
 
 def ensure_ollama_running() -> Tuple[bool, str]:
     """
-    Ensure Ollama is installed and running. Attempts to start if installed but not running.
+    Ensure Ollama is installed and running.
+
+    This function checks whether Ollama is installed and attempts to
+    install it if not present (on supported platforms). It also checks
+    whether the Ollama service is running, and starts it if needed.
 
     Returns:
-        Tuple of (is_running, message)
+        Tuple[bool, str]: A tuple containing:
+          - A boolean indicating if Ollama is running
+          - A status or error message
     """
     # First check if it's already running
     is_running, message = check_ollama_running()
