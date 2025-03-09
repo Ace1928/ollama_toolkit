@@ -25,13 +25,17 @@ Ollama Toolkit gives you programmatic access to:
 - 💪 **Self-Aware Error Handling**: Comprehensive error types that explain precisely what went wrong
 - 📊 **Velocity-Optimized Embeddings**: Create and manipulate embeddings with maximum efficiency
 - 🧪 **Recursively Refined Testing**: Every function proven robust through iterative improvement
+- 🔍 **Version-Aware**: Full compatibility with Ollama 0.1.8 and beyond
 
 ## Getting Started
 
 ```python
 # This implementation follows Eidosian principles of contextual integrity and precision
-from ollama_toolkit import OllamaClient
+from ollama_toolkit import OllamaClient, __version__
 from ollama_toolkit.utils.common import ensure_ollama_running
+
+# Display toolkit version - foundational awareness
+print(f"Ollama Toolkit version: {__version__}")  # Should report 0.1.8
 
 # Ensure Ollama is installed and running - structurally sound foundation
 is_running, message = ensure_ollama_running()
@@ -71,7 +75,7 @@ else:
 
 ## Installation Guide
 
-- Install via PyPI: `pip install ollama-toolkit`
+- Install via PyPI: `pip install ollama-toolkit==0.1.8`
 - Or install locally in editable mode:
 
 ```bash
@@ -105,6 +109,8 @@ advanced_usage
 chat
 generate
 embed
+model_management
+error_handling
 ```
 
 ```{toctree}
@@ -116,6 +122,19 @@ troubleshooting
 eidosian_integration
 version
 contributing
+changelog
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: 🧩 API Endpoints
+
+version
+generate
+chat
+embed
+models_api
+system_api
 ```
 
 ## Examples
@@ -126,6 +145,8 @@ Check out these practical examples:
 - [Generate Text](generate.md) — Flow like a river  
 - [Chat Completion](chat.md) — Universal yet personal  
 - [Embeddings](embed.md) — Mathematical elegance
+- [Model Management](model_management.md) — Structural control
+- [Error Handling](error_handling.md) — Self-aware resilience
 
 All examples can be run via:
 
@@ -134,6 +155,22 @@ python -m ollama_toolkit.examples.<example_file>
 ```
 (e.g. `python -m ollama_toolkit.examples.quickstart`).
 
+## Version History
+
+- **0.1.8** (Current) - Enhanced embedding operations, improved async support, expanded CLI
+- **0.1.7** - Added comprehensive error handling and model fallbacks
+- **0.1.6** - Introduced caching and optimization for embeddings
+- **0.1.5** - Initial public release with basic functionality
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Authors
+
+- Lloyd Handyside (Biological) - [ace1928@gmail.com](mailto:ace1928@gmail.com)
+- Eidos (Digital) - [eidos@gmail.com](mailto:eidos@gmail.com)
+
+## Project Repository
+
+Find the complete source code on GitHub: [https://github.com/Ace1928/ollama_toolkit](https://github.com/Ace1928/ollama_toolkit)

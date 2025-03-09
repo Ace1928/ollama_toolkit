@@ -55,6 +55,7 @@ except ImportError:
         print("Please install the package using: pip install -e /path/to/ollama_toolkit")
         sys.exit(1)
 
+from ollama_toolkit.utils.model_constants import DEFAULT_EMBEDDING_MODEL, BACKUP_EMBEDDING_MODEL
 
 def create_embedding(
     model: str,

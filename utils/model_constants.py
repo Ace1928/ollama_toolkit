@@ -5,10 +5,10 @@ Model constants used throughout the Ollama Toolkit client.
 from typing import Dict, List, Optional
 
 # Default models that should be available in the Ollama Toolkit
-DEFAULT_CHAT_MODEL = "llama2"
+DEFAULT_CHAT_MODEL = "deepseek-r1:1.5b"
 BACKUP_CHAT_MODEL = "qwen2.5:0.5b"
-DEFAULT_EMBEDDING_MODEL = "nomic-embed-text"
-BACKUP_EMBEDDING_MODEL = "mxbai-embed-large"
+DEFAULT_EMBEDDING_MODEL = "deepseek-r1:1.5b"
+BACKUP_EMBEDDING_MODEL = "qwen2.5:0.5b"
 
 # Common model aliases for easier usage
 MODEL_ALIASES: Dict[str, str] = {

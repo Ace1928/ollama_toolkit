@@ -76,9 +76,9 @@ class TestEmbeddings(unittest.TestCase):
 
         mock_post.side_effect = mock_request_side_effect
 
-        # Call function with fallback enabled
+        # Call function with fallback enabled - fix parameter order
         result = create_embedding(
-            DEFAULT_EMBEDDING_MODEL, "Test text", use_fallback=True
+            DEFAULT_EMBEDDING_MODEL, "Test text", options=None, use_fallback=True
         )
 
         # Assert results - should get backup model result

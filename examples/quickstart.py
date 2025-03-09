@@ -26,6 +26,7 @@ import time
 import json
 import socket
 import subprocess
+import traceback  # Added for better error reporting
 from typing import Any, Dict, List, Optional, Tuple, Union, Iterator, Generator
 import requests
 
@@ -74,7 +75,10 @@ try:
     _imported_utils = True
     _imported_constants = True
     print_info("Using installed ollama_toolkit package")
-except ImportError:
+except ImportError as e:
+    # More detailed error tracking for debugging
+    if os.environ.get('DEBUG'):
+        print(f"Layer 1 import error: {str(e)}")
     pass
 
 # Layer 2: Development mode imports (if Layer 1 failed)
@@ -85,7 +89,7 @@ if not (_imported_client and _imported_utils and _imported_constants):
     # Try parent directory (one level up from examples)
     try:
         parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        if parent_dir not in sys.path:
+        if (parent_dir not in sys.path):
             sys.path.insert(0, parent_dir)
         
         if not _imported_client:
@@ -104,9 +108,11 @@ if not (_imported_client and _imported_utils and _imported_constants):
             _imported_constants = True
             
         print_info(f"Using ollama_toolkit from development path: {parent_dir}")
-    except ImportError:
+    except ImportError as e:
         # Reset path before trying next approach
         sys.path = list(original_sys_path)
+        if os.environ.get('DEBUG'):
+            print(f"Layer 2A import error: {str(e)}")
         
         # Try grandparent directory (two levels up)
         try:
@@ -126,11 +132,16 @@ if not (_imported_client and _imported_utils and _imported_constants):
                 _imported_utils = True
                 
             if not _imported_constants:
-                from ollama_toolkit.utils.model_constants import DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL, DEFAULT_OLLAMA_API_URL
+                # Fixed: Don't import DEFAULT_OLLAMA_API_URL from model_constants
+                from ollama_toolkit.utils.model_constants import (
+                    DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL
+                )
                 _imported_constants = True
                 
             print_info(f"Using ollama_toolkit from path: {grandparent_dir}")
-        except ImportError:
+        except ImportError as e:
+            if os.environ.get('DEBUG'):
+                print(f"Layer 2B import error: {str(e)}")
             pass
 
 # Layer 3: Minimal fallback implementations (if all else fails)
@@ -160,7 +171,7 @@ RECOMMENDED_MODELS = [
     {"name": "qwen2.5:0.5b", "description": "Small and fast assistant model"},
     {"name": "deepseek-r1:1.5b", "description": "General purpose reasoning model"},
     {"name": "qwen2.5-coder:0.5b", "description": "Code assistant model"},
-    {"name": "qwen2.5-instruct:0.5b", "description": "Instruction-following assistant model"},
+    {"name": "qwen2.5:0.5b-Instruct", "description": "Instruction-following assistant model"},
     {"name": "deepscaler", "description": "Broad knowledge assistant model"}
 ]
 
@@ -335,11 +346,86 @@ def get_available_models() -> List[Dict[str, Any]]:
     """
     client = OllamaClient()
     try:
+        # Get models with robust error handling
         result = client.list_models()
-        if "models" in result:
-            return result["models"]
+        
+        # Unified response handling
+        if isinstance(result, dict):
+            # Result is already a dictionary
+            if "models" in result:
+                return result["models"]
+            elif "error" in result:
+                print_error(f"API returned error: {result.get('error', 'Unknown error')}")
+            else:
+                # Try to extract from the root level if it looks like a list of models
+                model_list = []
+                for key, value in result.items():
+                    if isinstance(value, list) and value and isinstance(value[0], dict) and "name" in value[0]:
+                        model_list = value
+                        print_info(f"Found models under key '{key}'")
+                        return model_list
+                
+                # Direct inspection of the root dict - is it a list of model objects?
+                if all(isinstance(result.get(k), dict) and "name" in result.get(k) for k in result):
+                    # Looks like a flat dict of models
+                    model_list = list(result.values())
+                    return model_list
+                
+                # Direct use with custom keys 
+                if all(isinstance(k, str) for k in result.keys()):
+                    # Try to interpret keys as model names
+                    model_list = [{"name": k, "details": v} for k, v in result.items()]
+                    return model_list
+                    
+                print_warning("Unexpected API response format")
+                print_info(f"Raw result type: {type(result)}")
     except Exception as e:
         print_error(f"Error getting models: {str(e)}")
+        if os.environ.get('DEBUG'):
+            traceback.print_exc()
+    
+    return []
+
+def get_models_from_cli() -> List[Dict[str, Any]]:
+    """Fallback to get models via command line when API fails."""
+    try:
+        print_info("Trying to get models via command line...")
+        result = subprocess.run(
+            ["ollama", "list"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=10
+        )
+        
+        if result.returncode == 0:
+            # Parse the output which typically looks like:
+            # NAME            ID              SIZE    MODIFIED
+            # qwen2.5:0.5b   d6bml...        157 MB  1 minute ago
+            models = []
+            lines = result.stdout.strip().split('\n')
+            if len(lines) <= 1:
+                return []
+                
+            # Skip header line
+            for line in lines[1:]:
+                parts = line.split(None, 3)  # Split by whitespace, max 4 parts
+                if len(parts) >= 2:
+                    name = parts[0].strip()
+                    model_id = parts[1].strip() if len(parts) > 1 else ""
+                    size_str = parts[2].strip() + " " + parts[3].strip() if len(parts) > 3 else ""
+                    
+                    models.append({
+                        "name": name,
+                        "id": model_id,
+                        "size_str": size_str
+                    })
+            
+            print_success(f"Found {len(models)} models via CLI")
+            return models
+    except Exception as e:
+        print_warning(f"CLI fallback also failed: {str(e)}")
+    
     return []
 
 def ensure_recommended_models(available_models: List[Dict[str, Any]]) -> bool:
@@ -357,13 +443,16 @@ def ensure_recommended_models(available_models: List[Dict[str, Any]]) -> bool:
     print_header("CHECKING RECOMMENDED MODELS")
     
     available_model_set = set()
-    for model in available_models:
-        name = model['name']
-        available_model_set.add(name)
-        if name.endswith(':latest'):
-            available_model_set.add(name[:-7])
-        else:
-            available_model_set.add(f"{name}:latest")
+    if available_models:
+        for model in available_models:
+            if not isinstance(model, dict) or 'name' not in model:
+                continue
+            name = model['name']
+            available_model_set.add(name)
+            if name.endswith(':latest'):
+                available_model_set.add(name[:-7])
+            else:
+                available_model_set.add(f"{name}:latest")
     
     client = OllamaClient()
     models_pulled = False
@@ -675,12 +764,24 @@ def main() -> None:
     available_models = get_available_models()
     
     if not available_models:
+        # Try fallback CLI method if API call failed
+        available_models = get_models_from_cli()
+    
+    if not available_models:
         print_info("No models found. Pulling recommended starter models...")
         ensure_recommended_models([])
         available_models = get_available_models()
+        
+        # Try CLI fallback again if API still fails
+        if not available_models:
+            available_models = get_models_from_cli()
     else:
         ensure_recommended_models(available_models)
         available_models = get_available_models()
+        
+        # Final CLI fallback
+        if not available_models:
+            available_models = get_models_from_cli()
     
     if not available_models:
         print_error("No models available. Please try again or pull models manually.")

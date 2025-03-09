@@ -101,9 +101,11 @@ def print_json(data: Any) -> None:
 
 
 def make_api_request(
-    method: str,
-    endpoint: str,
+    method: str, 
+    path: str, 
     data: Optional[Dict[str, Any]] = None,
+    base_url: str = DEFAULT_OLLAMA_API_URL,
+    timeout: int = 600,
     **kwargs: Any
 ) -> Dict[str, Any]:
     """
@@ -111,94 +113,52 @@ def make_api_request(
 
     Args:
         method: The HTTP method (GET, POST, etc.).
-        endpoint: The API endpoint path.
+        path: The API endpoint path.
         data: Request payload, if any.
+        base_url: Base URL for the API.
+        timeout: Request timeout in seconds.
         **kwargs: Additional request parameters.
 
     Returns:
-        Dict[str, Any]: Parsed JSON response from the Ollama API.
+        Dict[str, Any]: JSON response data or error dictionary.
     """
-    url = f"{DEFAULT_OLLAMA_API_URL.rstrip('/')}{endpoint}"
-
+    url = f"{base_url.rstrip('/')}{path}"
+    
     try:
-        logger.debug(f"Making {method} request to {url}")
-        if data:
-            logger.debug(f"Request data: {json.dumps(data)}")
-
-        # Use a session for better timeout control
+        # Create session directly without context manager
         session = requests.Session()
-        session.mount('http://', requests.adapters.HTTPAdapter(
-            max_retries=1  # Minimal retries
-        ))
-        
-        # Use separate connect and read timeouts
-        connect_timeout = min(30, kwargs.get('timeout', 300)/10)  # Connect timeout (max 30s, was 5s)
-        read_timeout = kwargs.get('timeout', 300) - connect_timeout  # Remaining time for reading
-        
         response = session.request(
-            method=method, 
-            url=url, 
-            json=data, 
-            timeout=(connect_timeout, read_timeout)
+            method=method,
+            url=url,
+            json=data if method in ["POST", "DELETE"] else None,
+            timeout=timeout,
+            **kwargs
         )
         response.raise_for_status()
         return response.json()
-
-    except requests.exceptions.ConnectionError as e:
-        logger.error(f"Connection error: {str(e)}")
-        print_error(f"Connection error: Could not connect to Ollama Toolkit at {DEFAULT_OLLAMA_API_URL}")
-        print_info("Make sure Ollama is running and accessible.")
-        raise ConnectionError(f"Failed to connect to {DEFAULT_OLLAMA_API_URL}: {str(e)}")
-
-    except requests.exceptions.Timeout as e:
-        logger.error(f"Timeout error: {str(e)}")
-        print_error(
-            f"Timeout error: Request to {url} timed out after {kwargs.get('timeout', 300)} seconds"
-        )
-        raise TimeoutError(f"Request timed out: {str(e)}")
-
-    except requests.exceptions.HTTPError as e:
-        status_code = e.response.status_code
-        logger.error(f"HTTP error {status_code}: {str(e)}")
-
+    except requests.HTTPError as e:
         try:
             error_data = e.response.json()
-            error_message = error_data.get("error", str(e))
         except json.JSONDecodeError:
-            error_message = e.response.text or str(e)
-
-        if status_code == 404 and "model not found" in error_message.lower():
-            print_error(f"Model not found: {error_message}")
-            raise ModelNotFoundError(error_message)
-        elif 400 <= status_code < 500:
-            print_error(f"Invalid request: {error_message}")
-            raise InvalidRequestError(error_message)
-        elif 500 <= status_code < 600:
-            print_error(f"Server error: {error_message}")
-            raise ServerError(error_message)
-        else:
-            print_error(f"HTTP error {status_code}: {error_message}")
-            raise OllamaAPIError(f"HTTP error {status_code}: {error_message}")
-
-    except Exception as e:
-        logger.error(f"Error making API request: {str(e)}")
-        print_error(f"Error: {str(e)}")
-        raise OllamaAPIError(f"Failed to make API request: {str(e)}")
+            error_data = {"error": str(e)}
+        return error_data
+    except requests.RequestException as e:
+        return {"error": str(e)}
 
 
 async def async_make_api_request(
     method: str,
-    endpoint: str,
+    path: str,  # Changed from endpoint to path for consistency
     data: Optional[Dict[str, Any]] = None,
     base_url: str = DEFAULT_OLLAMA_API_URL,
-    timeout: int = 300,  # Changed from 60 to 300 seconds
+    timeout: int = 600,  # Changed from 60 to 300 seconds
 ) -> Dict[str, Any]:
     """
     Asynchronously make an API request to the Ollama Toolkit
 
     Args:
         method: HTTP method (GET, POST, etc.)
-        endpoint: API endpoint path
+        path: API endpoint path
         data: Optional request data
         base_url: Base URL for the API
         timeout: Request timeout in seconds
@@ -206,7 +166,7 @@ async def async_make_api_request(
     Returns:
         JSON response data
     """
-    url = f"{base_url.rstrip('/')}{endpoint}"
+    url = f"{base_url.rstrip('/')}{path}"
 
     try:
         logger.debug(f"Making async {method} request to {url}")

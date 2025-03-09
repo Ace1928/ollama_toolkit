@@ -172,7 +172,7 @@ class TestOllamaClient(unittest.TestCase):
         # Assert results
         mock_request.assert_called_once_with(
             "GET",
-            "/api/tags",
+            "/api/models",  # Changed from /api/tags to match actual implementation
             base_url=self.client.base_url,
             timeout=self.client.timeout,
         )
