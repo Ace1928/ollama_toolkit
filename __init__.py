@@ -5,7 +5,7 @@ This package provides a convenient interface to interact with the Ollama Toolkit
 elevated to peak Eidosian perfection.
 """
 
-__version__ = "0.1.7"
+__version__ = "0.1.8"  # Update from 0.1.7 to match setup.cfg
 __author__ = "Lloyd Handyside, Eidos"
 __email__ = "ace1928@gmail.com, eidos@gmail.com"
 

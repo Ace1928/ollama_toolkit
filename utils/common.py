@@ -454,3 +454,23 @@ def format_traceback(e: Exception) -> str:
     tb_io = StringIO()
     traceback.print_exception(type(e), e, e.__traceback__, file=tb_io)
     return tb_io.getvalue()
+
+
+def is_ollama_api_responding(api_url: str = DEFAULT_OLLAMA_API_URL) -> bool:
+    """
+    Check if the Ollama API is responding by making a direct HTTP request.
+    
+    Args:
+        api_url: The base URL of the Ollama API.
+        
+    Returns:
+        True if the API is responding, False otherwise.
+    """
+    try:
+        response = requests.get(f"{api_url}/api/version", timeout=3)
+        if response.status_code == 200:
+            return True
+    except requests.RequestException:
+        pass
+    
+    return False

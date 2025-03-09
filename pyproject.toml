@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ollama_toolkit"
-version = "0.1.7"
+version = "0.1.8"  # Update from 0.1.7 to match setup.cfg
 description = "A comprehensive Python client library for the Ollama API"
 authors = [
     {name = "Lloyd Handyside", email = "ace1928@gmail.com"},
@@ -14,6 +14,33 @@ readme = "README.md"
 requires-python = ">=3.6"
 license = {text = "MIT"}
 urls = {repository = "https://github.com/Ace1928/ollama_toolkit"}
+
+# Add these fields for better PEP 621 compliance
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+keywords = ["ollama", "ai", "llm", "language models", "toolkit", "eidos"]
+
+[project.scripts]
+ollama-quickstart = "ollama_toolkit.examples.quickstart:main"
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flake8",
+    "mypy",
+    "pytest-cov",
+    "sphinx",
+    "twine",
+]
 
 [tool.black]
 line-length = 88
@@ -31,3 +58,7 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
+
+[tool.pytest.ini_options]
+# Add this line to your existing pytest config
+asyncio_default_fixture_loop_scope = "function"

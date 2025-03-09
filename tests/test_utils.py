@@ -82,6 +82,7 @@ class TestUtils(unittest.TestCase):
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.raise_for_status = Mock()
+        mock_response.json.return_value = {"version": "1.0.0"}
         
         # Set up the mock session instance
         session_instance = mock_session.return_value
@@ -94,7 +95,7 @@ class TestUtils(unittest.TestCase):
 
         # Assert results
         session_instance.request.assert_called_once()
-        self.assertEqual(result, mock_response)
+        self.assertEqual(result, {"version": "1.0.0"})
 
     @patch("requests.Session")
     def test_make_api_request_with_data(self, mock_session: Any) -> None:
@@ -103,6 +104,7 @@ class TestUtils(unittest.TestCase):
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.raise_for_status = Mock()
+        mock_response.json.return_value = {"response": "generated text"}
         
         # Set up the mock session instance
         session_instance = mock_session.return_value
@@ -116,9 +118,9 @@ class TestUtils(unittest.TestCase):
             "POST", "/api/generate", data=test_data, base_url=DEFAULT_OLLAMA_API_URL
         )
 
-        # Assert results - patch deeper mocking
+        # Assert results
         session_instance.request.assert_called_once()
-        self.assertEqual(result, mock_response)
+        self.assertEqual(result, {"response": "generated text"})
 
     @patch("requests.Session")
     def test_make_api_request(self, mock_session):
@@ -127,6 +129,7 @@ class TestUtils(unittest.TestCase):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.raise_for_status = Mock()
+        mock_response.json.return_value = {"result": "success"}
         
         # Set up the mock session instance
         session_instance = mock_session.return_value
@@ -136,7 +139,7 @@ class TestUtils(unittest.TestCase):
         result = make_api_request("GET", "/test")
         
         # Verify result
-        self.assertEqual(result, mock_response)
+        self.assertEqual(result, {"result": "success"})
         session_instance.request.assert_called_once()
     
     @patch("ollama_toolkit.utils.common.subprocess.run")

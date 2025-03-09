@@ -11,6 +11,7 @@ from typing import Any, Dict, List
 from unittest.mock import Mock, patch
 
 import pytest
+import requests
 
 # Add the parent directory to the path before any import attempts
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -59,51 +60,38 @@ class TestChat(unittest.TestCase):
         self.assertEqual(result["message"]["content"], "Hello there!")
         self.assertEqual(len(self.test_messages), 1)  # Original list unchanged
 
-    @pytest.mark.xfail(reason="Known issue with mock setup")
     @patch("requests.post")
     def test_chat_with_fallback(self, mock_post: Any) -> None:
         """Test chat fallback mechanism."""
-
-        # Setup mock responses for primary and backup model calls
-        def mock_side_effect(*args, **kwargs):
-            url = args[0] if args else kwargs.get("url", "")
-            if kwargs.get("json", {}).get("model") == DEFAULT_CHAT_MODEL:
-                # Primary model request - make raise_for_status throw an exception
-                # instead of having iter_lines throw it
-                mock_resp = Mock()
-                mock_resp.raise_for_status.side_effect = Exception(
-                    "Model not available"
-                )
-                return mock_resp
-            else:
-                # Backup model request - return successful response
-                mock_resp = Mock()
-                mock_resp.iter_lines.return_value = [
-                    json.dumps(
-                        {
-                            "message": {
-                                "role": "assistant",
-                                "content": "Backup model response",
-                            },
-                            "done": True,
-                        }
-                    ).encode(),
-                ]
-                mock_resp.raise_for_status = Mock()  # No exception for backup model
-                return mock_resp
-
-        # Configure the mock post function
-        mock_post.side_effect = mock_side_effect
-
+        # Create two different response objects
+        primary_response = Mock()
+        primary_response.raise_for_status.side_effect = requests.exceptions.RequestException("Model not available")
+        
+        backup_response = Mock()
+        backup_response.raise_for_status = Mock()  # No exception
+        backup_response.raise_for_status = Mock()  # No exception
+        backup_response.iter_lines.return_value = [
+            json.dumps(
+                {
+                    "message": {
+                        "role": "assistant", 
+                        "content": "Backup model response"
+                    },
+                    "done": True
+                }
+            ).encode()
+        ]
+        
+        # Configure mock to return different responses based on which call it is
+        mock_post.side_effect = [primary_response, backup_response]
+        
         # Call function with fallback enabled
         result = chat(DEFAULT_CHAT_MODEL, self.test_messages.copy(), use_fallback=True)
-
-        # Assert results - should get backup model result
+        
+        # Assert results
         self.assertIsNotNone(result)
         self.assertEqual(result["message"]["content"], "Backup model response")
-        self.assertEqual(
-            mock_post.call_count, 2
-        )  # Called twice: once for primary, once for backup
+        self.assertEqual(mock_post.call_count, 2)  # Called twice: primary then backup
 
     @patch("requests.post")
     def test_chat_streaming(self, mock_post: Any) -> None:
