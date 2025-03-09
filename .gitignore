@@ -20,7 +20,9 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
-#.pypirc/
+.pypirc/
+.pypirc
+*.pypirc*
 
 # Virtual environments
 venv/
