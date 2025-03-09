@@ -103,162 +103,202 @@ async def main():
 asyncio.run(main())
 ```
 
-## Chat Completion
+## Generate a Completion
 
-### Simple Chat
+Here's a complete example of generating text using the synchronous API:
 
 ```python
 from ollama_toolkit import OllamaClient
 
-client = OllamaClient()
-messages = [
-    {"role": "system", "content": "You are a helpful assistant."},
-    {"role": "user", "content": "Tell me about neural networks."}
-]
+client = OllamaClient(timeout=300)  # Increased timeout for larger responses
 
-response = client.chat(
+# Non-streaming example (get complete response at once)
+response = client.generate(
     model="llama2",
-    messages=messages,
+    prompt="Write a short poem about artificial intelligence.",
+    options={
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "max_tokens": 200
+    },
     stream=False
 )
 
-print(response["message"]["content"])
+print(f"Complete response: {response['response']}")
+
+# Streaming example (get tokens as they're generated)
+print("\nStreaming response:")
+for chunk in client.generate(
+    model="llama2",
+    prompt="Explain the concept of machine learning to a 10-year old.",
+    stream=True
+):
+    if "response" in chunk:
+        print(chunk["response"], end="", flush=True)
+    if chunk.get("done", False):
+        print("\n\nGeneration complete!")
 ```
 
-### Interactive Chat
+## Chat Completion
+
+The chat interface is robust and fully implemented:
 
 ```python
 from ollama_toolkit import OllamaClient
-from typing import List, Dict
 
-def chat_session(model: str = "llama2"):
-    client = OllamaClient()
-    messages: List[Dict[str, str]] = [
-        {"role": "system", "content": "You are a helpful assistant."}
-    ]
-    
-    print(f"Chat session with {model} (type 'exit' to quit)")
-    
-    while True:
-        user_input = input("\nYou: ")
-        if user_input.lower() == "exit":
-            break
-            
-        # Add user message to history
-        messages.append({"role": "user", "content": user_input})
-        
-        # Get response
-        print("\nAssistant: ", end="", flush=True)
-        
-        # Stream response
-        for chunk in client.chat(model, messages, stream=True):
-            if "message" in chunk and "content" in chunk["message"]:
-                content = chunk["message"]["content"]
-                print(content, end="", flush=True)
-                
-        # Add assistant response to history
-        messages.append({"role": "assistant", "content": content})
+client = OllamaClient(timeout=300)
 
-if __name__ == "__main__":
-    chat_session()
+# Prepare chat messages
+messages = [
+    {"role": "system", "content": "You are a helpful assistant who speaks like a pirate."},
+    {"role": "user", "content": "Tell me about the solar system."}
+]
+
+# Non-streaming example
+response = client.chat(
+    model="llama2",
+    messages=messages,
+    stream=False,
+    options={"temperature": 0.8}
+)
+
+print(f"Assistant: {response['message']['content']}")
+
+# Streaming example
+messages.append({"role": "user", "content": "What's the largest planet?"})
+
+print("\nStreaming response:")
+print("Assistant: ", end="", flush=True)
+
+for chunk in client.chat(
+    model="llama2",
+    messages=messages,
+    stream=True
+):
+    if "message" in chunk and "content" in chunk["message"]:
+        content = chunk["message"]["content"]
+        print(content, end="", flush=True)
+    
+    if chunk.get("done", False):
+        print("\n\nChat complete!")
 ```
 
 ## Embeddings
 
-### Create Embeddings
+Generate embeddings for semantic search and similarity:
 
 ```python
 from ollama_toolkit import OllamaClient
+import numpy as np
 
 client = OllamaClient()
-embedding = client.create_embedding(
-    model="nomic-embed-text",
-    prompt="This is a sample text for embedding."
+
+# Create embedding for a single text
+embedding1 = client.create_embedding(
+    model="nomic-embed-text",  # Use an embedding-specific model
+    prompt="Artificial intelligence is transforming industries worldwide."
 )
 
-print(f"Embedding dimension: {len(embedding['embedding'])}")
-print(f"First few values: {embedding['embedding'][:5]}...")
-```
+embedding2 = client.create_embedding(
+    model="nomic-embed-text",
+    prompt="AI technologies are changing how businesses operate globally."
+)
 
-### Compare Text Similarity
-
-```python
-import numpy as np
-from ollama_toolkit import OllamaClient
-
+# Calculate cosine similarity
 def cosine_similarity(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+    dot_product = np.dot(a, b)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    return dot_product / (norm_a * norm_b)
 
-client = OllamaClient()
-model = "nomic-embed-text"
+# Get the actual embedding vectors from the response
+vec1 = embedding1["embedding"]
+vec2 = embedding2["embedding"]
 
-# Get embeddings for two texts
-text1 = "Artificial intelligence is transforming the world."
-text2 = "AI technology is changing how we live and work."
-
-emb1 = client.create_embedding(model, text1)["embedding"]
-emb2 = client.create_embedding(model, text2)["embedding"]
-
-# Calculate similarity
-similarity = cosine_similarity(emb1, emb2)
-print(f"Similarity: {similarity:.4f}")
+# Calculate similarity (higher value means more similar)
+similarity = cosine_similarity(vec1, vec2)
+print(f"Similarity score: {similarity:.4f}")
 ```
 
 ## Working with Models
 
-### Pull a Model
+Manage models with the toolkit:
 
 ```python
 from ollama_toolkit import OllamaClient
 
 client = OllamaClient()
 
-# Non-streaming
-result = client.pull_model("llama2")
-print(f"Model pulled: {result}")
+# List all available models
+models = client.list_models()
+print("Available models:")
+for model in models.get("models", []):
+    name = model.get("name", "Unknown")
+    size_bytes = model.get("size", 0)
+    size_gb = size_bytes / (1024**3) if size_bytes else "Unknown"
+    print(f"- {name} ({size_gb:.2f} GB)" if isinstance(size_gb, float) else f"- {name} (size: {size_gb})")
 
-# Streaming with progress updates
-for update in client.pull_model("mistral", stream=True):
-    if "status" in update:
-        print(f"Progress: {update['status']}")
-```
-
-### Copy a Model
-
-```python
-from ollama_toolkit import OllamaClient
-
-client = OllamaClient()
-result = client.copy_model("llama2", "my-llama2-copy")
-print(f"Model copied: {result}")
-```
-
-### Delete a Model
-
-```python
-from ollama_toolkit import OllamaClient
-
-client = OllamaClient()
-success = client.delete_model("my-llama2-copy")
-print(f"Model deleted: {success}")
+# Pull a new model with progress updates
+print("\nPulling tinyllama model...")
+for update in client.pull_model("tinyllama", stream=True):
+    status = update.get("status", "")
+    if status == "downloading":
+        progress = update.get("completed", 0) / update.get("total", 1) * 100
+        print(f"\rDownloading: {progress:.1f}%", end="", flush=True)
+    elif status == "success":
+        print("\nDownload complete!")
+        
+# Delete a model (if needed)
+# Uncomment to test deletion:
+# result = client.delete_model("tinyllama")
+# print(f"Model deleted: {result}")
 ```
 
 ## Error Handling
 
+Proper error handling with Ollama Toolkit:
+
 ```python
-from ollama_toolkit import OllamaClient, ModelNotFoundError, OllamaAPIError, ConnectionError
+from ollama_toolkit import OllamaClient
+from ollama_toolkit.exceptions import (
+    ModelNotFoundError, 
+    ConnectionError, 
+    TimeoutError,
+    OllamaAPIError
+)
 
 client = OllamaClient()
 
-try:
-    # Try to use a model that doesn't exist
-    client.generate(model="non-existent-model", prompt="Hello")
-except ModelNotFoundError as e:
-    print(f"Model not found: {e}")
-except ConnectionError as e:
-    print(f"Connection error: {e}. Is Ollama server running?")
-except OllamaAPIError as e:
-    print(f"API error: {e}")
+def safe_generate():
+    try:
+        # Try with a model that may not exist
+        return client.generate(
+            model="nonexistent-model-123",
+            prompt="This won't work",
+            stream=False
+        )
+    except ModelNotFoundError as e:
+        print(f"Model not found: {e}")
+        # Fallback to a model we know exists
+        return client.generate(
+            model="llama2",
+            prompt="This is a fallback prompt",
+            stream=False
+        )
+    except ConnectionError as e:
+        print(f"Connection error: {e}")
+        print("Please ensure Ollama server is running")
+        return None
+    except TimeoutError as e:
+        print(f"Request timed out: {e}")
+        return None
+    except OllamaAPIError as e:
+        print(f"API error: {e}")
+        return None
+
+response = safe_generate()
+if response:
+    print(f"Response: {response.get('response', '')}")
 ```
 
 ## Automatic Ollama Installation

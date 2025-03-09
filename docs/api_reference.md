@@ -1,6 +1,6 @@
 # API Reference
 
-This page documents the key classes and methods provided by the Ollama Toolkit client.
+This page documents all classes and methods provided by the Ollama Toolkit client.
 
 ## OllamaClient
 
@@ -11,17 +11,18 @@ from ollama_toolkit import OllamaClient
 
 client = OllamaClient(
     base_url="http://localhost:11434/",
-    timeout=60,
+    timeout=300,
     max_retries=3,
     retry_delay=1.0,
-    cache_enabled=False
+    cache_enabled=False,
+    cache_ttl=300.0
 )
 ```
 
 ### Constructor Parameters
 
 - `base_url` (str): The base URL of the Ollama Toolkit server. Default: "http://localhost:11434/"
-- `timeout` (int): Default timeout for API requests in seconds. Default: 60
+- `timeout` (int): Default timeout for API requests in seconds. Default: 300
 - `max_retries` (int): Maximum number of retry attempts for failed requests. Default: 3
 - `retry_delay` (float): Delay between retry attempts in seconds. Default: 1.0
 - `cache_enabled` (bool): Whether to cache API responses. Default: False
@@ -54,9 +55,19 @@ response = client.generate(
 - If `stream=False`: A dictionary containing the response
 - If `stream=True`: An iterator yielding response chunks
 
+**Options Dictionary Parameters**:
+- `temperature` (float): Controls randomness in generation. Higher values (e.g., 0.8) make output more random, lower values (e.g., 0.2) make it more deterministic
+- `top_p` (float): Controls diversity via nucleus sampling. Default: 1.0
+- `top_k` (int): Limits token selection to top K options. Default: -1 (disabled)
+- `max_tokens` (int): Maximum number of tokens to generate. Default varies by model
+- `presence_penalty` (float): Penalty for token repetition. Default: 0.0
+- `frequency_penalty` (float): Penalty based on frequency in text. Default: 0.0
+- `stop` (list): Sequences where the API will stop generating further tokens
+- `seed` (int): Random number seed for reproducible outputs
+
 ##### agenerate
 
-Asynchronous version of `generate`.
+Asynchronous version of `generate`. *(Note: This method is planned but not fully implemented in the current version)*
 
 ```python
 response = await client.agenerate(
@@ -94,15 +105,21 @@ response = client.chat(
 - `model` (str): The model name to use for generation
 - `messages` (list): List of message dictionaries with 'role' and 'content' keys
 - `options` (dict, optional): Additional model parameters
-- `stream` (bool, optional): Whether to stream the response. Default: False
+- `stream` (bool, optional): Whether to stream the response. Default: True
 
 **Returns**:
 - If `stream=False`: A dictionary containing the response
 - If `stream=True`: An iterator yielding response chunks
 
+**Message Object Structure**:
+- `role` (str): The role of the message - "system", "user", "assistant", or "tool"
+- `content` (str): The content of the message
+- `images` (list, optional): For multimodal models, a list of image data
+- `tool_calls` (list, optional): For function calling, a list of tool call objects
+
 ##### achat
 
-Asynchronous version of `chat`.
+Asynchronous version of `chat`. *(Note: This method is planned but not fully implemented in the current version)*
 
 ```python
 response = await client.achat(
@@ -134,9 +151,15 @@ embedding = client.create_embedding(
 **Returns**:
 - A dictionary containing the embedding vector
 
+**Response Structure**:
+- `model` (str): The model name
+- `embedding` (list): The embedding vector (array of floats)
+- `total_duration` (int): Time spent generating embeddings (nanoseconds)
+- `prompt_eval_count` (int): Number of tokens processed
+
 ##### acreate_embedding
 
-Asynchronous version of `create_embedding`.
+Asynchronous version of `create_embedding`. *(Note: This method is planned but not fully implemented in the current version)*
 
 ```python
 embedding = await client.acreate_embedding(
@@ -147,7 +170,7 @@ embedding = await client.acreate_embedding(
 
 ##### batch_embeddings
 
-Create embeddings for multiple prompts efficiently.
+Create embeddings for multiple prompts efficiently. *(Note: This method is planned but not fully implemented in the current version)*
 
 ```python
 embeddings = client.batch_embeddings(
@@ -177,9 +200,17 @@ models = client.list_models()
 **Returns**:
 - A dictionary containing the list of available models
 
+**Response Structure**:
+- `models` (list): A list of model objects containing:
+  - `name` (str): The model name
+  - `size` (int): Size in bytes
+  - `modified_at` (str): Timestamp of last modification
+  - `digest` (str): Model digest
+  - `details` (object): Additional model details
+
 ##### get_model_info
 
-Get information about a specific model.
+Get information about a specific model. *(Note: This method is planned but not fully implemented in the current version)*
 
 ```python
 model_info = client.get_model_info("llama2")
@@ -212,6 +243,12 @@ for update in client.pull_model("llama2", stream=True):
 - If `stream=False`: A dictionary with the status
 - If `stream=True`: An iterator of status updates
 
+**Stream Update Structure**:
+- `status` (str): Status message like "downloading", "processing", "success"
+- `completed` (int): Bytes downloaded (present during downloading)
+- `total` (int): Total bytes to download (present during downloading)
+- `digest` (str): Model digest (present during downloading)
+
 ##### delete_model
 
 Delete a model.
@@ -228,7 +265,7 @@ success = client.delete_model("llama2")
 
 ##### copy_model
 
-Copy a model to a new name.
+Copy a model to a new name. *(Note: This method is planned but not fully implemented in the current version)*
 
 ```python
 result = client.copy_model("llama2", "my-llama2-copy")
@@ -263,6 +300,34 @@ Asynchronous version of `get_version`.
 version = await client.aget_version()
 ```
 
+##### _messages_to_prompt
+
+Convert chat messages to a unified prompt string for models that don't support chat format.
+
+```python
+prompt = client._messages_to_prompt(messages)
+```
+
+**Parameters**:
+- `messages` (list): List of message dictionaries
+
+**Returns**:
+- A formatted prompt string
+
+##### _is_likely_embedding_model
+
+Check if a model is likely to be an embedding-only model based on name patterns.
+
+```python
+is_embedding = client._is_likely_embedding_model("nomic-embed-text")
+```
+
+**Parameters**:
+- `model_name` (str): Name of the model to check
+
+**Returns**:
+- `True` if the model is likely embedding-only, `False` otherwise
+
 ## Exception Classes
 
 The package provides several exception types for better error handling:
@@ -276,20 +341,43 @@ The package provides several exception types for better error handling:
 - `StreamingError`: Raised when there's an error during streaming responses
 - `ParseError`: Raised when there's an error parsing API responses
 - `AuthenticationError`: Raised when authentication fails
+- `EndpointNotFoundError`: Raised when an API endpoint is not found
+- `ModelCompatibilityError`: Raised when a model doesn't support an operation
+- `StreamingTimeoutError`: Raised when a streaming response times out
 
 ## Utility Functions
 
 The package provides several utility functions in `ollama_toolkit.utils.common`:
 
+### Display Functions
+
 - `print_header(title)`: Print a formatted header
-- `print_success(message)`: Print a success message
-- `print_error(message)`: Print an error message
-- `print_warning(message)`: Print a warning message
-- `print_info(message)`: Print an information message
+- `print_success(message)`: Print a success message in green
+- `print_error(message)`: Print an error message in red
+- `print_warning(message)`: Print a warning message in yellow
+- `print_info(message)`: Print an information message in blue
 - `print_json(data)`: Print formatted JSON data
-- `make_api_request(method, endpoint, data=None, base_url=DEFAULT_OLLAMA_API_URL, timeout=60)`: Make an API request
-- `async_make_api_request(method, endpoint, data=None, base_url=DEFAULT_OLLAMA_API_URL, timeout=60)`: Make an async API request
-- `check_ollama_installed()`: Check if Ollama is installed
+
+### API Utilities
+
+- `make_api_request(method, endpoint, data=None, base_url=DEFAULT_OLLAMA_API_URL, timeout=300)`: Make a synchronous API request
+- `async_make_api_request(method, endpoint, data=None, base_url=DEFAULT_OLLAMA_API_URL, timeout=300)`: Make an asynchronous API request
+
+### Ollama Management
+
+- `check_ollama_installed()`: Check if Ollama is installed on the system
 - `check_ollama_running()`: Check if Ollama server is running
 - `install_ollama()`: Attempt to install Ollama
 - `ensure_ollama_running()`: Ensure Ollama is installed and running
+- `format_traceback(e)`: Format an exception traceback for logging or display
+
+### Model Constants
+
+The `ollama_toolkit.utils.model_constants` module provides:
+
+- `DEFAULT_CHAT_MODEL`: Default model for chat completions
+- `BACKUP_CHAT_MODEL`: Fallback model for chat completions
+- `DEFAULT_EMBEDDING_MODEL`: Default model for embeddings
+- `BACKUP_EMBEDDING_MODEL`: Fallback model for embeddings
+- `resolve_model_alias(alias)`: Convert model alias to actual model name
+- `get_fallback_model(model_name)`: Get the appropriate fallback model
