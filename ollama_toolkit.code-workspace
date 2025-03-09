@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "."
+		},
+		{
+			"path": "../../research_project/emergent_reality_theory"
 		}
 	],
 	"settings": {}

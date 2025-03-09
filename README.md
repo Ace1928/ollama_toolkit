@@ -1,6 +1,6 @@
 # Ollama Toolkit Python Client
 
-[![PyPI version](https://badge.fury.io/py/ollama-api.svg)](https://badge.fury.io/py/ollama-api)
+[![PyPI version](https://badge.fury.io/py/ollama-toolkit.svg)](https://badge.fury.io/py/ollama-toolkit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
@@ -394,6 +394,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Contact
 
-Lloyd Handyside - [ace1928@gmail.com](mailto:ace1928@gmail.com)
+- Lloyd Handyside (Biological) - [ace1928@gmail.com](mailto:ace1928@gmail.com)
+- Eidos (Digital) - [eidos@gmail.com](mailto:eidos@gmail.com)
 
-Project Link: [https://github.com/lloydhd/ollama_toolkit](https://github.com/lloydhd/ollama_toolkit)
+Project Link: [https://github.com/Ace1928/ollama_toolkit](https://github.com/Ace1928/ollama_toolkit)

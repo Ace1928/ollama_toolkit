@@ -34,9 +34,9 @@ Then open `_build/html/index.html` in your web browser.
 
 We welcome improvements to the documentation! To contribute:
 
-1. Fork the repository
+1. Fork the repository from https://github.com/Ace1928/ollama_toolkit
 2. Make your changes following our Eidosian principles
-3. Submit a pull request
+3. Submit a pull request to https://github.com/Ace1928/ollama_toolkit
 
 ## 📜 Documentation Standards
 

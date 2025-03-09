@@ -6,8 +6,8 @@ elevated to peak Eidosian perfection.
 """
 
 __version__ = "0.1.7"
-__author__ = "Lloyd Handyside"
-__email__ = "ace1928@gmail.com"
+__author__ = "Lloyd Handyside, Eidos"
+__email__ = "ace1928@gmail.com, eidos@gmail.com"
 
 # Utilities
 from .utils.common import (

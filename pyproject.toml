@@ -2,6 +2,19 @@
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "ollama_toolkit"
+version = "0.1.7"
+description = "A comprehensive Python client library for the Ollama API"
+authors = [
+    {name = "Lloyd Handyside", email = "ace1928@gmail.com"},
+    {name = "Eidos", email = "eidos@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "MIT"}
+urls = {repository = "https://github.com/Ace1928/ollama_toolkit"}
+
 [tool.black]
 line-length = 88
 target-version = ["py38"]
