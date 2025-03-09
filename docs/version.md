@@ -32,21 +32,21 @@ curl http://localhost:11434/api/version
 
 ```json
 {
-  "version": "0.1.8"
+  "version": "0.1.11"
 }
 ```
+
+(This corresponds to the Ollama server’s version. Ensure it meets or exceeds 0.1.11.)
 
 ### Python Usage Example
 
 ```python
 from ollama_toolkit import OllamaClient
 
-# Initialize the client - system verification foundation
 client = OllamaClient()
 
-# Get and display version information
 version_info = client.get_version()
-print(f"Connected to Ollama version: {version_info['version']}")
+print(f"Connected to Ollama server version: {version_info['version']}")
 ```
 
 ## Async Example

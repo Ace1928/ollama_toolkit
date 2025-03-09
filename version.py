@@ -6,10 +6,10 @@ to ensure consistency across the project.
 """
 
 # Current version of the Ollama Toolkit package
-__version__ = "0.1.8"
+__version__ = "0.1.8"             # Ollama Toolkit client version
 
 # Minimum compatible Ollama server version
-MINIMUM_OLLAMA_VERSION = "0.1.11"
+MINIMUM_OLLAMA_VERSION = "0.1.11"  # Confirmed minimum Ollama server version
 
 # Version release date (YYYY-MM-DD)
 VERSION_RELEASE_DATE = "2023-10-15"

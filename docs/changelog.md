@@ -4,16 +4,17 @@ A detailed record of changes to the Ollama Toolkit, following Eidosian principle
 
 ## 0.1.8 (Current)
 
-### Added
-- Enhanced embedding operations with batch processing
-- Comprehensive error handling documentation
-- Model management interface for custom model creation
-- CLI support for all new features
-- Async context manager support
-- Complete API documentation including all endpoints
-- New utility functions for model selection
-- Extended examples for all API features
-- Expanded test coverage to 95%
+- Ensured all documentation references align with client version 0.1.8.
+- Clarified minimum recommended Ollama server version is 0.1.11.
+- Enhanced embedding operations with batch processing.
+- Comprehensive error handling documentation.
+- Model management interface for custom model creation.
+- CLI support for all new features.
+- Async context manager support.
+- Complete API documentation including all endpoints.
+- New utility functions for model handling.
+- Extended examples for all API capabilities.
+- Expanded test coverage to 95%.
 
 ### Changed
 - Improved async support with proper exception handling

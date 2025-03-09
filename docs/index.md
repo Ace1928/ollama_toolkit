@@ -34,25 +34,25 @@ Ollama Toolkit gives you programmatic access to:
 from ollama_toolkit import OllamaClient, __version__
 from ollama_toolkit.utils.common import ensure_ollama_running
 
-# Display toolkit version - foundational awareness
-print(f"Ollama Toolkit version: {__version__}")  # Should report 0.1.8
+# Display toolkit version – foundational awareness
+print(f"Ollama Toolkit version: {__version__}")  # Should be 0.1.8
 
-# Ensure Ollama is installed and running - structurally sound foundation
+# Ensure Ollama is installed and running – structurally sound foundation
 is_running, message = ensure_ollama_running()
 if not is_running:
     print(f"Error: {message}")
     exit(1)
-    
+
 print(f"Ollama status: {message}")
 
 # Initialize the client with optimal timeout
-client = OllamaClient(timeout=300)  # 5-minute timeout for larger operations
+client = OllamaClient(timeout=600)  # 10-minute timeout
 
-# Check version - self-aware system verification
+# Check Ollama server version – recommended minimum is v0.1.11
 version = client.get_version()
-print(f"Connected to Ollama version: {version['version']}")
+print(f"Connected to Ollama server version: {version.get('version', 'unknown')}")
 
-# List available models - structural awareness
+# List available models – structural awareness
 models = client.list_models()
 model_names = [model["name"] for model in models.get("models", [])]
 print(f"Available models: {model_names}")
@@ -60,14 +60,8 @@ print(f"Available models: {model_names}")
 # Generate text with precision and flow
 if model_names:  # Use first available model if any exist
     model_name = model_names[0]
-    print(f"\nGenerating text with {model_name}...")
-    
-    response = client.generate(
-        model=model_name,
-        prompt="Explain what makes a good API in three sentences.",
-        stream=False
-    )
-    
+    print("\nGenerating a short test response...")
+    response = client.generate(model=model_name, prompt="Say hello!", stream=False)
     print(f"\nResponse: {response.get('response', 'No response generated')}")
 else:
     print("No models available. Use client.pull_model() to download a model.")
