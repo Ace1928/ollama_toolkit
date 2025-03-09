@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ollama Toolkit Documentation &mdash; Ollama Toolkit 0.1.0 documentation</title>
+  <title>Ollama Toolkit Documentation &mdash; Ollama Toolkit 0.1.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/documentation_options.js?v=22607128"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -58,14 +58,26 @@
 <li class="toctree-l1"><a class="reference internal" href="chat.html">Generate a Chat Completion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generate.html">Generate a Completion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="embed.html">Generate Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_management.html">Model Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="error_handling.html">Error Handling</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">🧠 Guides &amp; References</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="conventions.html">Ollama Toolkit Conventions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eidosian_integration.html">Eidosian Integration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="version.html">Version API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="version.html">Version Endpoint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🧩 API Endpoints</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="version.html">Version Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">Generate a Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chat.html">Generate a Chat Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embed.html">Generate Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models_api.html">Models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system_api.html">System API</a></li>
 </ul>
 
         </div>
@@ -119,30 +131,34 @@
 <li><p>💪 <strong>Self-Aware Error Handling</strong>: Comprehensive error types that explain precisely what went wrong</p></li>
 <li><p>📊 <strong>Velocity-Optimized Embeddings</strong>: Create and manipulate embeddings with maximum efficiency</p></li>
 <li><p>🧪 <strong>Recursively Refined Testing</strong>: Every function proven robust through iterative improvement</p></li>
+<li><p>🔍 <strong>Version-Aware</strong>: Full compatibility with Ollama 0.1.8 and beyond</p></li>
 </ul>
 </section>
 <section id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This implementation follows Eidosian principles of contextual integrity and precision</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ollama_toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">OllamaClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ollama_toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">OllamaClient</span><span class="p">,</span> <span class="n">__version__</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ollama_toolkit.utils.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_ollama_running</span>
 
-<span class="c1"># Ensure Ollama is installed and running - structurally sound foundation</span>
+<span class="c1"># Display toolkit version – foundational awareness</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ollama Toolkit version: </span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Should be 0.1.8</span>
+
+<span class="c1"># Ensure Ollama is installed and running – structurally sound foundation</span>
 <span class="n">is_running</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="n">ensure_ollama_running</span><span class="p">()</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">is_running</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    
+
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ollama status: </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Initialize the client with optimal timeout</span>
-<span class="n">client</span> <span class="o">=</span> <span class="n">OllamaClient</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>  <span class="c1"># 5-minute timeout for larger operations</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">OllamaClient</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>  <span class="c1"># 10-minute timeout</span>
 
-<span class="c1"># Check version - self-aware system verification</span>
+<span class="c1"># Check Ollama server version – recommended minimum is v0.1.11</span>
 <span class="n">version</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connected to Ollama version: </span><span class="si">{</span><span class="n">version</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connected to Ollama server version: </span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># List available models - structural awareness</span>
+<span class="c1"># List available models – structural awareness</span>
 <span class="n">models</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">list_models</span><span class="p">()</span>
 <span class="n">model_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;models&quot;</span><span class="p">,</span> <span class="p">[])]</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available models: </span><span class="si">{</span><span class="n">model_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -150,14 +166,8 @@
 <span class="c1"># Generate text with precision and flow</span>
 <span class="k">if</span> <span class="n">model_names</span><span class="p">:</span>  <span class="c1"># Use first available model if any exist</span>
     <span class="n">model_name</span> <span class="o">=</span> <span class="n">model_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Generating text with </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
-    
-    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
-        <span class="n">prompt</span><span class="o">=</span><span class="s2">&quot;Explain what makes a good API in three sentences.&quot;</span><span class="p">,</span>
-        <span class="n">stream</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">)</span>
-    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Generating a short test response...&quot;</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="s2">&quot;Say hello!&quot;</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Response: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;response&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;No response generated&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No models available. Use client.pull_model() to download a model.&quot;</span><span class="p">)</span>
@@ -167,7 +177,7 @@
 <section id="installation-guide">
 <h2>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Install via PyPI: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ollama-toolkit</span></code></p></li>
+<li><p>Install via PyPI: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ollama-toolkit==0.1.8</span></code></p></li>
 <li><p>Or install locally in editable mode:</p></li>
 </ul>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>/path/to/ollama_toolkit
@@ -265,6 +275,32 @@
 <li class="toctree-l2"><a class="reference internal" href="embed.html#examples">Examples</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="model_management.html">Model Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#listing-models">Listing Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#retrieving-model-information">Retrieving Model Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#pulling-models">Pulling Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#copying-models">Copying Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#deleting-models">Deleting Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#creating-custom-models">Creating Custom Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#running-models">Running Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#pushing-models">Pushing Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#recommended-models">Recommended Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#model-constants">Model Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#utility-functions">Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_management.html#best-practices">Best Practices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="error_handling.html">Error Handling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#exception-hierarchy">Exception Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#basic-error-handling-pattern">Basic Error Handling Pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#advanced-fallback-mechanisms">Advanced Fallback Mechanisms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#exception-details">Exception Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#error-logging">Error Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#eidosian-error-messages">Eidosian Error Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#best-practices">Best Practices</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
@@ -272,11 +308,16 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="conventions.html">Ollama Toolkit Conventions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="conventions.html#model-names">Model Names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conventions.html#api-versioning">API Versioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conventions.html#durations">Durations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conventions.html#streaming-responses">Streaming Responses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conventions.html#error-handling">Error Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conventions.html#python-client-parameters">Python Client Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conventions.html#documentation-style">Documentation Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conventions.html#cli-conventions">CLI Conventions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting Guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#connection-issues">Connection Issues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#model-loading-errors">Model Loading Errors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#performance-problems">Performance Problems</a></li>
@@ -287,17 +328,37 @@
 <li class="toctree-l2"><a class="reference internal" href="eidosian_integration.html#implementing-eidosian-excellence">Implementing Eidosian Excellence</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="version.html">Version API</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="version.html">Version Endpoint</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="version.html#endpoint">Endpoint</a></li>
-<li class="toctree-l2"><a class="reference internal" href="version.html#response">Response</a></li>
 <li class="toctree-l2"><a class="reference internal" href="version.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="version.html#async-example">Async Example</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#getting-started">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#development-setup">Development Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#authors-maintainers">Authors &amp; Maintainers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#pull-request-process">Pull Request Process</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#current">0.1.8 (Current)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id1">0.1.7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id4">0.1.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id8">0.1.5</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">🧩 API Endpoints</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="version.html">Version Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">Generate a Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chat.html">Generate a Chat Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embed.html">Generate Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models_api.html">Models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system_api.html">System API</a></li>
 </ul>
 </div>
 </section>
@@ -309,6 +370,8 @@
 <li><p><a class="reference internal" href="generate.html"><span class="std std-doc">Generate Text</span></a> — Flow like a river</p></li>
 <li><p><a class="reference internal" href="chat.html"><span class="std std-doc">Chat Completion</span></a> — Universal yet personal</p></li>
 <li><p><a class="reference internal" href="embed.html"><span class="std std-doc">Embeddings</span></a> — Mathematical elegance</p></li>
+<li><p><a class="reference internal" href="model_management.html"><span class="std std-doc">Model Management</span></a> — Structural control</p></li>
+<li><p><a class="reference internal" href="error_handling.html"><span class="std std-doc">Error Handling</span></a> — Self-aware resilience</p></li>
 </ul>
 <p>All examples can be run via:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>ollama_toolkit.examples.&lt;example_file&gt;
@@ -316,9 +379,29 @@
 </div>
 <p>(e.g. <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">ollama_toolkit.examples.quickstart</span></code>).</p>
 </section>
+<section id="version-history">
+<h2>Version History<a class="headerlink" href="#version-history" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>0.1.8</strong> (Current) - Enhanced embedding operations, improved async support, expanded CLI</p></li>
+<li><p><strong>0.1.7</strong> - Added comprehensive error handling and model fallbacks</p></li>
+<li><p><strong>0.1.6</strong> - Introduced caching and optimization for embeddings</p></li>
+<li><p><strong>0.1.5</strong> - Initial public release with basic functionality</p></li>
+</ul>
+</section>
 <section id="license">
 <h2>License<a class="headerlink" href="#license" title="Link to this heading"></a></h2>
 <p>This project is licensed under the MIT License - see the LICENSE file for details.</p>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Lloyd Handyside (Biological) - <a class="reference external" href="mailto:ace1928&#37;&#52;&#48;gmail&#46;com">ace1928<span>&#64;</span>gmail<span>&#46;</span>com</a></p></li>
+<li><p>Eidos (Digital) - <a class="reference external" href="mailto:eidos&#37;&#52;&#48;gmail&#46;com">eidos<span>&#64;</span>gmail<span>&#46;</span>com</a></p></li>
+</ul>
+</section>
+<section id="project-repository">
+<h2>Project Repository<a class="headerlink" href="#project-repository" title="Link to this heading"></a></h2>
+<p>Find the complete source code on GitHub: <a class="reference external" href="https://github.com/Ace1928/ollama_toolkit">https://github.com/Ace1928/ollama_toolkit</a></p>
 </section>
 </section>
 

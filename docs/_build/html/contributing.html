@@ -6,19 +6,21 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contributing Guide &mdash; Ollama Toolkit 0.1.0 documentation</title>
+  <title>Contributing Guide &mdash; Ollama Toolkit 0.1.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/documentation_options.js?v=22607128"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Changelog" href="changelog.html" />
+    <link rel="prev" title="Version Endpoint" href="version.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,15 +42,51 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Contributing Guide</a><ul>
-<li><a class="reference internal" href="#development-setup">Development Setup</a></li>
-<li><a class="reference internal" href="#pull-request-process">Pull Request Process</a></li>
+              <p class="caption" role="heading"><span class="caption-text">📚 Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="README.html">About the Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🛠️ Core Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🔄 Features &amp; Capabilities</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chat.html">Generate a Chat Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">Generate a Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embed.html">Generate Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_management.html">Model Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="error_handling.html">Error Handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🧠 Guides &amp; References</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="conventions.html">Ollama Toolkit Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eidosian_integration.html">Eidosian Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="version.html">Version Endpoint</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#development-setup">Development Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#authors-maintainers">Authors &amp; Maintainers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pull-request-process">Pull Request Process</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
-</div>
+<p class="caption" role="heading"><span class="caption-text">🧩 API Endpoints</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="version.html">Version Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">Generate a Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chat.html">Generate a Chat Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embed.html">Generate Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models_api.html">Models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system_api.html">System API</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -76,20 +114,35 @@
   <section id="contributing-guide">
 <h1>Contributing Guide<a class="headerlink" href="#contributing-guide" title="Link to this heading"></a></h1>
 <p>Thank you for considering contributing to Ollama Toolkit!</p>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Fork the repository from <a class="reference external" href="https://github.com/Ace1928/ollama_toolkit">https://github.com/Ace1928/ollama_toolkit</a></p></li>
+<li><p>Clone your fork: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/yourusername/ollama_toolkit.git</span></code></p></li>
+<li><p>Set upstream: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">remote</span> <span class="pre">add</span> <span class="pre">upstream</span> <span class="pre">https://github.com/Ace1928/ollama_toolkit.git</span></code></p></li>
+</ol>
+</section>
 <section id="development-setup">
 <h2>Development Setup<a class="headerlink" href="#development-setup" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
-<li><p>Fork the repository</p></li>
-<li><p>Clone your fork</p></li>
-<li><p>Install development dependencies…</p></li>
+<li><p>Install development dependencies: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">&quot;.[dev]&quot;</span></code></p></li>
+<li><p>Run tests to verify your setup: <code class="docutils literal notranslate"><span class="pre">pytest</span></code></p></li>
+<li><p>Create a branch for your changes: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">-b</span> <span class="pre">feature/your-feature-name</span></code></p></li>
 </ol>
+</section>
+<section id="authors-maintainers">
+<h2>Authors &amp; Maintainers<a class="headerlink" href="#authors-maintainers" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Lloyd Handyside (Biological) - <a class="reference external" href="mailto:ace1928&#37;&#52;&#48;gmail&#46;com">ace1928<span>&#64;</span>gmail<span>&#46;</span>com</a></p></li>
+<li><p>Eidos (Digital) - <a class="reference external" href="mailto:eidos&#37;&#52;&#48;gmail&#46;com">eidos<span>&#64;</span>gmail<span>&#46;</span>com</a></p></li>
+</ul>
 </section>
 <section id="pull-request-process">
 <h2>Pull Request Process<a class="headerlink" href="#pull-request-process" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
-<li><p>Ensure all tests pass</p></li>
-<li><p>Update documentation</p></li>
-<li><p>Submit your PR…</p></li>
+<li><p>Ensure all tests pass: <code class="docutils literal notranslate"><span class="pre">pytest</span></code></p></li>
+<li><p>Update documentation if needed</p></li>
+<li><p>Submit your PR to https://github.com/Ace1928/ollama_toolkit</p></li>
 </ol>
 </section>
 </section>
@@ -97,7 +150,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="version.html" class="btn btn-neutral float-left" title="Version Endpoint" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

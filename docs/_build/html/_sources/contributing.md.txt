@@ -2,14 +2,25 @@
 
 Thank you for considering contributing to Ollama Toolkit!
 
+## Getting Started
+
+1. Fork the repository from [https://github.com/Ace1928/ollama_toolkit](https://github.com/Ace1928/ollama_toolkit)
+2. Clone your fork: `git clone https://github.com/yourusername/ollama_toolkit.git`
+3. Set upstream: `git remote add upstream https://github.com/Ace1928/ollama_toolkit.git`
+
 ## Development Setup
 
-1. Fork the repository
-2. Clone your fork
-3. Install development dependencies...
+1. Install development dependencies: `pip install -e ".[dev]"`
+2. Run tests to verify your setup: `pytest`
+3. Create a branch for your changes: `git checkout -b feature/your-feature-name`
+
+## Authors & Maintainers
+
+- Lloyd Handyside (Biological) - [ace1928@gmail.com](mailto:ace1928@gmail.com)
+- Eidos (Digital) - [eidos@gmail.com](mailto:eidos@gmail.com)
 
 ## Pull Request Process
 
-1. Ensure all tests pass
-2. Update documentation
-3. Submit your PR...
+1. Ensure all tests pass: `pytest`
+2. Update documentation if needed
+3. Submit your PR to https://github.com/Ace1928/ollama_toolkit

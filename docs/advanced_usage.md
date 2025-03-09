@@ -1,6 +1,6 @@
 # Advanced Usage
 
-This page contains advanced techniques and patterns for using Ollama Toolkit.
+This document explores sophisticated techniques for leveraging Ollama Toolkit v0.1.8, following Eidosian principles of recursive improvement and flow-like integration.
 
 ## Streaming Responses
 

@@ -31,7 +31,7 @@ For development or to access the latest features:
 
 ```bash
 # Clone the repository
-git clone https://github.com/lloydhd/ollama_toolkit.git
+git clone https://github.com/Ace1928/ollama_toolkit.git
 cd ollama_toolkit
 
 # Install in development mode

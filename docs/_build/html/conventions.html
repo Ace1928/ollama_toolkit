@@ -6,19 +6,21 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ollama Toolkit Conventions &mdash; Ollama Toolkit 0.1.0 documentation</title>
+  <title>Ollama Toolkit Conventions &mdash; Ollama Toolkit 0.1.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/documentation_options.js?v=22607128"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Troubleshooting Guide" href="troubleshooting.html" />
+    <link rel="prev" title="Error Handling" href="error_handling.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,16 +42,59 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Ollama Toolkit Conventions</a><ul>
-<li><a class="reference internal" href="#model-names">Model Names</a></li>
-<li><a class="reference internal" href="#durations">Durations</a></li>
-<li><a class="reference internal" href="#streaming-responses">Streaming Responses</a></li>
+              <p class="caption" role="heading"><span class="caption-text">📚 Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="README.html">About the Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🛠️ Core Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🔄 Features &amp; Capabilities</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chat.html">Generate a Chat Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">Generate a Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embed.html">Generate Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_management.html">Model Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="error_handling.html">Error Handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🧠 Guides &amp; References</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Ollama Toolkit Conventions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#model-names">Model Names</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#recommended-models">Recommended Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#model-name-format">Model Name Format</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#api-versioning">API Versioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#durations">Durations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#streaming-responses">Streaming Responses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#error-handling">Error Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-client-parameters">Python Client Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation-style">Documentation Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cli-conventions">CLI Conventions</a></li>
 </ul>
-</div>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eidosian_integration.html">Eidosian Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="version.html">Version Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🧩 API Endpoints</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="version.html">Version Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">Generate a Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chat.html">Generate a Chat Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embed.html">Generate Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models_api.html">Models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system_api.html">System API</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -76,31 +121,119 @@
              
   <section id="ollama-toolkit-conventions">
 <h1>Ollama Toolkit Conventions<a class="headerlink" href="#ollama-toolkit-conventions" title="Link to this heading"></a></h1>
-<p>This document outlines the conventions used across the Ollama Toolkit.</p>
+<p>This document outlines the conventions used across the Ollama Toolkit v0.1.8, following Eidosian principles of precision, clarity, and structural integrity.</p>
 <section id="model-names">
 <h2>Model Names<a class="headerlink" href="#model-names" title="Link to this heading"></a></h2>
-<p>Latest recommended default model is <code class="docutils literal notranslate"><span class="pre">deepseek-r1:1.5b</span></code>. Other examples:</p>
+<section id="recommended-models">
+<h3>Recommended Models<a class="headerlink" href="#recommended-models" title="Link to this heading"></a></h3>
+<p>Latest recommended default models for different purposes:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">qwen2.5:0.5b</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">nomic-embed-text</span></code></p></li>
+<li><p><strong>General text generation</strong>: <code class="docutils literal notranslate"><span class="pre">deepseek-r1:1.5b</span></code> - Excellent balance of quality and efficiency</p></li>
+<li><p><strong>Chat</strong>: <code class="docutils literal notranslate"><span class="pre">qwen2.5:0.5b</span></code> - Optimized for conversational flow</p></li>
+<li><p><strong>Embeddings</strong>: <code class="docutils literal notranslate"><span class="pre">nomic-embed-text</span></code> - Mathematical precision for vector representations</p></li>
+<li><p><strong>Lightweight option</strong>: <code class="docutils literal notranslate"><span class="pre">tinyllama</span></code> - Minimal resource usage for constrained environments</p></li>
 </ul>
-<p>The tag is optional and, if not provided, will default to <code class="docutils literal notranslate"><span class="pre">latest</span></code>. The tag is used to identify a specific version.</p>
+<p>The tag is optional and, if not provided, will default to <code class="docutils literal notranslate"><span class="pre">latest</span></code>. The tag is used to identify a specific version of a model.</p>
+</section>
+<section id="model-name-format">
+<h3>Model Name Format<a class="headerlink" href="#model-name-format" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">[:</span><span class="n">tag</span><span class="p">]</span><span class="nd">@owner</span><span class="o">/</span><span class="n">model</span>
+</pre></div>
+</div>
+<p>Examples:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">llama2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">llama2:13b</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">llama2:70b-q4_0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stability.ai/stable-diffusion</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="api-versioning">
+<h2>API Versioning<a class="headerlink" href="#api-versioning" title="Link to this heading"></a></h2>
+<p>Ollama Toolkit follows semantic versioning (MAJOR.MINOR.PATCH):</p>
+<ul class="simple">
+<li><p>Current version: 0.1.8</p></li>
+<li><p>Version information is accessible via <code class="docutils literal notranslate"><span class="pre">ollama_toolkit.__version__</span></code></p></li>
+<li><p>All endpoints maintain backward compatibility within the same MAJOR version</p></li>
+</ul>
 </section>
 <section id="durations">
 <h2>Durations<a class="headerlink" href="#durations" title="Link to this heading"></a></h2>
-<p>All durations remain in nanoseconds.</p>
+<p>All durations in API responses are provided in nanoseconds for maximum precision.</p>
 </section>
 <section id="streaming-responses">
 <h2>Streaming Responses<a class="headerlink" href="#streaming-responses" title="Link to this heading"></a></h2>
-<p>Set <code class="docutils literal notranslate"><span class="pre">{&quot;stream&quot;:</span> <span class="pre">true}</span></code> or <code class="docutils literal notranslate"><span class="pre">{&quot;stream&quot;:</span> <span class="pre">false}</span></code> in request JSON.</p>
-<p>Certain endpoints stream responses as JSON objects. Streaming can be disabled by providing <code class="docutils literal notranslate"><span class="pre">{&quot;stream&quot;:</span> <span class="pre">false}</span></code> for these endpoints.</p>
+<p>Several endpoints support streaming responses. Control streaming behavior by setting:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;stream&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;stream&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>in request JSON.</p>
+<p>Streaming can be disabled by providing <code class="docutils literal notranslate"><span class="pre">{&quot;stream&quot;:</span> <span class="pre">false}</span></code> for these endpoints:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/api/generate</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/api/chat</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/api/pull</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/api/push</span></code></p></li>
+</ul>
+</section>
+<section id="error-handling">
+<h2>Error Handling<a class="headerlink" href="#error-handling" title="Link to this heading"></a></h2>
+<p>All error responses follow a consistent format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Descriptive error message&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>HTTP status codes:</p>
+<ul class="simple">
+<li><p>200: Success</p></li>
+<li><p>400: Bad request (client error)</p></li>
+<li><p>404: Not found</p></li>
+<li><p>500: Server error</p></li>
+</ul>
+</section>
+<section id="python-client-parameters">
+<h2>Python Client Parameters<a class="headerlink" href="#python-client-parameters" title="Link to this heading"></a></h2>
+<p>When using the Python client, parameters follow consistent naming:</p>
+<ul class="simple">
+<li><p>Use snake_case for parameter names</p></li>
+<li><p>Boolean flags use explicit names (e.g., <code class="docutils literal notranslate"><span class="pre">stream=True</span></code> not <code class="docutils literal notranslate"><span class="pre">stream</span></code>)</p></li>
+<li><p>Optional parameters default to Python’s <code class="docutils literal notranslate"><span class="pre">None</span></code> where appropriate</p></li>
+</ul>
+</section>
+<section id="documentation-style">
+<h2>Documentation Style<a class="headerlink" href="#documentation-style" title="Link to this heading"></a></h2>
+<p>All documentation follows these Eidosian principles:</p>
+<ul class="simple">
+<li><p><strong>Contextual Integrity</strong>: Every section serves a precise purpose</p></li>
+<li><p><strong>Exhaustive But Concise</strong>: Complete information presented efficiently</p></li>
+<li><p><strong>Flow Like a River</strong>: Smooth transitions between related concepts</p></li>
+<li><p><strong>Precision as Style</strong>: Clear, accurate information presented elegantly</p></li>
+</ul>
+</section>
+<section id="cli-conventions">
+<h2>CLI Conventions<a class="headerlink" href="#cli-conventions" title="Link to this heading"></a></h2>
+<p>Command-line interface commands use consistent patterns:</p>
+<ul class="simple">
+<li><p>Main subcommands represent primary API functions</p></li>
+<li><p>Options follow GNU-style with both short and long forms (e.g., <code class="docutils literal notranslate"><span class="pre">-m/--model</span></code>)</p></li>
+<li><p>Global flags appear before subcommands, specific flags after</p></li>
+</ul>
 </section>
 </section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="error_handling.html" class="btn btn-neutral float-left" title="Error Handling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="troubleshooting.html" class="btn btn-neutral float-right" title="Troubleshooting Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
