@@ -8,7 +8,7 @@ import sys
 import argparse
 import json
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Generator  # <-- Added Generator import
 
 import requests
 from colorama import Fore, Style, init

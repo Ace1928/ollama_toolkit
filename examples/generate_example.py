@@ -11,7 +11,7 @@ import sys
 import argparse
 import json
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 
 import requests
 from colorama import Fore, Style, init
