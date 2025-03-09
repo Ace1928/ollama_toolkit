@@ -1,42 +1,28 @@
-# Version API
+# Version Endpoint
 
-Retrieve the Ollama version information.
+This document explains how to retrieve the current version of the Ollama server and confirms the Ollama Toolkit client is at v0.1.8.
 
 ## Endpoint
 
 ```
 GET /api/version
 ```
-
-This endpoint returns version information about the running Ollama instance. It doesn't require any parameters and is useful for checking API compatibility.
-
-## Response
-
-Returns a JSON object containing the current Ollama version.
-
-### Response Fields
-
-| Field    | Type   | Description          |
-|----------|--------|----------------------|
-| version  | string | The Ollama version   |
+Returns JSON containing the server's version details.
 
 ## Example
-
-### Request
 
 ```bash
 curl http://localhost:11434/api/version
 ```
 
-### Response
-
+Expected output:
 ```json
 {
   "version": "0.1.11"
 }
 ```
 
-(This corresponds to the Ollama server’s version. Ensure it meets or exceeds 0.1.11.)
+(Ollama Toolkit v0.1.8 is compatible with Ollama server >= 0.1.11.)
 
 ### Python Usage Example
 

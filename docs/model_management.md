@@ -28,12 +28,9 @@ models = client.list_models()
 print("Available models:")
 for model in models.get("models", []):
     name = model.get("name", "Unknown")
-    size_bytes = model.get("size", 0)
-    size_gb = size_bytes / (1024**3) if size_bytes else "Unknown"
-    modified = model.get("modified_at", "Unknown")
+    modified = model.get("modified_at", "Unknown")  # Fix definition
     
     print(f"- {name}:")
-    print(f"  Size: {size_gb:.2f} GB" if isinstance(size_gb, float) else f"  Size: {size_gb}")
     print(f"  Last modified: {modified}")
 ```
 

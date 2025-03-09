@@ -3,6 +3,9 @@ Version information for the Ollama Toolkit package.
 
 This file contains version constants and version-related utilities
 to ensure consistency across the project.
+
+Client version: 0.1.8
+Minimum Ollama server version: 0.1.11
 """
 
 # Current version of the Ollama Toolkit package
