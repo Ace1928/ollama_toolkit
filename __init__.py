@@ -18,7 +18,11 @@ from .utils.common import (
     print_info,
     print_json,
     make_api_request,
-    DEFAULT_OLLAMA_API_URL
+    DEFAULT_OLLAMA_API_URL,
+    ensure_ollama_running,
+    check_ollama_installed,
+    check_ollama_running,
+    install_ollama
 )
 
 # Client
@@ -34,7 +38,9 @@ from .exceptions import (
     TimeoutError,
     ModelNotFoundError,
     ServerError,
-    InvalidRequestError
+    InvalidRequestError,
+    StreamingError,
+    ParseError
 )
 
 __all__ = [
@@ -56,4 +62,10 @@ __all__ = [
     "ModelNotFoundError",
     "ServerError",
     "InvalidRequestError",
+    "ensure_ollama_running",
+    "check_ollama_installed",
+    "check_ollama_running",
+    "install_ollama",
+    "StreamingError",
+    "ParseError"
 ]
