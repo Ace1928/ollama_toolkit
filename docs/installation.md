@@ -1,6 +1,6 @@
 # Installation Guide
 
-This guide covers all aspects of installing and setting up Ollama Toolkit.
+This guide covers all aspects of installing and setting up Ollama Forge.
 
 ## Introduction
 
@@ -31,8 +31,8 @@ For development or to access the latest features:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Ace1928/ollama_toolkit.git
-cd ollama_toolkit
+git clone https://github.com/Ace1928/ollama_forge.git
+cd ollama_forge
 
 # Install in development mode
 pip install -e .
@@ -40,10 +40,10 @@ pip install -e .
 
 ## Automatic Ollama Setup
 
-Ollama Toolkit can automatically install and manage Ollama for you:
+Ollama Forge can automatically install and manage Ollama for you:
 
 ```python
-from ollama_toolkit.utils.common import ensure_ollama_running
+from ollama_forge.utils.common import ensure_ollama_running
 
 # This will install Ollama if needed and start the server
 is_running, message = ensure_ollama_running()
@@ -75,7 +75,7 @@ Download the installer from: https://ollama.com/download/windows
 Verify the installation with:
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 client = OllamaClient()
 version = client.get_version()
@@ -99,7 +99,7 @@ The package automatically installs these dependencies:
 No configuration is necessary to get started, but you can customize the client:
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 # Custom configuration
 client = OllamaClient(

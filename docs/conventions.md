@@ -1,6 +1,6 @@
-# Ollama Toolkit Conventions
+# Ollama Forge Conventions
 
-This document outlines the conventions used across the Ollama Toolkit v0.1.9, following Eidosian principles of precision, clarity, and structural integrity.
+This document outlines the conventions used across the Ollama Forge v0.1.9, following Eidosian principles of precision, clarity, and structural integrity.
 
 ## Model Names
 
@@ -29,9 +29,9 @@ Examples:
 
 ## API Versioning
 
-Ollama Toolkit follows semantic versioning (MAJOR.MINOR.PATCH):
+Ollama Forge follows semantic versioning (MAJOR.MINOR.PATCH):
 - Current version: 0.1.9
-- Version information is accessible via `ollama_toolkit.__version__`
+- Version information is accessible via `ollama_forge.__version__`
 - All endpoints maintain backward compatibility within the same MAJOR version
 
 ## Durations

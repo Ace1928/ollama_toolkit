@@ -16,11 +16,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 # Now try imports
 try:
-    from ollama_toolkit.examples.embedding_example import (
+    from ollama_forge.examples.embedding_example import (
         calculate_similarity,
         create_embedding,
     )
-    from ollama_toolkit.utils.model_constants import (
+    from ollama_forge.utils.model_constants import (
         BACKUP_EMBEDDING_MODEL,
         DEFAULT_EMBEDDING_MODEL,
     )
@@ -29,6 +29,7 @@ except ImportError as e:
     print("Make sure you've installed the package with: pip install -e .")
     sys.exit(1)
 
+from ollama_forge import OllamaClient
 
 class TestEmbeddings(unittest.TestCase):
     """Test cases for embedding functionality."""
@@ -155,6 +156,24 @@ class TestEmbeddings(unittest.TestCase):
         with self.assertRaises(ValueError):
             calculate_similarity([1.0, 2.0], [1.0, 2.0, 3.0])
 
+class TestEmbedding(unittest.TestCase):
+    def setUp(self):
+        self.client = OllamaClient()
+
+    def test_create_embedding(self):
+        embedding = self.client.create_embedding(
+            model="nomic-embed-text",
+            prompt="This is a sample text for embedding."
+        )
+        self.assertIn("embedding", embedding)
+
+    def test_batch_embeddings(self):
+        embeddings = self.client.batch_embeddings(
+            model="nomic-embed-text",
+            prompts=["Text one", "Text two", "Text three"]
+        )
+        self.assertEqual(len(embeddings), 3)
+        self.assertIn("embedding", embeddings[0])
 
 if __name__ == "__main__":
     unittest.main()

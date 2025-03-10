@@ -14,7 +14,7 @@ from typing import Dict, List, Set, Tuple, Any, Optional
 import textwrap
 from datetime import datetime
 
-import ollama_toolkit
+import ollama_forge
 
 
 class FunctionVisitor(ast.NodeVisitor):
@@ -49,88 +49,46 @@ class TestCodeCoverage(unittest.TestCase):
     
     def setUp(self) -> None:
         """Set up test environment."""
-        # Root directories
-        self.pkg_dir = Path(os.path.abspath(os.path.dirname(ollama_toolkit.__file__)))
+        self.pkg_dir = Path(os.path.abspath(os.path.dirname(ollama_forge.__file__)))
         self.test_dir = Path(os.path.abspath(os.path.join(os.path.dirname(__file__))))
-        
-        # Test patterns for matching
-        self.exclude_modules = {
-            "setup"  # Skip importing setup.py
-        }
-
-        # Additional patterns to look for in tests
+        self.exclude_modules = {"setup"}
         self.test_pattern_regexes = [
-            r'test[_\s]([a-zA-Z0-9_]+)',  # test_function or test function
-            r'verify[_\s]([a-zA-Z0-9_]+)',  # verify_function or verify function
-            r'assert.*\b([a-zA-Z0-9_]+)\(',  # assert something with function call
-            r'mock_([a-zA-Z0-9_]+)',  # mocked function references
-            r'patch\([\'"].*\.([a-zA-Z0-9_]+)[\'"]',  # patch decorator references
+            r'test[_\s]([a-zA-Z0-9_]+)',
+            r'verify[_\s]([a-zA-Z0-9_]+)',
+            r'assert.*\b([a-zA-Z0-9_]+)\(',
+            r'mock_([a-zA-Z0-9_]+)',
+            r'patch\([\'"].*\.([a-zA-Z0-9_]+)[\'"]',
         ]
-        
+
     def test_function_coverage(self) -> None:
-        """
-        Verify that all functions in the codebase have corresponding unit tests.
-        
-        This meta-test inspects the entire codebase, identifies all functions and methods,
-        and checks if there's at least one test targeting each function. It generates a
-        comprehensive report of functions that need tests.
-        """
-        # Extract all source modules and functions
+        """Verify that all functions in the codebase have corresponding unit tests."""
         source_functions = self._get_source_functions()
-        
-        # Extract all test patterns
         test_patterns = self._get_test_patterns()
-        
-        # Find untested functions
         untested_functions = {}
-        
         for key, func_info in source_functions.items():
             function_name = func_info['name']
             class_name = func_info['class']
             module_name = func_info['module']
-            
-            # Skip if we explicitly excluded this module
-            module_path = '.'.join(module_name.split('.')[:2])  # Get first two parts
+            module_path = '.'.join(module_name.split('.')[:2])
             if module_path in self.exclude_modules:
                 continue
-                
-            # Skip test functions themselves
-            if function_name.startswith('test_') or module_name.startswith('test_'):
-                continue
-                
-            # Check if this function is tested using various patterns
             tested = False
-            
-            # Function name matches directly
             if function_name in test_patterns:
                 tested = True
-            
-            # Class.method name pattern
             if class_name and f"{class_name}.{function_name}" in test_patterns:
                 tested = True
-                
-            # test_function_name pattern
             if f"test_{function_name}" in test_patterns:
                 tested = True
-            
-            # test_class_function pattern
             if class_name and f"test_{class_name}_{function_name}" in test_patterns:
                 tested = True
-                
-            # If no test found, add to untested list
             if not tested:
                 untested_functions[key] = func_info
-        
-        # Generate report - but don't fail the test as this is informational
         if untested_functions:
             report = self._generate_coverage_report(untested_functions, source_functions)
             print(f"\n{report}")
-            
-            # Uncomment to fail the test if untested functions are found
-            # self.assertEqual(len(untested_functions), 0, f"{len(untested_functions)} functions without tests")
         else:
             print("\n✅ All functions have corresponding tests!")
-    
+
     def _get_source_functions(self) -> Dict[str, Dict[str, Any]]:
         """Extract all functions from source files."""
         source_functions = {}
@@ -138,7 +96,7 @@ class TestCodeCoverage(unittest.TestCase):
         # Walk through package modules
         for _, module_name, is_pkg in pkgutil.walk_packages(
             path=[str(self.pkg_dir)], 
-            prefix='ollama_toolkit.'  # or whatever your package prefix is
+            prefix='ollama_forge.'  # or whatever your package prefix is
         ):
             # 1) Skip modules you don’t want to import:
             #    e.g. "setup" or anything else in self.exclude_modules

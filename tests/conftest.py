@@ -43,3 +43,8 @@ def sample_api_response():
         "prompt_eval_count": 10,
         "eval_count": 20,
     }
+
+@pytest.fixture(scope="session")
+def ollama_client():
+    from ollama_forge import OllamaClient
+    return OllamaClient()

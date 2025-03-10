@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 # Now try imports
 try:
-    from ollama_toolkit.utils.common import (
+    from ollama_forge.utils.common import (
         DEFAULT_OLLAMA_API_URL,
         async_make_api_request,
         make_api_request,
@@ -29,6 +29,9 @@ try:
         print_warning,
         print_json,
         check_ollama_running,
+        ensure_ollama_running,
+        check_ollama_installed,
+        install_ollama,
     )
 except ImportError as e:
     print(f"Import error: {e}")
@@ -60,6 +63,7 @@ class TestUtils(unittest.TestCase):
         print_error(test_message)
         print_info(test_message)
         print_warning(test_message)
+        print_json({"key": "value"})
 
         output = self.captured_output.getvalue()
 
@@ -142,7 +146,7 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(result, {"result": "success"})
         session_instance.request.assert_called_once()
     
-    @patch("ollama_toolkit.utils.common.subprocess.run")
+    @patch("ollama_forge.utils.common.subprocess.run")
     def test_check_ollama_running(self, mock_run):
         """Test check_ollama_running function."""
         # Setup mock for running Ollama
@@ -154,6 +158,14 @@ class TestUtils(unittest.TestCase):
         # Verify result
         self.assertTrue(is_running)
         self.assertIn("Ollama server is running", message)
+
+    def test_check_ollama_installed(self):
+        self.assertTrue(check_ollama_installed())
+
+    def test_ensure_ollama_running(self):
+        is_running, message = ensure_ollama_running()
+        self.assertTrue(is_running)
+        self.assertIn("Ollama is ready", message)
 
 if __name__ == "__main__":
     unittest.main()

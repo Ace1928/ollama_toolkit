@@ -5,7 +5,7 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))  # Add project root to path
 
 # Project information
-project = 'Ollama Toolkit'
+project = 'Ollama Forge'
 copyright = '2025, Lloyd Handyside'
 author = 'Lloyd Handyside'
 version = '0.1.9'
@@ -16,7 +16,7 @@ extensions = [
     'sphinx.ext.autodoc',  # Automatically generate API documentation
     'sphinx.ext.viewcode',  # Add links to source code
     'sphinx.ext.napoleon',  # Support for Google-style docstrings
-'sphinx.ext.coverage',  # Check documentation coverage
+    'sphinx.ext.coverage',  # Check documentation coverage
     'myst_parser',  # Add this line
 ]
 

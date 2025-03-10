@@ -76,7 +76,7 @@ curl http://localhost:11434/api/generate -d '{
 
 Use the Python examples:
 ```bash
-python -m ollama_toolkit.examples.generate_example --prompt "Explain AI ethics."
+python -m ollama_forge.examples.generate_example --prompt "Explain AI ethics."
 ```
 You can specify options like `--stream`, `--no-fallback`, and `--temperature`.
 

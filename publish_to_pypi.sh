@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prepare and publish ollama_toolkit package to PyPI
+# Prepare and publish ollama_forge package to PyPI
 # Usage: ./publish_to_pypi.sh [--test]
 # Add --test flag to publish to Test PyPI instead of production
 
@@ -75,12 +75,12 @@ if [ -f "pyproject.toml" ]; then
 fi
 
 echo -e "\n${BLUE}Step 2: Checking package version${NC}"
-VERSION=$(python3 -c "import ollama_toolkit; print(ollama_toolkit.__version__)" 2>/dev/null) || {
-    echo -e "${RED}Failed to import ollama_toolkit. Make sure the package is properly installed.${NC}" 
+VERSION=$(python3 -c "import ollama_forge; print(ollama_forge.__version__)" 2>/dev/null) || {
+    echo -e "${RED}Failed to import ollama_forge. Make sure the package is properly installed.${NC}" 
     echo "Running fix script to repair imports..."
     python3 fix_me_please.py
-    VERSION=$(python3 -c "import ollama_toolkit; print(ollama_toolkit.__version__)" 2>/dev/null) || {
-        echo -e "${RED}Still can't import ollama_toolkit after fix. Exiting.${NC}"
+    VERSION=$(python3 -c "import ollama_forge; print(ollama_forge.__version__)" 2>/dev/null) || {
+        echo -e "${RED}Still can't import ollama_forge after fix. Exiting.${NC}"
         exit 1
     }
 }
@@ -89,15 +89,15 @@ echo "Package version: $VERSION"
 echo -e "\n${BLUE}Step 3: Running code quality checks${NC}"
 # Run code formatting
 echo "Running Black..."
-black --check ollama_toolkit utils examples tests || { 
+black --check ollama_forge utils examples tests || { 
     echo -e "${YELLOW}Code formatting issues detected. Running autoformat...${NC}"
-    black ollama_toolkit utils examples tests
+    black ollama_forge utils examples tests
 }
 
 echo "Running isort..."
-isort --check --profile black ollama_toolkit utils examples tests || { 
+isort --check --profile black ollama_forge utils examples tests || { 
     echo -e "${YELLOW}Import sorting issues detected. Running autoformat...${NC}"
-    isort --profile black ollama_toolkit utils examples tests
+    isort --profile black ollama_forge utils examples tests
 }
 
 if [[ "$SKIP_TESTS" -eq 0 ]]; then
@@ -121,7 +121,7 @@ echo -e "\n${BLUE}Step 5: Cleaning previous builds${NC}"
 rm -rf build/ dist/ *.egg-info/
 
 echo "Uninstalling previous version if it exists..."
-pip uninstall -y ollama_toolkit || true
+pip uninstall -y ollama_forge || true
 
 echo -e "\n${BLUE}Step 6: Building package${NC}"
 echo "Creating source distribution..."
@@ -155,8 +155,8 @@ fi
 echo "Testing installation..."
 pip install --force-reinstall dist/*.whl
 python -c "
-import ollama_toolkit
-print(f'✅ Successfully imported ollama_toolkit v{ollama_toolkit.__version__}')
+import ollama_forge
+print(f'✅ Successfully imported ollama_forge v{ollama_forge.__version__}')
 " || {
     echo -e "${RED}Installation test failed. Please fix issues before continuing.${NC}"
     exit 1
@@ -184,7 +184,7 @@ fi
 
 echo -e "\n${BLUE}Step 8: Ready to publish${NC}"
 echo -e "Package details:"
-echo -e "  Name: ollama_toolkit"
+echo -e "  Name: ollama_forge"
 echo -e "  Version: $VERSION"
 echo -e "  Files: $(ls dist/)"
 
@@ -223,10 +223,10 @@ echo -e "${GREEN}============================================${NC}"
 
 if [[ "$TEST_MODE" -eq 1 ]]; then
     echo -e "\nTo test the installation from Test PyPI:"
-    echo -e "pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple ollama_toolkit"
+    echo -e "pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple ollama_forge"
 else 
     echo -e "\nTo install your package:"
-    echo -e "pip install ollama_toolkit"
+    echo -e "pip install ollama_forge"
 fi
 
 echo -e "\nYou may want to tag this release in git:"

@@ -92,6 +92,44 @@ except ImportError:
             """Fallback function that returns the backup chat model."""
             return BACKUP_CHAT_MODEL
 
+# Import embedding utilities
+try:
+    from .embedding import (
+        calculate_similarity,
+        normalize_vector,
+        batch_calculate_similarities,
+        process_embeddings_response,
+    )
+except ImportError:
+    try:
+        from ollama_toolkit.utils.embedding import (
+            calculate_similarity,
+            normalize_vector,
+            batch_calculate_similarities,
+            process_embeddings_response,
+        )
+    except ImportError:
+        # Fallback definitions if module is missing
+        def calculate_similarity(vec1, vec2):
+            """Fallback similarity function."""
+            logging.warning("Embedding module not available")
+            return 0.0
+            
+        def normalize_vector(vector):
+            """Fallback vector normalization."""
+            logging.warning("Embedding module not available")
+            return vector
+            
+        def batch_calculate_similarities(query_vector, comparison_vectors):
+            """Fallback batch similarity calculation."""
+            logging.warning("Embedding module not available")
+            return []
+            
+        def process_embeddings_response(response):
+            """Fallback embedding response processor."""
+            logging.warning("Embedding module not available")
+            return None
+
 # Make submodules directly importable with robust fallback handling
 try:
     from . import common
@@ -110,6 +148,15 @@ except ImportError:
     except ImportError:
         import logging
         logging.debug("Could not import model_constants module")
+
+try:
+    from . import embedding
+except ImportError:
+    try:
+        import ollama_toolkit.utils.embedding as embedding
+    except ImportError:
+        import logging
+        logging.debug("Could not import embedding module")
 
 __all__ = [
     # Formatting utilities
@@ -131,6 +178,10 @@ __all__ = [
     # Model utilities
     "resolve_model_alias", "get_fallback_model",
     
+    # Embedding utilities
+    "calculate_similarity", "normalize_vector", 
+    "batch_calculate_similarities", "process_embeddings_response",
+    
     # Submodules
-    "common", "model_constants",
+    "common", "model_constants", "embedding",
 ]

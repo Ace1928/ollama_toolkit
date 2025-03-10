@@ -1,10 +1,10 @@
 # Error Handling
 
-This document details the error handling capabilities in Ollama Toolkit v0.1.9, following Eidosian principles of self-awareness and structural robustness.
+This document details the error handling capabilities in Ollama Forge v0.1.9, following Eidosian principles of self-awareness and structural robustness.
 
 ## Exception Hierarchy
 
-Ollama Toolkit provides a precise hierarchy of exception types for optimal error handling:
+Ollama Forge provides a precise hierarchy of exception types for optimal error handling:
 
 ```
 OllamaAPIError (base)
@@ -26,8 +26,8 @@ Each exception type serves a specific purpose, allowing for precise handling of 
 ## Basic Error Handling Pattern
 
 ```python
-from ollama_toolkit import OllamaClient
-from ollama_toolkit.exceptions import ModelNotFoundError, ConnectionError, TimeoutError, OllamaAPIError
+from ollama_forge import OllamaClient
+from ollama_forge.exceptions import ModelNotFoundError, ConnectionError, TimeoutError, OllamaAPIError
 
 client = OllamaClient()
 
@@ -58,8 +58,8 @@ Version 0.1.9 introduces sophisticated fallback mechanisms that operate at multi
 ### Model Fallback
 
 ```python
-from ollama_toolkit import OllamaClient
-from ollama_toolkit.utils.model_constants import get_fallback_model
+from ollama_forge import OllamaClient
+from ollama_forge.utils.model_constants import get_fallback_model
 
 client = OllamaClient()
 
@@ -79,9 +79,9 @@ print(response.get("response", ""))
 ### Comprehensive Fallback Strategy
 
 ```python
-from ollama_toolkit import OllamaClient
-from ollama_toolkit.exceptions import *
-from ollama_toolkit.utils.model_constants import get_fallback_model
+from ollama_forge import OllamaClient
+from ollama_forge.exceptions import *
+from ollama_forge.utils.model_constants import get_fallback_model
 
 client = OllamaClient()
 
@@ -172,11 +172,11 @@ except StreamingError as e:
 
 ## Error Logging
 
-Ollama Toolkit provides comprehensive logging for error diagnosis:
+Ollama Forge provides comprehensive logging for error diagnosis:
 
 ```python
 import logging
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 # Configure logging
 logging.basicConfig(

@@ -1,12 +1,12 @@
 # Contributing Guide
 
-Thank you for considering contributing to Ollama Toolkit!
+Thank you for considering contributing to Ollama Forge!
 
 ## Getting Started
 
-1. Fork the repository from [https://github.com/Ace1928/ollama_toolkit](https://github.com/Ace1928/ollama_toolkit)
-2. Clone your fork: `git clone https://github.com/yourusername/ollama_toolkit.git`
-3. Set upstream: `git remote add upstream https://github.com/Ace1928/ollama_toolkit.git`
+1. Fork the repository from [https://github.com/Ace1928/ollama_forge](https://github.com/Ace1928/ollama_forge)
+2. Clone your fork: `git clone https://github.com/yourusername/ollama_forge.git`
+3. Set upstream: `git remote add upstream https://github.com/Ace1928/ollama_forge.git`
 
 ## Development Setup
 
@@ -23,4 +23,4 @@ Thank you for considering contributing to Ollama Toolkit!
 
 1. Ensure all tests pass: `pytest`
 2. Update documentation if needed
-3. Submit your PR to https://github.com/Ace1928/ollama_toolkit
+3. Submit your PR to https://github.com/Ace1928/ollama_forge

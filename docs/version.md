@@ -1,6 +1,6 @@
 # Version Endpoint
 
-This document explains how to retrieve the current version of the Ollama server and confirms the Ollama Toolkit client is at v0.1.9.
+This document explains how to retrieve the current version of the Ollama server and confirms the Ollama Forge client is at v0.1.9.
 
 ## Endpoint
 
@@ -22,12 +22,12 @@ Expected output:
 }
 ```
 
-(Ollama Toolkit v0.1.9 is compatible with Ollama server >= 0.1.11.)
+(Ollama Forge v0.1.9 is compatible with Ollama server >= 0.1.11.)
 
 ### Python Usage Example
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 client = OllamaClient()
 
@@ -39,7 +39,7 @@ print(f"Connected to Ollama server version: {version_info['version']}")
 
 ```python
 import asyncio
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 async def get_version_async():
     client = OllamaClient()

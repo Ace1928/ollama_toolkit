@@ -15,11 +15,11 @@ set -euo pipefail
 
 # 📝 CONFIGURATION VARIABLES 📝
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET_DIR="$REPO_ROOT/ollama_toolkit"
+TARGET_DIR="$REPO_ROOT/ollama_forge"
 LOG_FILE="$REPO_ROOT/file_move_$(date +%Y%m%d_%H%M%S).log"
 EXCLUDED_ITEMS=(
     # Git and repo structure
-    ".git" "ollama_toolkit" "$(basename "${BASH_SOURCE[0]}")" ".gitignore" "README.md"
+    ".git" "ollama_forge" "$(basename "${BASH_SOURCE[0]}")" ".gitignore" "README.md"
     # Package configuration
     "pyproject.toml" "setup.py" "setup.cfg" "MANIFEST.in" "LICENSE" 
     # Documentation
@@ -28,7 +28,7 @@ EXCLUDED_ITEMS=(
     "build_docs.sh" "publish_to_pypi.sh" "publish.py" "development.sh"
     "init_repo.sh" "update_parent_gitignore.sh"
     # Build artifacts and cache
-    "dist" "ollama_toolkit.egg-info" ".pytest_cache" ".vscode" "wheelhouse"
+    "dist" "ollama_forge.egg-info" ".pytest_cache" ".vscode" "wheelhouse"
     # Tests and examples
     "tests" "examples"
     # Credentials and configs

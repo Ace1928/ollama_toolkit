@@ -1,6 +1,6 @@
 # Changelog
 
-A detailed record of changes to the Ollama Toolkit, following Eidosian principles of recursive refinement and self-awareness.
+A detailed record of changes to the Ollama Forge, following Eidosian principles of recursive refinement and self-awareness.
 
 ## 0.1.9 (Current)
 

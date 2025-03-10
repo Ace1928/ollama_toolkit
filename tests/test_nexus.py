@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Centralized test runner for the Ollama Toolkit client.
+Centralized test runner for the Ollama Forge client.
 
 This script discovers and runs all tests in the tests directory.
 It can be run directly or through pytest.
@@ -18,7 +18,6 @@ import pytest  # Add pytest import
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
-
 
 def run_all_tests(
     verbosity: int = 2,
@@ -76,67 +75,32 @@ def run_all_tests(
         result = test_runner.run(all_tests)
 
         # Print summary
-        print("\n" + "=" * 80)
-        test_count = result.testsRun
-        fail_count = len(result.failures)
-        error_count = len(result.errors)
-        success_count = test_count - fail_count - error_count
-
-        print(f"SUMMARY: Ran {test_count} tests".center(80))
-        print(
-            f"SUCCESS: {success_count} | FAILURES: {fail_count} | ERRORS: {error_count}".center(
-                80
-            )
-        )
-        print("=" * 80 + "\n")
-
-        # Return True if all tests passed
-        return len(result.failures) == 0 and len(result.errors) == 0
-
+        return result.wasSuccessful()
 
 def main() -> None:
     """Parse command line arguments and run tests."""
-    parser = argparse.ArgumentParser(description="Run all Ollama Toolkit tests")
+    parser = argparse.ArgumentParser(description="Run all tests in the tests directory.")
     parser.add_argument(
-        "--verbosity", "-v", type=int, default=2, help="Verbosity level (1-3)"
+        "-v", "--verbosity", type=int, default=2, help="Verbosity level for test output"
     )
     parser.add_argument(
-        "--pattern",
-        "-p",
-        type=str,
-        default="test_*.py",
-        help="Pattern to match test files",
+        "-p", "--pattern", type=str, default="test_*.py", help="Pattern to match test files"
     )
     parser.add_argument(
-        "--ignore",
-        "-i",
-        type=str,
-        nargs="+",
-        help="Test files to ignore (e.g., test_nexus.py)",
+        "-i", "--ignore", type=str, nargs="*", help="List of test files to ignore"
     )
     parser.add_argument(
-        "--exit-code",
-        "-e",
-        action="store_true",
-        help="Return non-zero exit code on test failure",
+        "--use-pytest", action="store_true", help="Use pytest for running tests"
     )
-    parser.add_argument(
-        "--use-pytest", "-u", action="store_true", help="Use pytest for running tests"
-    )
-
     args = parser.parse_args()
 
-    # Default to ignoring this file to prevent recursion
-    if args.ignore is None:
-        args.ignore = ["test_nexus.py"]
-
-    # Run all tests
-    success = run_all_tests(args.verbosity, args.pattern, args.ignore, args.use_pytest)
-
-    # Exit with appropriate code
-    if args.exit_code and not success:
-        sys.exit(1)
-
+    success = run_all_tests(
+        verbosity=args.verbosity,
+        pattern=args.pattern,
+        ignore=args.ignore,
+        use_pytest=args.use_pytest,
+    )
+    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     main()

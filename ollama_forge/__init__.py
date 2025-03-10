@@ -1,5 +1,5 @@
 """
-Ollama Toolkit client package for Python.
+Ollama Forge client package for Python.
 
 This package provides a comprehensive interface to interact with the Ollama API,
 following Eidosian principles of elegance, efficiency, and contextual integrity.

@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-This document provides structured solutions for common issues encountered when using Ollama Toolkit v0.1.9, organized by problem domain with Eidosian precision and recursion.
+This document provides structured solutions for common issues encountered when using Ollama Forge v0.1.9, organized by problem domain with Eidosian precision and recursion.
 
 ## Connection Issues
 
@@ -15,7 +15,7 @@ This document provides structured solutions for common issues encountered when u
 
 **Diagnostic:**
 ```python
-from ollama_toolkit.utils.common import check_ollama_running
+from ollama_forge.utils.common import check_ollama_running
 
 is_running, message = check_ollama_running()
 print(f"Ollama running: {is_running}, Message: {message}")
@@ -25,7 +25,7 @@ print(f"Ollama running: {is_running}, Message: {message}")
 Start the Ollama server with one of these approaches:
 ```python
 # Method 1: Using toolkit utilities
-from ollama_toolkit.utils.common import ensure_ollama_running
+from ollama_forge.utils.common import ensure_ollama_running
 ensure_ollama_running()
 
 # Method 2: Command line (execute in terminal)

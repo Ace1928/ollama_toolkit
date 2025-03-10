@@ -81,6 +81,6 @@ curl http://localhost:11434/api/embed -d '{
 
 In Python, try:
 ```bash
-python -m ollama_toolkit.examples.embedding_example --text "Your text here"
+python -m ollama_forge.examples.embedding_example --text "Your text here"
 ```
 

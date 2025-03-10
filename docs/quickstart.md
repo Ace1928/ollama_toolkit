@@ -1,6 +1,6 @@
 # Quickstart Guide
 
-This guide will help you get started with Ollama Toolkit in minutes—following Eidosian principles of efficiency and elegance.
+This guide will help you get started with Ollama Forge in minutes—following Eidosian principles of efficiency and elegance.
 
 ## 🚀 Installation
 
@@ -15,10 +15,10 @@ pip install ollama-toolkit
 Ensure everything is working correctly:
 
 ```python
-from ollama_toolkit import OllamaClient, __version__
+from ollama_forge import OllamaClient, __version__
 
 # Print version
-print(f"Ollama Toolkit version: {__version__}")
+print(f"Ollama Forge version: {__version__}")
 
 # Initialize client
 client = OllamaClient()
@@ -36,7 +36,7 @@ except Exception as e:
 Here's a minimal example to generate text:
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 # Initialize client
 client = OllamaClient()
@@ -56,8 +56,8 @@ print(response["response"])
 This example showcases automatic installation, model listing, and text generation:
 
 ```python
-from ollama_toolkit import OllamaClient
-from ollama_toolkit.utils.common import ensure_ollama_running
+from ollama_forge import OllamaClient
+from ollama_forge.utils.common import ensure_ollama_running
 
 # Ensure Ollama is running (will attempt to install if not found)
 is_running, message = ensure_ollama_running()

@@ -1,10 +1,10 @@
 # Model Management
 
-This document details the model management capabilities in Ollama Toolkit v0.1.9, following Eidosian principles of structural control and recursive refinement.
+This document details the model management capabilities in Ollama Forge v0.1.9, following Eidosian principles of structural control and recursive refinement.
 
 ## Overview
 
-Ollama Toolkit provides a comprehensive set of functions for managing models:
+Ollama Forge provides a comprehensive set of functions for managing models:
 - Listing available models
 - Retrieving model information
 - Pulling new models
@@ -17,7 +17,7 @@ Ollama Toolkit provides a comprehensive set of functions for managing models:
 Retrieve a list of all available models with their metadata:
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 client = OllamaClient()
 
@@ -153,7 +153,7 @@ for update in client.push_model("my-custom-model", stream=True):
 
 ## Recommended Models
 
-Ollama Toolkit v0.1.9 recommends these models for different use cases:
+Ollama Forge v0.1.9 recommends these models for different use cases:
 
 | Purpose | Model | Size | Description |
 |---------|-------|------|-------------|
@@ -167,7 +167,7 @@ Ollama Toolkit v0.1.9 recommends these models for different use cases:
 The toolkit provides constants for commonly used models:
 
 ```python
-from ollama_toolkit.utils.model_constants import (
+from ollama_forge.utils.model_constants import (
     DEFAULT_CHAT_MODEL,
     BACKUP_CHAT_MODEL,
     DEFAULT_EMBEDDING_MODEL,
@@ -185,7 +185,7 @@ print(f"Backup embedding model: {BACKUP_EMBEDDING_MODEL}")
 Helper functions for model management:
 
 ```python
-from ollama_toolkit.utils.model_constants import resolve_model_alias, get_fallback_model
+from ollama_forge.utils.model_constants import resolve_model_alias, get_fallback_model
 
 # Resolve a model alias to its full name
 model_name = resolve_model_alias("chat")  # Returns DEFAULT_CHAT_MODEL

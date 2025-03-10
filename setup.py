@@ -1,7 +1,17 @@
 #!/usr/bin/env python3
-"""Setup script for the ollama_toolkit package."""
+"""
+Legacy setup script for Ollama Forge.
+This file exists for compatibility with older pip/setuptools versions.
+The actual package configuration is in pyproject.toml.
+"""
 
-from setuptools import setup
+import setuptools
 
-# Remove the use_scm_version as it's causing issues
-setup()
+# Use setuptools.setup() with minimal configuration required.
+# All actual configuration should be in pyproject.toml.
+setuptools.setup(
+    name="ollama_forge",
+    author="Lloyd Handyside, Eidos",
+    author_email="ace1928@gmail.com",
+    description="Python client library and CLI for Ollama",
+)

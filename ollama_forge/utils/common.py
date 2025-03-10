@@ -15,14 +15,26 @@ import aiohttp
 import requests
 from colorama import Fore, Style
 
-from exceptions import (
-    ConnectionError,
-    InvalidRequestError,
-    ModelNotFoundError,
-    OllamaAPIError,
-    ServerError,
-    TimeoutError,
-)
+try:
+    # Try relative import for package use
+    from ..exceptions import (
+        ConnectionError,
+        InvalidRequestError,
+        ModelNotFoundError,
+        OllamaAPIError,
+        ServerError,
+        TimeoutError,
+    )
+except ImportError:
+    # Fallback for when run directly
+    from exceptions import (
+        ConnectionError,
+        InvalidRequestError,
+        ModelNotFoundError,
+        OllamaAPIError,
+        ServerError,
+        TimeoutError,
+    )
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -45,9 +57,7 @@ def print_header(title: str) -> None:
     Args:
         title: The title to display
     """
-    print(f"\n{Fore.CYAN}{'=' * 60}{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}{title.center(60)}{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}{'=' * 60}{Style.RESET_ALL}\n")
+    print(f"\n{'=' * 80}\n{title.center(80)}\n{'=' * 80}")
 
 
 def print_success(message: str) -> None:
@@ -57,7 +67,7 @@ def print_success(message: str) -> None:
     Args:
         message: The message to display
     """
-    print(f"{Fore.GREEN}✓ {message}{Style.RESET_ALL}")
+    print(f"\033[92m{message}\033[0m")
 
 
 def print_error(message: str) -> None:
@@ -67,7 +77,7 @@ def print_error(message: str) -> None:
     Args:
         message: The message to display
     """
-    print(f"{Fore.RED}✗ {message}{Style.RESET_ALL}")
+    print(f"\033[91m{message}\033[0m")
 
 
 def print_warning(message: str) -> None:
@@ -77,7 +87,7 @@ def print_warning(message: str) -> None:
     Args:
         message: The message to display
     """
-    print(f"{Fore.YELLOW}⚠ {message}{Style.RESET_ALL}")
+    print(f"\033[93m{message}\033[0m")
 
 
 def print_info(message: str) -> None:
@@ -87,7 +97,7 @@ def print_info(message: str) -> None:
     Args:
         message: The message to display
     """
-    print(f"{Fore.BLUE}ℹ {message}{Style.RESET_ALL}")
+    print(f"\033[94m{message}\033[0m")
 
 
 def print_json(data: Any) -> None:
@@ -97,7 +107,7 @@ def print_json(data: Any) -> None:
     Args:
         data: The data to display as JSON
     """
-    print(json.dumps(data, indent=2))
+    print(json.dumps(data, indent=4))
 
 
 def make_api_request(

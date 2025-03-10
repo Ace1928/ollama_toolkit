@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Core client functionality for interacting with the Ollama Toolkit v0.1.9.
+Core client functionality for interacting with the Ollama Forge v0.1.9.
 
 This module provides a fully typed, self-documenting client interface to
 all core Ollama API endpoints including model management, generation, chat,
@@ -60,7 +60,7 @@ APIResponse = Union[Dict[str, Any], requests.Response]
 
 class OllamaClient:
     """
-    Client for interacting with the Ollama Toolkit.
+    Client for interacting with the Ollama Forge.
     """
 
     def __init__(
@@ -115,7 +115,7 @@ class OllamaClient:
 
     def generate(
         self,
-        model: str,
+        model: str = DEFAULT_CHAT_MODEL,
         prompt: str,
         options: Optional[Dict[str, Any]] = None,
         stream: bool = False
@@ -189,7 +189,7 @@ class OllamaClient:
 
     def chat(
         self,
-        model: str,
+        model: str = DEFAULT_CHAT_MODEL,
         messages: List[Dict[str, str]],
         stream: bool = True,
         options: Optional[Dict[str, Any]] = None
@@ -282,7 +282,7 @@ class OllamaClient:
 
     def create_embedding(
         self,
-        model: str,
+        model: str = DEFAULT_EMBEDDING_MODEL,
         prompt: str,
         options: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
@@ -318,7 +318,7 @@ class OllamaClient:
 
     def batch_embeddings(
         self,
-        model: str,
+        model: str = DEFAULT_EMBEDDING_MODEL,
         prompts: List[str],
         options: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:

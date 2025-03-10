@@ -1,18 +1,18 @@
 # Examples
 
-This page contains precision-engineered examples that demonstrate the Ollama Toolkit client's capabilities with Eidosian elegance.
+This page contains precision-engineered examples that demonstrate the Ollama Forge client's capabilities with Eidosian elegance.
 
 ## Basic Usage {#basic-usage}
 - Demonstrates version checks, listing models, and generating completions.  
 - Run:
   ```bash
-  python -m ollama_toolkit.examples.basic_usage
+  python -m ollama_forge.examples.basic_usage
   ```
 
 Here's a simple example of getting the version and listing available models:
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 # Initialize the client - foundation of all operations
 client = OllamaClient()
@@ -30,7 +30,7 @@ for model in models.get("models", []):
 
 Run with mathematical simplicity:
 ```bash
-python -m ollama_toolkit.examples.basic_usage
+python -m ollama_forge.examples.basic_usage
 ```
 
 ## Text Generation {#text-generation}
@@ -43,7 +43,7 @@ python -m ollama_toolkit.examples.basic_usage
 ### Non-streaming Generation
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 client = OllamaClient()
 # Single operation, complete result - maximum efficiency
@@ -64,7 +64,7 @@ print(response["response"])
 ### Streaming Generation
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 client = OllamaClient()
 # Flowing river of tokens - immediate feedback loop
@@ -84,7 +84,7 @@ for chunk in client.generate(
 
 ```python
 import asyncio
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 async def main():
     client = OllamaClient()
@@ -103,7 +103,7 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 async def main():
     client = OllamaClient()
@@ -125,7 +125,7 @@ asyncio.run(main())
 Here's a complete example of generating text using the synchronous API:
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 client = OllamaClient(timeout=300)  # Increased timeout for larger responses
 
@@ -159,13 +159,13 @@ for chunk in client.generate(
 ## Chat Completion {#chat-completion}
 - Use message roles (system, user, assistant).
   ```bash
-  python -m ollama_toolkit.examples.chat_example
+  python -m ollama_forge.examples.chat_example
   ```
 
 The chat interface is robust and fully implemented:
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 client = OllamaClient(timeout=300)
 
@@ -207,13 +207,13 @@ for chunk in client.chat(
 ## Embeddings {#embeddings}
 - Demonstrates embedding creation and cosine similarity:
   ```bash
-  python -m ollama_toolkit.examples.embedding_example --text "Hello world"
+  python -m ollama_forge.examples.embedding_example --text "Hello world"
   ```
 
 Generate embeddings for semantic search and similarity:
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 import numpy as np
 
 client = OllamaClient()
@@ -248,7 +248,7 @@ print(f"Similarity score: {similarity:.4f}")  # Precise formatting
 
 Run with one simple command:
 ```bash
-python -m ollama_toolkit.examples.embedding_example --text "Hello world"
+python -m ollama_forge.examples.embedding_example --text "Hello world"
 ```
 
 ## Working with Models
@@ -261,7 +261,7 @@ python -m ollama_toolkit.examples.embedding_example --text "Hello world"
 Manage models with the toolkit:
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 client = OllamaClient()
 
@@ -294,8 +294,8 @@ for update in client.pull_model("tinyllama", stream=True):
 Includes fallback mechanisms and thorough exceptions—structural resilience in action:
 
 ```python
-from ollama_toolkit import OllamaClient
-from ollama_toolkit.exceptions import (
+from ollama_forge import OllamaClient
+from ollama_forge.exceptions import (
     ModelNotFoundError,  # Specific error classification
     ConnectionError, 
     TimeoutError,
@@ -343,7 +343,7 @@ if response:
 ## Automatic Ollama Installation
 
 ```python
-from ollama_toolkit.utils.common import ensure_ollama_running, check_ollama_installed
+from ollama_forge.utils.common import ensure_ollama_running, check_ollama_installed
 
 # Check if Ollama is installed
 is_installed, install_message = check_ollama_installed()

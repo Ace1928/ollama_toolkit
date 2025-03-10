@@ -1,8 +1,8 @@
 # About the Documentation
 
-## 📚 Ollama Toolkit Documentation
+## 📚 Ollama Forge Documentation
 
-Welcome to the comprehensive documentation for Ollama Toolkit. This documentation is designed with Eidosian principles in mind—precision, clarity, and elegance in every detail.
+Welcome to the comprehensive documentation for Ollama Forge. This documentation is designed with Eidosian principles in mind—precision, clarity, and elegance in every detail.
 
 ## 🏗️ Structure
 
@@ -34,9 +34,9 @@ Then open `_build/html/index.html` in your web browser.
 
 We welcome improvements to the documentation! To contribute:
 
-1. Fork the repository from https://github.com/Ace1928/ollama_toolkit
+1. Fork the repository from https://github.com/Ace1928/ollama_forge
 2. Make your changes following our Eidosian principles
-3. Submit a pull request to https://github.com/Ace1928/ollama_toolkit
+3. Submit a pull request to https://github.com/Ace1928/ollama_forge
 
 ## 📜 Documentation Standards
 

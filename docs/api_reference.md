@@ -1,13 +1,14 @@
 # API Reference
 
-This document—a precision-engineered blueprint—details all classes and methods provided by the Ollama Toolkit client.
+This document—a precision-engineered blueprint—details all classes and methods provided by the Ollama Forge client.
 
 ## OllamaClient
 
-The main class for interacting with the Ollama Toolkit, designed with contextual integrity and recursive refinement.
+The main class for interacting with the Ollama Forge, designed with contextual integrity and recursive refinement.
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
+from ollama_forge.utils.model_constants import DEFAULT_CHAT_MODEL, DEFAULT_EMBEDDING_MODEL
 
 # Initialize with optimal defaults - each parameter carefully calibrated
 client = OllamaClient(
@@ -18,13 +19,28 @@ client = OllamaClient(
     cache_enabled=False,                 # Toggle for performance optimization
     cache_ttl=300.0                      # Time-bounded memory efficiency
 )
+
+# Generate text
+response = client.generate(
+    model=DEFAULT_CHAT_MODEL,
+    prompt="Explain quantum computing in simple terms",
+    options={"temperature": 0.7}
+)
+print(response["response"])
+
+# Create embedding
+embedding = client.create_embedding(
+    model=DEFAULT_EMBEDDING_MODEL,
+    prompt="This is a sample text for embedding."
+)
+print(embedding["embedding"])
 ```
 
 ### Constructor Parameters
 
 Each parameter precisely tuned for maximum effect:
 
-- `base_url` (str): The base URL of the Ollama Toolkit server. Default: "http://localhost:11434/"
+- `base_url` (str): The base URL of the Ollama Forge server. Default: "http://localhost:11434/"
 - `timeout` (int): Default timeout for API requests in seconds. Default: 300
 - `max_retries` (int): Maximum number of retry attempts for failed requests. Default: 3
 - `retry_delay` (float): Delay between retry attempts in seconds. Default: 1.0
@@ -48,7 +64,7 @@ Generate a completion for the given prompt with recursive refinement.
 
 ```python
 response = client.generate(
-    model="llama2",
+    model=DEFAULT_CHAT_MODEL,
     prompt="Explain quantum computing in simple terms",
     options={"temperature": 0.7},  # Precisely tuned randomness
     stream=False
@@ -81,7 +97,7 @@ Asynchronous version of `generate`. *(Note: This method is planned but not fully
 
 ```python
 response = await client.agenerate(
-    model="llama2",
+    model=DEFAULT_CHAT_MODEL,
     prompt="Explain quantum computing in simple terms",
     options={"temperature": 0.7},
     stream=False
@@ -104,7 +120,7 @@ messages = [
     {"role": "user", "content": "Tell me about neural networks."}
 ]
 response = client.chat(
-    model="llama2",
+    model=DEFAULT_CHAT_MODEL,
     messages=messages,
     options={"temperature": 0.7},
     stream=False
@@ -133,7 +149,7 @@ Asynchronous version of `chat`. *(Note: This method is planned but not fully imp
 
 ```python
 response = await client.achat(
-    model="llama2",
+    model=DEFAULT_CHAT_MODEL,
     messages=messages,
     options={"temperature": 0.7},
     stream=False
@@ -148,7 +164,7 @@ Create an embedding vector for the given text.
 
 ```python
 embedding = client.create_embedding(
-    model="nomic-embed-text",
+    model=DEFAULT_EMBEDDING_MODEL,
     prompt="This is a sample text for embedding."
 )
 ```
@@ -173,7 +189,7 @@ Asynchronous version of `create_embedding`. *(Note: This method is planned but n
 
 ```python
 embedding = await client.acreate_embedding(
-    model="nomic-embed-text",
+    model=DEFAULT_EMBEDDING_MODEL,
     prompt="This is a sample text for embedding."
 )
 ```
@@ -184,7 +200,7 @@ Create embeddings for multiple prompts efficiently. *(Note: This method is plann
 
 ```python
 embeddings = client.batch_embeddings(
-    model="nomic-embed-text",
+    model=DEFAULT_EMBEDDING_MODEL,
     prompts=["Text one", "Text two", "Text three"]
 )
 ```
@@ -223,7 +239,7 @@ models = client.list_models()
 Get information about a specific model. *(Note: This method is planned but not fully implemented in the current version)*
 
 ```python
-model_info = client.get_model_info("llama2")
+model_info = client.get_model_info(DEFAULT_CHAT_MODEL)
 ```
 
 **Parameters**:
@@ -238,10 +254,10 @@ Pull a model from the Ollama registry.
 
 ```python
 # Non-streaming
-result = client.pull_model("llama2", stream=False)
+result = client.pull_model(DEFAULT_CHAT_MODEL, stream=False)
 
 # Streaming with progress updates
-for update in client.pull_model("llama2", stream=True):
+for update in client.pull_model(DEFAULT_CHAT_MODEL, stream=True):
     print(f"Progress: {update.get('status')}")
 ```
 
@@ -264,7 +280,7 @@ for update in client.pull_model("llama2", stream=True):
 Delete a model.
 
 ```python
-success = client.delete_model("llama2")
+success = client.delete_model(DEFAULT_CHAT_MODEL)
 ```
 
 **Parameters**:
@@ -278,7 +294,7 @@ success = client.delete_model("llama2")
 Copy a model to a new name. *(Note: This method is planned but not fully implemented in the current version)*
 
 ```python
-result = client.copy_model("llama2", "my-llama2-copy")
+result = client.copy_model(DEFAULT_CHAT_MODEL, "my-model-copy")
 ```
 
 **Parameters**:
@@ -329,7 +345,7 @@ prompt = client._messages_to_prompt(messages)
 Check if a model is likely to be an embedding-only model based on name patterns.
 
 ```python
-is_embedding = client._is_likely_embedding_model("nomic-embed-text")
+is_embedding = client._is_likely_embedding_model(DEFAULT_EMBEDDING_MODEL)
 ```
 
 **Parameters**:
@@ -349,7 +365,7 @@ We strive for recursive excellence:
 
 The package provides precisely engineered exception types for clear error handling:
 
-- `OllamaAPIError`: Base exception class for all Ollama Toolkit errors
+- `OllamaAPIError`: Base exception class for all Ollama Forge errors
 - `ConnectionError`: Raised when connection to the API fails
 - `TimeoutError`: Raised when an API request times out
 - `ModelNotFoundError`: Raised when a requested model is not found
@@ -364,7 +380,7 @@ The package provides precisely engineered exception types for clear error handli
 
 ## Utility Functions
 
-The package provides several utility functions in `ollama_toolkit.utils.common`:
+The package provides several utility functions in `ollama_forge.utils.common`:
 
 ### Display Functions
 
@@ -390,7 +406,7 @@ The package provides several utility functions in `ollama_toolkit.utils.common`:
 
 ### Model Constants
 
-The `ollama_toolkit.utils.model_constants` module provides:
+The `ollama_forge.utils.model_constants` module provides:
 
 - `DEFAULT_CHAT_MODEL`: Default model for chat completions
 - `BACKUP_CHAT_MODEL`: Fallback model for chat completions

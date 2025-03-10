@@ -1,6 +1,6 @@
 # Models API
 
-This document details the model management endpoints in Ollama Toolkit v0.1.9, providing interfaces for listing, pulling, modifying, and deleting models.
+This document details the model management endpoints in Ollama Forge v0.1.9, providing interfaces for listing, pulling, modifying, and deleting models.
 
 ## Endpoints Overview
 
@@ -237,4 +237,4 @@ The Models API follows Eidosian principles of structural control, ensuring each 
 
 ## Client Implementation
 
-The Ollama Toolkit client implements these endpoints with both synchronous and asynchronous interfaces, maintaining structural integrity across the API surface.
+The Ollama Forge client implements these endpoints with both synchronous and asynchronous interfaces, maintaining structural integrity across the API surface.

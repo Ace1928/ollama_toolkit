@@ -1,5 +1,5 @@
 """
-Version information for the Ollama Toolkit package.
+Version information for the Ollama Forge package.
 
 This file contains version constants and version-related utilities
 to ensure consistency across the project.
@@ -8,8 +8,8 @@ Client version: 0.1.9
 Minimum Ollama server version: 0.1.11
 """
 
-# Current version of the Ollama Toolkit package
-__version__ = "0.1.9"             # Ollama Toolkit client version
+# Current version of the Ollama Forge package
+__version__ = "0.1.9"             # Ollama Forge client version
 
 # Minimum compatible Ollama server version
 MINIMUM_OLLAMA_VERSION = "0.1.11"  # Confirmed minimum Ollama server version
@@ -30,28 +30,14 @@ def get_version_string():
     """Return the full version string."""
     return __version__
 
+from packaging.version import parse as parse_version
+
 def is_compatible_ollama_version(version_str):
     """Check if the given Ollama version is compatible with this toolkit version."""
     try:
-        # Simple version comparison - can be expanded for more complex comparisons
-        min_parts = MINIMUM_OLLAMA_VERSION.split('.')
-        version_parts = version_str.split('.')
-        
-        # Compare major version
-        if int(version_parts[0]) < int(min_parts[0]):
-            return False
-        
-        # If major version is equal, compare minor version
-        if int(version_parts[0]) == int(min_parts[0]) and int(version_parts[1]) < int(min_parts[1]):
-            return False
-            
-        # If major and minor are equal, compare patch
-        if (int(version_parts[0]) == int(min_parts[0]) and 
-            int(version_parts[1]) == int(min_parts[1]) and 
-            int(version_parts[2]) < int(min_parts[2])):
-            return False
-            
-        return True
+        min_version = parse_version(MINIMUM_OLLAMA_VERSION)
+        current_version = parse_version(version_str)
+        return current_version >= min_version
     except (IndexError, ValueError):
         # If there's any error parsing the version, assume incompatible
         return False

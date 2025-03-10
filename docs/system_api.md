@@ -1,6 +1,6 @@
 # System API
 
-This document details system-related endpoints in Ollama Toolkit v0.1.9 for checking server status, version information, and system operations.
+This document details system-related endpoints in Ollama Forge v0.1.9 for checking server status, version information, and system operations.
 
 ## Endpoints Overview
 
@@ -59,11 +59,11 @@ Retrieve performance metrics for the Ollama server (if enabled).
 
 ## Client Implementation
 
-The Ollama Toolkit client provides utility functions for interacting with these system endpoints:
+The Ollama Forge client provides utility functions for interacting with these system endpoints:
 
 ```python
-from ollama_toolkit import OllamaClient
-from ollama_toolkit.utils.common import (
+from ollama_forge import OllamaClient
+from ollama_forge.utils.common import (
     check_ollama_installed,
     check_ollama_running,
     ensure_ollama_running,
@@ -100,7 +100,7 @@ else:
 
 ## Installation Process
 
-The Ollama Toolkit can install and manage the Ollama server with zero friction:
+The Ollama Forge can install and manage the Ollama server with zero friction:
 
 1. **Detection**: Check if Ollama binary exists in standard paths
 2. **Installation**: Download and install Ollama from official sources
@@ -113,7 +113,7 @@ The Ollama Toolkit can install and manage the Ollama server with zero friction:
 Controlling the Ollama server lifecycle:
 
 ```python
-from ollama_toolkit.utils.common import (
+from ollama_forge.utils.common import (
     start_ollama_server,
     stop_ollama_server,
     restart_ollama_server
@@ -141,7 +141,7 @@ The System API embodies Eidosian principles:
 - **Recursive Refinement**: Each operation builds upon the previous with mathematical precision
 - **Velocity as Intelligence**: Optimized for rapid state transitions with minimal overhead
 
-By maintaining awareness of the system state, Ollama Toolkit creates a foundationally sound basis for all higher-level operations.
+By maintaining awareness of the system state, Ollama Forge creates a foundationally sound basis for all higher-level operations.
 
 ## Platform Compatibility
 

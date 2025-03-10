@@ -3,17 +3,18 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ollama_toolkit"
-version = "0.1.9"  # Updated from 0.1.8 to match version.py
-description = "A comprehensive Python client library for the Ollama API"
+name = "ollama-toolkit"
+version = "0.1.9"
+description = "Python client library and CLI for Ollama"
+readme = "README.md"
 authors = [
     {name = "Lloyd Handyside", email = "ace1928@gmail.com"},
-    {name = "Eidos", email = "eidos@gmail.com"}
+    {name = "Eidos", email = "syntheticeidos@gmail.com"},
 ]
 readme = "README.md"
 requires-python = ">=3.6"
 license = {text = "MIT"}
-urls = {repository = "https://github.com/Ace1928/ollama_toolkit"}
+urls = {repository = "https://github.com/Ace1928/ollama_forge"}
 
 # Add these fields for better PEP 621 compliance
 classifiers = [
@@ -29,8 +30,20 @@ classifiers = [
 ]
 keywords = ["ollama", "ai", "llm", "language models", "toolkit", "eidos"]
 
+dependencies = [
+    "requests>=2.26.0,<3.0.0",
+    "aiohttp>=3.8.0,<4.0.0",
+    "colorama>=0.4.4",
+"pytest>=6.2.5"
+    "pytest>=6.2.5"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Ace1928/ollama_forge"
+"Bug Tracker" = "https://github.com/Ace1928/ollama_forge/issues"
+
 [project.scripts]
-ollama-quickstart = "ollama_toolkit.examples.quickstart:main"
+ollama-toolkit = "ollama_forge.cli:main"
 
 [project.optional-dependencies]
 dev = [

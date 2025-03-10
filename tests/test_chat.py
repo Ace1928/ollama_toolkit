@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 # Now try imports
 try:
-    from ollama_toolkit.examples.chat_example import chat, chat_streaming, initialize_chat
-    from ollama_toolkit.utils.model_constants import (
+    from ollama_forge.examples.chat_example import chat, chat_streaming, initialize_chat
+    from ollama_forge.utils.model_constants import (
         BACKUP_CHAT_MODEL,
         DEFAULT_CHAT_MODEL,
     )
@@ -28,6 +28,7 @@ except ImportError as e:
     print("Make sure you've installed the package with: pip install -e .")
     sys.exit(1)
 
+from ollama_forge import OllamaClient
 
 class TestChat(unittest.TestCase):
     """Test cases for chat functionality."""
@@ -35,6 +36,7 @@ class TestChat(unittest.TestCase):
     def setUp(self) -> None:
         """Set up test fixtures."""
         self.test_messages = [{"role": "user", "content": "Hello!"}]
+        self.client = OllamaClient()
 
     @patch("requests.post")
     def test_chat_function(self, mock_post: Any) -> None:
@@ -155,6 +157,31 @@ class TestChat(unittest.TestCase):
         # Test without system message
         messages = initialize_chat(DEFAULT_CHAT_MODEL)
         self.assertEqual(len(messages), 0)
+
+    def test_chat(self):
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Tell me about neural networks."}
+        ]
+        response = self.client.chat(
+            model=DEFAULT_CHAT_MODEL,
+            messages=messages,
+            options={"temperature": 0.7}
+        )
+        self.assertIn("response", response)
+
+    def test_chat_streaming(self):
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Tell me about neural networks."}
+        ]
+        chunks = list(self.client.chat(
+            model=DEFAULT_CHAT_MODEL,
+            messages=messages,
+            stream=True
+        ))
+        self.assertGreater(len(chunks), 0)
+        self.assertIn("response", chunks[0])
 
 
 if __name__ == "__main__":

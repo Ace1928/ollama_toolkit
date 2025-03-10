@@ -1,7 +1,7 @@
 """
-Test package for the ollama_toolkit package.
+Test package for the ollama_forge package.
 
-This package contains comprehensive tests for all ollama_toolkit functionality.
+This package contains comprehensive tests for all ollama_forge functionality.
 """
 
 # Standard imports
@@ -29,7 +29,7 @@ for module_name in [
     except ImportError:
         try:
             # Try absolute import next (direct execution context)
-            module = __import__(f"ollama_toolkit.tests.{module_name}", fromlist=["*"])
+            module = __import__(f"ollama_forge.tests.{module_name}", fromlist=["*"])
             test_modules[module_name] = module
         except ImportError as e:
             logging.debug(f"Could not import {module_name}: {e}")

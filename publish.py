@@ -7,6 +7,7 @@ This script builds the package and uploads it to PyPI.
 import os
 import subprocess
 import sys
+import argparse
 from typing import List
 from version import update_version_universally
 
@@ -20,21 +21,21 @@ def run_command(cmd: List[str]) -> None:
 
 def main() -> None:
     """Main entry point."""
-    # Ensure we're in the right directory
+    parser = argparse.ArgumentParser(description="Publish the package to PyPI.")
+    parser.add_argument("--dry-run", action="store_true", help="Perform a dry run without publishing.")
+    args = parser.parse_args()
+    
     script_dir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(script_dir)
     
     print("Starting package publishing process...")
     
-    # Check if there are changes in the repo:
     changed = subprocess.run(["git", "diff", "--quiet"], capture_output=True)
     if changed.returncode != 0:
         confirm = input("Uncommitted changes detected. Bump version? [y/N]: ").strip().lower()
         if confirm == "y":
             new_version = input("Enter new version (e.g. 0.2.0): ").strip()
             update_version_universally(new_version)
-
-            # Check again if changes were actually made
             changed_after = subprocess.run(["git", "diff", "--quiet"], capture_output=True)
             if changed_after.returncode != 0:
                 subprocess.run(["git", "add", "."])
@@ -43,25 +44,24 @@ def main() -> None:
             else:
                 print("No changes detected after version update, skipping commit.")
     
-    # Clean build artifacts
     print("Cleaning previous build artifacts...")
-    for directory in ["build", "dist", "ollama_toolkit.egg-info"]:
+    for directory in ["build", "dist", "ollama_forge.egg-info"]:
         if os.path.exists(directory):
             run_command(["rm", "-rf", directory])
     
-    # Run tests
     print("Running tests...")
-    run_command(["python", "-m", "pytest", "tests"])  # Updated path
+    run_command(["python", "-m", "pytest", "tests"])
     
-    # Build the package
+    if args.dry_run:
+        print("Dry run completed. Skipping publishing.")
+        return
+    
     print("Building the package...")
     run_command(["python", "-m", "build"])
     
-    # Build package documentation
     print("Building package documentation...")
     subprocess.run(["bash", "build_docs.sh"], check=True)
     
-    # Upload to PyPI
     print("Uploading to PyPI...")
     run_command(["python", "-m", "twine", "upload", "dist/*"])
     

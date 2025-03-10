@@ -1,26 +1,28 @@
-# Ollama Toolkit Python Client
+# Ollama Forge Python Client
 
-[![PyPI version](https://badge.fury.io/py/ollama-toolkit.svg)](https://badge.fury.io/py/ollama-toolkit)
+[![PyPI version](https://badge.fury.io/py/ollama-forge.svg)](https://badge.fury.io/py/ollama-forge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-A comprehensive Python client library and command-line tools for interacting with the [Ollama](https://ollama.ai/) API. This package provides easy access to all Ollama Toolkit endpoints with intuitive interfaces, complete type hints, and detailed documentation.
+Welcome to the Ollama Forge Python Client! This toolkit provides a comprehensive Python client library and command-line tools for interacting with the [Ollama](https://ollama.ai/) API. 🚀
 
 ## Features
 
-- 🚀 **Complete API Coverage**: Support for all Ollama Toolkit endpoints
-- 🔄 **Async Support**: Both synchronous and asynchronous interfaces
-- 🔧 **Built-in CLI**: Powerful command-line tools for Ollama interaction
-- 🔌 **Auto-Installation**: Can automatically install and start Ollama if needed
-- 💪 **Robust Error Handling**: Comprehensive error types and fallback mechanisms
-- 📊 **Embeddings Support**: Easy creation and manipulation of embeddings
-- 🧪 **Well-Tested**: Comprehensive test suite for reliability
+- **High-level client** (`OllamaClient`) for making API requests
+- **Command-line interface** for interacting with Ollama models
+- **Utility functions** for common operations
+- **Comprehensive error handling** with precise exception types
+- **Detailed examples and documentation** for easy onboarding
 
 ## EIDOSIAN Excellence
 Every part of this toolkit embraces Eidosian Principles, ensuring:
 - Precision for style, humor for clarity
 - A seamless flow in usage
 - Self-awareness to continually refine your process
+
+## Why Use Ollama Forge?
+
+Ollama Forge provides a comprehensive and efficient interface to interact with the Ollama API, following Eidosian principles of elegance, efficiency, and contextual integrity. It offers robust error handling, seamless integration, and extensive documentation to ensure a smooth development experience.
 
 ## Installation
 
@@ -33,25 +35,16 @@ Every part of this toolkit embraces Eidosian Principles, ensuring:
 ### Install from PyPI
 
 ```bash
-pip install ollama-api
+pip install ollama-forge
 ```
 
 ### Install from source
 
 ```bash
-git clone https://github.com/lloydhd/ollama_toolkit.git
-cd ollama_toolkit
+git clone https://github.com/Ace1928/ollama_forge.git
+cd ollama_forge
 pip install -e .
 ```
-
-- From PyPI:  
-  ```bash
-  pip install ollama-toolkit
-  ```
-- For development:  
-  ```bash
-  pip install -e /path/to/ollama_toolkit
-  ```
 
 ## Verifying Installation
 
@@ -59,22 +52,23 @@ After installation, you can verify everything is working by running:
 
 ```bash
 # Run all tests
-python -m pytest ollama_toolkit/tests
+python -m pytest ollama_forge/tests
 
 # Run specific test modules
-python -m pytest ollama_toolkit/tests/test_client.py
+python -m pytest ollama_forge/tests/test_client.py
 ```
 
 You can also run a quick import test to ensure the package is accessible:
 
 ```bash
-python -c "import ollama_toolkit; print(f'Ollama Toolkit version: {ollama_toolkit.__version__}')"
+python -c "import ollama_forge; print(f'Ollama Forge version: {ollama_forge.__version__}')"
 ```
 
 ## Quick Start
 
 ```python
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
+from ollama_forge.utils.model_constants import DEFAULT_CHAT_MODEL
 
 # Initialize the client
 client = OllamaClient()
@@ -85,7 +79,7 @@ print(f"Ollama version: {version['version']}")
 
 # Generate text (non-streaming)
 response = client.generate(
-    model="llama2",
+    model=DEFAULT_CHAT_MODEL,
     prompt="Explain quantum computing in simple terms",
     options={"temperature": 0.7}
 )
@@ -94,7 +88,7 @@ print(response["response"])
 
 # Generate text (streaming)
 for chunk in client.generate(
-    model="llama2", 
+    model=DEFAULT_CHAT_MODEL, 
     prompt="Write a short poem about AI", 
     stream=True
 ):
@@ -108,7 +102,7 @@ The library also supports async operations:
 
 ```python
 import asyncio
-from ollama_toolkit import OllamaClient
+from ollama_forge import OllamaClient
 
 async def main():
     client = OllamaClient()
@@ -137,7 +131,7 @@ asyncio.run(main())
 This package can automatically check for Ollama installation and help you install it:
 
 ```python
-from ollama_toolkit.utils.common import ensure_ollama_running
+from ollama_forge.utils.common import ensure_ollama_running
 
 # Check and optionally install/start Ollama
 is_running, message = ensure_ollama_running()
@@ -151,19 +145,19 @@ You can also use the provided CLI tool:
 
 ```bash
 # Check if Ollama is installed and running, install if needed
-python -m ollama_toolkit.tools.install_ollama
+python -m ollama_forge.tools.install_ollama
 
 # Check only, don't install or start
-python -m ollama_toolkit.tools.install_ollama --check
+python -m ollama_forge.tools.install_ollama --check
 
 # Install Ollama if not already installed
-python -m ollama_toolkit.tools.install_ollama --install
+python -m ollama_forge.tools.install_ollama --install
 
 # Start Ollama if not already running
-python -m ollama_toolkit.tools.install_ollama --start
+python -m ollama_forge.tools.install_ollama --start
 
 # Restart Ollama server
-python -m ollama_toolkit.tools.install_ollama --restart
+python -m ollama_forge.tools.install_ollama --restart
 ```
 
 ## Command-Line Interface
@@ -172,28 +166,28 @@ The package includes a comprehensive CLI:
 
 ```bash
 # Main CLI command with subcommands
-python -m ollama_toolkit.cli --help
+python -m ollama_forge.cli --help
 
 # List available models
-python -m ollama_toolkit.cli list-models
+python -m ollama_forge.cli list-models
 
 # Generate text
-python -m ollama_toolkit.cli generate llama2 "Explain quantum computing"
+python -m ollama_forge.cli generate llama2 "Explain quantum computing"
 
 # Chat with a model
-python -m ollama_toolkit.cli chat llama2 "Tell me a joke" --system "You are a comedian"
+python -m ollama_forge.cli chat llama2 "Tell me a joke" --system "You are a comedian"
 
 # Create embeddings
-python -m ollama_toolkit.cli embedding llama2 "This is a test sentence"
+python -m ollama_forge.cli embedding llama2 "This is a test sentence"
 
 # Model management
-python -m ollama_toolkit.cli pull llama2
-python -m ollama_toolkit.cli model-info llama2
-python -m ollama_toolkit.cli copy llama2 llama2-backup
-python -m ollama_toolkit.cli delete llama2-backup
+python -m ollama_forge.cli pull llama2
+python -m ollama_forge.cli model-info llama2
+python -m ollama_forge.cli copy llama2 llama2-backup
+python -m ollama_forge.cli delete llama2-backup
 
 # Get Ollama version
-python -m ollama_toolkit.cli version
+python -m ollama_forge.cli version
 ```
 
 ## API Documentation
@@ -218,7 +212,7 @@ All methods have async equivalents prefixed with 'a' (e.g., `agenerate`, `achat`
 The package provides specific exception types for better error handling:
 
 ```python
-from ollama_toolkit import ModelNotFoundError, OllamaAPIError
+from ollama_forge import ModelNotFoundError, OllamaAPIError
 
 try:
     client.generate(model="non-existent-model", prompt="Hello")
@@ -237,14 +231,14 @@ This project uses a central virtual environment located at `/home/lloyd/Developm
 source ./development.sh
 
 # Format code
-black ollama_toolkit
-isort ollama_toolkit
+black ollama_forge
+isort ollama_forge
 
 # Run type checking
-mypy ollama_toolkit
+mypy ollama_forge
 
 # Run tests
-pytest ollama_toolkit/tests
+pytest ollama_forge/tests
 ```
 
 For repository setup:
@@ -270,16 +264,16 @@ The package includes several example scripts to help you get started:
 Run the examples directly from the examples directory:
 
 ```bash
-python -m ollama_toolkit.examples.basic_usage
+python -m ollama_forge.examples.basic_usage
 ```
 
 Use the scripts in the examples folder:
 ```bash
-python -m ollama_toolkit.examples.quickstart
-python -m ollama_toolkit.examples.basic_usage
-python -m ollama_toolkit.examples.generate_example
-python -m ollama_toolkit.examples.chat_example
-python -m ollama_toolkit.examples.embedding_example
+python -m ollama_forge.examples.quickstart
+python -m ollama_forge.examples.basic_usage
+python -m ollama_forge.examples.generate_example
+python -m ollama_forge.examples.chat_example
+python -m ollama_forge.examples.embedding_example
 ```
 
 Review each example for the latest usage patterns, including fallback mechanisms, streaming modes, and updated model names (e.g. `deepseek-r1:1.5b`).
@@ -287,7 +281,7 @@ Review each example for the latest usage patterns, including fallback mechanisms
 ## Project Structure
 
 ```
-ollama_toolkit/
+ollama_forge/
 ├── __init__.py                  # Package initialization and exports
 ├── client.py                    # Main OllamaClient implementation
 ├── cli.py                       # Command-line interface
@@ -327,11 +321,11 @@ ollama_toolkit/
 
 ### Initializing as a Standalone Repository
 
-If you're working within a larger repository and want to initialize `ollama_toolkit` as its own Git repository:
+If you're working within a larger repository and want to initialize `ollama_forge` as its own Git repository:
 
 ```bash
-# Navigate to the ollama_toolkit directory
-cd /path/to/ollama_toolkit
+# Navigate to the ollama_forge directory
+cd /path/to/ollama_forge
 
 # Initialize a new Git repository
 git init
@@ -340,10 +334,10 @@ git init
 git add .
 
 # Create an initial commit
-git commit -m "Initial commit of ollama_toolkit"
+git commit -m "Initial commit of ollama_forge"
 
 # Add a remote repository (replace with your repository URL)
-git remote add origin https://github.com/Ace1928/ollama_toolkit.git
+git remote add origin https://github.com/Ace1928/ollama_forge.git
 
 # Push to your repository
 git push -u origin main
@@ -353,7 +347,7 @@ To avoid tracking this directory in the parent repository, add it to the parent'
 
 ## Overview
 
-The `ollama_toolkit` package provides a convenient interface to interact with the Ollama Toolkit. It includes:
+The `ollama_forge` package provides a convenient interface to interact with the Ollama Forge. It includes:
 
 - A high-level client (`OllamaClient`) for making API requests
 - Command-line interface for interacting with Ollama models
@@ -387,7 +381,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Format your code (`black ollama_toolkit && isort ollama_toolkit`)
+3. Format your code (`black ollama_forge && isort ollama_forge`)
 4. Commit your changes (`git commit -m 'Add some amazing feature'`)
 5. Push to the branch (`git push origin feature/amazing-feature`)
 6. Open a Pull Request
@@ -395,6 +389,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Contact
 
 - Lloyd Handyside (Biological) - [ace1928@gmail.com](mailto:ace1928@gmail.com)
-- Eidos (Digital) - [eidos@gmail.com](mailto:eidos@gmail.com)
+- Eidos (Digital) - [syntheticeidos@gmail.com](mailto:syntheticeidos@gmail.com)
 
-Project Link: [https://github.com/Ace1928/ollama_toolkit](https://github.com/Ace1928/ollama_toolkit)
+Project Link: [https://github.com/Ace1928/ollama_forge](https://github.com/Ace1928/ollama_forge)

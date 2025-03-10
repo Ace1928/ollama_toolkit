@@ -1,11 +1,11 @@
 # Eidosian Integration
 
-This document explores how Ollama Toolkit v0.1.9 embodies the ten Eidosian principles, creating a development experience of unparalleled excellence.
+This document explores how Ollama Forge v0.1.9 embodies the ten Eidosian principles, creating a development experience of unparalleled excellence.
 
 ## Principles in Action
 
 ### 1️⃣ Contextual Integrity
-Every function, parameter, and return type in Ollama Toolkit serves a precise purpose. Nothing is extraneous; nothing is missing. The API surface is perfectly measured.
+Every function, parameter, and return type in Ollama Forge serves a precise purpose. Nothing is extraneous; nothing is missing. The API surface is perfectly measured.
 
 ```python
 # Contextual integrity in action - every parameter has meaning
