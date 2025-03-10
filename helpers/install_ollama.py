@@ -16,12 +16,8 @@ from typing import Tuple
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 try:
-    from ollama_forge.utils.common import (
+    from ollama_forge.helpers.common import (
         DEFAULT_OLLAMA_API_URL,
-        check_ollama_installed,
-        check_ollama_running,
-        ensure_ollama_running,
-        install_ollama,
         print_error,
         print_header,
         print_info,
@@ -29,18 +25,74 @@ try:
         print_warning,
     )
 except ImportError:
-    from utils.common import (
+    # When run directly or in development
+    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    if parent_dir not in sys.path:
+        sys.path.insert(0, parent_dir)
+    from helpers.common import (
         DEFAULT_OLLAMA_API_URL,
-        check_ollama_installed,
-        check_ollama_running,
-        ensure_ollama_running,
-        install_ollama,
         print_error,
         print_header,
         print_info,
         print_success,
         print_warning,
     )
+
+
+def check_ollama_installed() -> Tuple[bool, str]:
+    """
+    Check if Ollama is installed by attempting to locate it.
+
+    Returns:
+        Tuple[bool, str]: A tuple containing:
+          - A boolean indicating installation status
+          - Version string or error message
+    """
+    try:
+        if platform.system() == "Windows":
+            result = subprocess.run(
+                ["where", "ollama"], capture_output=True, text=True, check=False
+            )
+        else:
+            result = subprocess.run(
+                ["which", "ollama"], capture_output=True, text=True, check=False
+            )
+
+        if result.returncode == 0:
+            version_result = subprocess.run(
+                ["ollama", "--version"], capture_output=True, text=True, check=False
+            )
+            if version_result.returncode == 0:
+                return True, version_result.stdout.strip()
+            else:
+                return True, "Unknown version"
+        else:
+            return False, "Ollama not found in PATH"
+
+    except Exception as e:
+        return False, str(e)
+
+
+def check_ollama_running() -> Tuple[bool, str]:
+    """
+    Check if the Ollama server is running.
+    
+    Returns:
+        Tuple[bool, str]: A tuple containing:
+          - A boolean indicating if the server is running
+          - Version string or error message
+    """
+    try:
+        import requests
+
+        response = requests.get(f"{DEFAULT_OLLAMA_API_URL}/api/version", timeout=2)
+        if response.status_code == 200:
+            data = response.json()
+            return True, data.get("version", "Unknown version")
+        else:
+            return False, f"Server returned status code {response.status_code}"
+    except Exception as e:
+        return False, str(e)
 
 
 def run_ollama() -> bool:
@@ -64,7 +116,7 @@ def run_ollama() -> bool:
     if not is_installed:
         print_error(f"Ollama is not installed: {install_message}")
         print_info(
-            "Install Ollama first with: python -m ollama_forge.tools.install_ollama --install"
+            "Install Ollama first with: python -m ollama_forge.helpers.install_ollama --install"
         )
         return False
 
@@ -144,55 +196,6 @@ def stop_ollama() -> bool:
         return False
 
 
-def check_ollama_installed() -> Tuple[bool, str]:
-    """
-    Check if Ollama is installed by attempting to locate it.
-
-    Returns:
-        Tuple[bool, str]: A tuple containing:
-          - A boolean indicating installation status
-          - Version string or error message
-    """
-    try:
-        if platform.system() == "Windows":
-            result = subprocess.run(
-                ["where", "ollama"], capture_output=True, text=True, check=False
-            )
-        else:
-            result = subprocess.run(
-                ["which", "ollama"], capture_output=True, text=True, check=False
-            )
-
-        if result.returncode == 0:
-            version_result = subprocess.run(
-                ["ollama", "--version"], capture_output=True, text=True, check=False
-            )
-            if version_result.returncode == 0:
-                return True, version_result.stdout.strip()
-            else:
-                return True, "Unknown version"
-        else:
-            return False, "Ollama not found in PATH"
-
-    except Exception as e:
-        return False, str(e)
-
-
-def check_ollama_running() -> Tuple[bool, str]:
-    """Check if Ollama server is running."""
-    try:
-        import requests
-
-        response = requests.get(f"{DEFAULT_OLLAMA_API_URL}/api/version", timeout=2)
-        if response.status_code == 200:
-            data = response.json()
-            return True, data.get("version", "Unknown version")
-        else:
-            return False, f"Server returned status code {response.status_code}"
-    except Exception as e:
-        return False, str(e)
-
-
 def install_ollama() -> Tuple[bool, str]:
     """
     Install Ollama on the system.
@@ -245,8 +248,19 @@ def install_ollama() -> Tuple[bool, str]:
 
 
 def ensure_ollama_running() -> Tuple[bool, str]:
-    """Ensure Ollama is running."""
-    # Check if running
+    """
+    Ensure Ollama is installed and running.
+
+    This function checks whether Ollama is installed and attempts to
+    install it if not present. It also checks whether the Ollama service 
+    is running, and starts it if needed.
+
+    Returns:
+        Tuple[bool, str]: A tuple containing:
+          - A boolean indicating if Ollama is running
+          - A status or error message
+    """
+    # First check if already running
     is_running, message = check_ollama_running()
     if is_running:
         return True, message
@@ -263,10 +277,13 @@ def ensure_ollama_running() -> Tuple[bool, str]:
     try:
         print_info("Starting Ollama...")
         if platform.system() == "Windows":
+            # Define Windows-specific constants
+            DETACHED_PROCESS = 0x00000008
+            CREATE_NEW_PROCESS_GROUP = 0x00000200
+            
             subprocess.Popen(
                 ["ollama", "serve"],
-                creationflags=subprocess.DETACHED_PROCESS
-                | subprocess.CREATE_NEW_PROCESS_GROUP,
+                creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
                 shell=True,
             )
         else:
@@ -328,7 +345,7 @@ def main() -> None:
         else:
             print_error(f"Ollama is not installed: {install_message}")
             print_info(
-                "To install Ollama, run: python -m ollama_forge.tools.install_ollama --install"
+                "To install Ollama, run: python -m ollama_forge.helpers.install_ollama --install"
             )
             print_info("Or visit https://ollama.com/download")
             return
@@ -341,7 +358,7 @@ def main() -> None:
         else:
             print_warning(f"Ollama server is not running: {run_message}")
             print_info(
-                "To start Ollama server, run: python -m ollama_forge.tools.install_ollama --start"
+                "To start Ollama server, run: python -m ollama_forge.helpers.install_ollama --start"
             )
 
     elif args.install:

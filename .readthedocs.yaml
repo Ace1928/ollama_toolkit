@@ -1,20 +1,34 @@
+# Read the Docs configuration file for Ollama Forge
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
 version: 2
 
+# Set the OS, Python version and other tools
 build:
-  os: ubuntu-22.04
+  os: ubuntu-24.04
   tools:
-    python: "3.10"
+    python: "3.12"  # Use more recent Python for better performance
+  jobs:
+    pre_build:
+      # Validate docs structure before building
+      - python -m pip install --upgrade pip
+      - python -c "import pathlib; docs_index = pathlib.Path('docs/index.md'); docs_index.exists() or exit('Missing docs/index.md')"
 
+# Additional requirements for building docs
 python:
   install:
     - requirements: docs/requirements.txt
     - method: pip
       path: .
+      extra_requirements:
+        - docs
 
+# Build documentation with Sphinx
 sphinx:
   configuration: docs/conf.py
-  fail_on_warning: true
+  fail_on_warning: true  # Ensure documentation quality
 
+# Generate PDF and EPUB formats for offline reading
 formats:
   - pdf
   - epub

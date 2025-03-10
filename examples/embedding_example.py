@@ -20,14 +20,14 @@ init()
 
 # Try to import as a package first, then try relative imports
 try:
-    from ollama_forge.utils.common import (
+    from ollama_forge.helpers.common import (
         DEFAULT_OLLAMA_API_URL,
         print_error,
         print_header,
         print_info,
         print_success,
     )
-    from ollama_forge.utils.model_constants import (
+    from ollama_forge.helpers.model_constants import (
         DEFAULT_CHAT_MODEL,
         BACKUP_CHAT_MODEL,
     )
@@ -37,14 +37,14 @@ except ImportError:
     if parent_dir not in sys.path:
         sys.path.insert(0, parent_dir)
     try:
-        from ollama_forge.utils.common import (
+        from ollama_forge.helpers.common import (
             DEFAULT_OLLAMA_API_URL,
             print_error,
             print_header,
             print_info,
             print_success,
         )
-        from ollama_forge.utils.model_constants import (
+        from ollama_forge.helpers.model_constants import (
             BACKUP_EMBEDDING_MODEL,
             DEFAULT_EMBEDDING_MODEL,
         )
@@ -54,7 +54,7 @@ except ImportError:
         sys.exit(1)
 
 from ollama_forge import OllamaClient
-from ollama_forge.utils.model_constants import DEFAULT_EMBEDDING_MODEL
+from ollama_forge.helpers.model_constants import DEFAULT_EMBEDDING_MODEL
 
 def main() -> None:
     """Main entry point for the script."""

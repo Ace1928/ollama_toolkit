@@ -57,7 +57,7 @@ This example showcases automatic installation, model listing, and text generatio
 
 ```python
 from ollama_forge import OllamaClient
-from ollama_forge.utils.common import ensure_ollama_running
+from ollama_forge.helpers.common import ensure_ollama_running
 
 # Ensure Ollama is running (will attempt to install if not found)
 is_running, message = ensure_ollama_running()

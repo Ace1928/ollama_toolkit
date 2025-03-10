@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 try:
     from ollama_forge.client import OllamaClient
-    from ollama_forge.utils.common import (
+    from ollama_forge.helpers.common import (
         print_header,
         print_success,
         print_error,
@@ -25,7 +25,7 @@ try:
         print_json,
         ensure_ollama_running,
     )
-    from ollama_forge.utils.model_constants import (
+    from ollama_forge.helpers.model_constants import (
         DEFAULT_CHAT_MODEL,
         BACKUP_CHAT_MODEL,
     )

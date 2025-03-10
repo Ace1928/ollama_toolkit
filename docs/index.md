@@ -2,7 +2,7 @@
 
 # Ollama Forge Documentation
 
-Welcome to the Ollama Forge documentation! This toolkit provides a comprehensive Python client library and command-line tools for interacting with [Ollama](https://ollama.ai/), delivering both power and simplicity in one elegant package. 🚀
+Welcome to the Ollama Forge documentation! This toolkit provides a comprehensive Python client library and command-line helpers for interacting with [Ollama](https://ollama.ai/), delivering both power and simplicity in one elegant package. 🚀
 
 ## Features at a Glance
 
@@ -62,7 +62,7 @@ pip install -e .
 
 ```python
 from ollama_forge import OllamaClient
-from ollama_forge.utils.model_constants import DEFAULT_CHAT_MODEL
+from ollama_forge.helpers.model_constants import DEFAULT_CHAT_MODEL
 
 # Initialize the client
 client = OllamaClient()

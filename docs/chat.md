@@ -10,7 +10,7 @@ Generate the next message in a chat with a provided model. This is a streaming e
 |-----------|------|-------------|----------|
 | model | string | The model name | Yes |
 | messages | array | The messages of the chat, used to keep chat memory | Yes |
-| tools | array | List of tools in JSON for the model to use if supported | No |
+| helpers | array | List of helpers in JSON for the model to use if supported | No |
 
 ### Message Object
 
@@ -19,7 +19,7 @@ Generate the next message in a chat with a provided model. This is a streaming e
 | role | string | The role of the message: "system", "user", "assistant", or "tool" | Yes |
 | content | string | The content of the message | Yes |
 | images | array | A list of images to include in the message (for multimodal models) | No |
-| tool_calls | array | A list of tools in JSON that the model wants to use | No |
+| tool_calls | array | A list of helpers in JSON that the model wants to use | No |
 
 ### Advanced Parameters (Optional)
 

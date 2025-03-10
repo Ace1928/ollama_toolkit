@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 try:
     from ollama_forge.client import OllamaClient
     from ollama_forge.exceptions import ModelNotFoundError, OllamaAPIError
-    from ollama_forge.utils.model_constants import (
+    from ollama_forge.helpers.model_constants import (
         BACKUP_CHAT_MODEL,
         BACKUP_EMBEDDING_MODEL,
         DEFAULT_CHAT_MODEL,
@@ -278,7 +278,7 @@ class TestOllamaClient(unittest.TestCase):
         # The client should have internal fallback logic or we'll implement it
         from ollama_forge.client import OllamaClient
         # Import the necessary function
-        from ollama_forge.utils.model_constants import get_fallback_model
+        from ollama_forge.helpers.model_constants import get_fallback_model
         original_generate = OllamaClient.generate
         
         # Temporarily patch the generate method to add fallback behavior

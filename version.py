@@ -1,39 +1,52 @@
 """
 Version information for the Ollama Forge package.
 
-This file contains version constants and version-related utilities
-to ensure consistency across the project, following Eidosian principles
-of precision and self-awareness.
+This file now imports from the centralized config module when available,
+following Eidosian principles of "Structure as Control" and "Self-Awareness as Foundation".
 
 Client version: 0.1.9
 Minimum Ollama server version: 0.1.11
 """
 
-# Current version of the Ollama Forge package
-__version__ = "0.1.9"  # Ollama Forge client version
+# Import from centralized config if available (for installed package)
+try:
+    from ollama_forge.config import (
+        VERSION as __version__,
+        VERSION_MAJOR,
+        VERSION_MINOR, 
+        VERSION_PATCH,
+        VERSION_RELEASE_DATE,
+        MINIMUM_OLLAMA_VERSION,
+        get_version_string,
+        get_version_tuple
+    )
+except ImportError:
+    # Fallback for direct use from repository root
+    # Current version of the Ollama Forge package
+    __version__ = "0.1.9"  # Ollama Forge client version
 
-# Minimum compatible Ollama server version
-MINIMUM_OLLAMA_VERSION = "0.1.11"  # Confirmed minimum Ollama server version
+    # Minimum compatible Ollama server version
+    MINIMUM_OLLAMA_VERSION = "0.1.11"  # Confirmed minimum Ollama server version
 
-# Version release date (YYYY-MM-DD)
-VERSION_RELEASE_DATE = "2023-10-15"
+    # Version release date (YYYY-MM-DD)
+    VERSION_RELEASE_DATE = "2025-01-15"
 
-# Version components for programmatic access
-VERSION_MAJOR = 0
-VERSION_MINOR = 1
-VERSION_PATCH = 9
+    # Version components for programmatic access
+    VERSION_MAJOR = 0
+    VERSION_MINOR = 1
+    VERSION_PATCH = 9
 
-def get_version_tuple():
-    """Return version as a tuple of (major, minor, patch)."""
-    return (VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
+    def get_version_tuple():
+        """Return version as a tuple of (major, minor, patch)."""
+        return (VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
 
-def get_version_string():
-    """Return the full version string."""
-    return __version__
+    def get_version_string():
+        """Return the full version string."""
+        return __version__
 
-def get_release_date():
-    """Return the release date of the current version."""
-    return VERSION_RELEASE_DATE
+    def get_release_date():
+        """Return the release date of the current version."""
+        return VERSION_RELEASE_DATE
 
 try:
     from packaging.version import parse as parse_version

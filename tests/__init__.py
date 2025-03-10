@@ -20,7 +20,7 @@ test_modules = {}
 # Try to import all test modules safely
 for module_name in [
     "test_client", "test_chat", "test_embedding", 
-    "test_utils", "test_coverage", "test_nexus", "conftest"
+    "test_helpers", "test_coverage", "test_nexus", "conftest"
 ]:
     try:
         # Try relative import first (package context)
@@ -38,14 +38,14 @@ for module_name in [
 TestOllamaClient = getattr(test_modules.get("test_client", {}), "TestOllamaClient", None)
 TestChat = getattr(test_modules.get("test_chat", {}), "TestChat", None)
 TestEmbeddings = getattr(test_modules.get("test_embedding", {}), "TestEmbeddings", None)
-TestUtils = getattr(test_modules.get("test_utils", {}), "TestUtils", None)
+TestHelpers = getattr(test_modules.get("test_helpers", {}), "TestHelpers", None)
 TestCodeCoverage = getattr(test_modules.get("test_coverage", {}), "TestCodeCoverage", None)
 
 # Convert available modules to namespace attributes
 test_client = test_modules.get("test_client")
 test_chat = test_modules.get("test_chat")
 test_embedding = test_modules.get("test_embedding")
-test_utils = test_modules.get("test_utils")
+test_helpers = test_modules.get("test_helpers")
 test_coverage = test_modules.get("test_coverage")
 test_nexus = test_modules.get("test_nexus")
 conftest = test_modules.get("conftest")
@@ -54,12 +54,12 @@ __all__ = [
     # Test classes (if available)
     name for name in [
         "TestOllamaClient", "TestChat", "TestEmbeddings", 
-        "TestUtils", "TestCodeCoverage"
+        "TestHelpers", "TestCodeCoverage"
     ] if locals().get(name) is not None
 ] + [
     # Test modules (if available)
     name for name in [
-        "test_client", "test_chat", "test_embedding", "test_utils",
+        "test_client", "test_chat", "test_embedding", "test_helpers",
         "test_coverage", "test_nexus", "conftest"
     ] if locals().get(name) is not None
 ]

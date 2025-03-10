@@ -185,7 +185,7 @@ version: 2
 
 build:
   os: "ubuntu-22.04"
-  tools:
+  helpers:
     python: "3.8"
 
 python:
@@ -203,7 +203,7 @@ version
 build.os
 
     Required, specifies the Docker image used to build the documentation. states the name of the base image.
-build.tools.python
+build.helpers.python
 
     Specifies the Python version.
 python.install.requirements
@@ -234,7 +234,7 @@ version: 2
 
 build:
   os: "ubuntu-22.04"
-  tools:
+  helpers:
     python: "3.8"
 
 python:
@@ -338,7 +338,7 @@ Once your project is up and running, you will probably want to understand how re
 
     are readers finding what they are looking for?
 
-Read the Docs has traffic and search analytics tools to help you find answers to these questions.
+Read the Docs has traffic and search analytics helpers to help you find answers to these questions.
 Understanding traffic analytics
 
 The Traffic Analytics view gives you a simple overview of how your readers browse your documentation. It respects visitor privacy by not storing identifying information about your them.

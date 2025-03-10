@@ -59,7 +59,7 @@ Version 0.1.9 introduces sophisticated fallback mechanisms that operate at multi
 
 ```python
 from ollama_forge import OllamaClient
-from ollama_forge.utils.model_constants import get_fallback_model
+from ollama_forge.helpers.model_constants import get_fallback_model
 
 client = OllamaClient()
 
@@ -81,7 +81,7 @@ print(response.get("response", ""))
 ```python
 from ollama_forge import OllamaClient
 from ollama_forge.exceptions import *
-from ollama_forge.utils.model_constants import get_fallback_model
+from ollama_forge.helpers.model_constants import get_fallback_model
 
 client = OllamaClient()
 

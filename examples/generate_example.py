@@ -4,7 +4,7 @@ Example script to generate text using the Ollama API.
 """
 
 from ollama_forge import OllamaClient
-from ollama_forge.utils.model_constants import DEFAULT_CHAT_MODEL
+from ollama_forge.helpers.model_constants import DEFAULT_CHAT_MODEL
 
 def main() -> None:
     """Main entry point for the script."""

@@ -63,7 +63,7 @@ The Ollama Forge client provides utility functions for interacting with these sy
 
 ```python
 from ollama_forge import OllamaClient
-from ollama_forge.utils.common import (
+from ollama_forge.helpers.common import (
     check_ollama_installed,
     check_ollama_running,
     ensure_ollama_running,
@@ -113,7 +113,7 @@ The Ollama Forge can install and manage the Ollama server with zero friction:
 Controlling the Ollama server lifecycle:
 
 ```python
-from ollama_forge.utils.common import (
+from ollama_forge.helpers.common import (
     start_ollama_server,
     stop_ollama_server,
     restart_ollama_server

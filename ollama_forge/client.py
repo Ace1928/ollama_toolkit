@@ -27,7 +27,7 @@ from typing import (
 )
 from requests.adapters import HTTPAdapter
 
-from .utils.common import (
+from .helpers.common import (
     DEFAULT_OLLAMA_API_URL,
     make_api_request,
     async_make_api_request
@@ -41,7 +41,7 @@ from .exceptions import (
     StreamingError,
     ParseError
 )
-from .utils.model_constants import (
+from .helpers.model_constants import (
     DEFAULT_CHAT_MODEL,
     BACKUP_CHAT_MODEL,
     DEFAULT_EMBEDDING_MODEL,

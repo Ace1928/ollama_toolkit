@@ -28,7 +28,7 @@ It is an **optimized feedback loop** and a **fractal cascade of meaning** that c
       return price * (1 - discount / 100) if discount else price
   
   # Advanced usage: Chain multiple pricing rules with context-aware decorators
-  from functools import wraps
+  from funchelpers import wraps
   
   def validate_price(func):
       @wraps(func)
@@ -193,7 +193,7 @@ The structure is engineered so every pause is intentional and every transition i
   ```python
   # Advanced chained function using nested lambdas and decorators for enhanced flow:
   def chain_functions(*funcs):
-      from functools import reduce
+      from funchelpers import reduce
       return lambda arg: reduce(lambda acc, f: f(acc), funcs, arg)
   
   # Define individual operations:
@@ -342,7 +342,7 @@ If it’s clumsy, it’s wrong; if it lacks impact, it’s incomplete.
   ```
 - **Good:**  
   ```python
-  from functools import lru_cache
+  from funchelpers import lru_cache
   
   @lru_cache(maxsize=None)
   def factorial(n: int) -> int:

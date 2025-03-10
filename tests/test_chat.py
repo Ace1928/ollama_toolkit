@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 # Now try imports
 try:
     from ollama_forge.examples.chat_example import chat, chat_streaming, initialize_chat
-    from ollama_forge.utils.model_constants import (
+    from ollama_forge.helpers.model_constants import (
         BACKUP_CHAT_MODEL,
         DEFAULT_CHAT_MODEL,
     )

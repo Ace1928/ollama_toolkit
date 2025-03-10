@@ -343,7 +343,7 @@ if response:
 ## Automatic Ollama Installation
 
 ```python
-from ollama_forge.utils.common import ensure_ollama_running, check_ollama_installed
+from ollama_forge.helpers.common import ensure_ollama_running, check_ollama_installed
 
 # Check if Ollama is installed
 is_installed, install_message = check_ollama_installed()

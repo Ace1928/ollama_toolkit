@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 # Now try imports
 try:
-    from ollama_forge.utils.common import (
+    from ollama_forge.helpers.common import (
         DEFAULT_OLLAMA_API_URL,
         async_make_api_request,
         make_api_request,
@@ -39,7 +39,7 @@ except ImportError as e:
     sys.exit(1)
 
 
-class TestUtils(unittest.TestCase):
+class TestHelpers(unittest.TestCase):
     """Test cases for utility functions."""
 
     def setUp(self) -> None:
@@ -146,7 +146,7 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(result, {"result": "success"})
         session_instance.request.assert_called_once()
     
-    @patch("ollama_forge.utils.common.subprocess.run")
+    @patch("ollama_forge.helpers.common.subprocess.run")
     def test_check_ollama_running(self, mock_run):
         """Test check_ollama_running function."""
         # Setup mock for running Ollama

@@ -1,14 +1,27 @@
-"""
-Utility modules for the Ollama Toolkit client.
-
-This package provides essential utility functions, constants, and tools
-for working with Ollama.
-"""
-
-# Standard imports
 import sys
 import os
 import logging
+from . import common
+import logging
+from . import model_constants
+import logging
+from . import embedding
+import logging
+
+"""
+Ollama Forge Helpers
+
+This package provides essential helper functions and constants for the Ollama Forge toolkit.
+Following Eidosian principles, it offers elegantly structured helpers for common operations.
+
+Modules:
+    common: General utility functions
+    embedding: Functions for working with embeddings
+    install_ollama: Helpers for installing and managing Ollama
+    model_constants: Constants and resolvers for models
+"""
+
+# Standard imports
 
 # Configure minimal logging - will be overridden if proper logging is imported
 try:
@@ -32,10 +45,10 @@ except ImportError:
     try:
         # Add parent directory to path for absolute imports
         parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        if parent_dir not in sys.path:
+        if (parent_dir not in sys.path):
             sys.path.insert(0, parent_dir)
             
-        from ollama_toolkit.utils.common import (
+        from ollama_toolkit.helpers.common import (
             print_header, print_success, print_error,
             print_warning, print_info, print_json,
             make_api_request, async_make_api_request,
@@ -69,13 +82,15 @@ try:
         DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL,
         DEFAULT_EMBEDDING_MODEL, BACKUP_EMBEDDING_MODEL,
         resolve_model_alias, get_fallback_model,
+        get_model_recommendation
     )
 except ImportError:
     try:
-        from ollama_toolkit.utils.model_constants import (
+        from ollama_toolkit.helpers.model_constants import (
             DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL,
             DEFAULT_EMBEDDING_MODEL, BACKUP_EMBEDDING_MODEL,
             resolve_model_alias, get_fallback_model,
+            get_model_recommendation
         )
     except ImportError:
         # Fallback definitions if module is missing
@@ -92,6 +107,10 @@ except ImportError:
             """Fallback function that returns the backup chat model."""
             return BACKUP_CHAT_MODEL
 
+        def get_model_recommendation(model_name):
+            """Fallback function that returns the backup chat model."""
+            return BACKUP_CHAT_MODEL
+
 # Import embedding utilities
 try:
     from .embedding import (
@@ -102,7 +121,7 @@ try:
     )
 except ImportError:
     try:
-        from ollama_toolkit.utils.embedding import (
+        from ollama_toolkit.helpers.embedding import (
             calculate_similarity,
             normalize_vector,
             batch_calculate_similarities,
@@ -132,32 +151,27 @@ except ImportError:
 
 # Make submodules directly importable with robust fallback handling
 try:
-    from . import common
 except ImportError:
     try:
-        import ollama_toolkit.utils.common as common
+        import ollama_toolkit.helpers.common as common
     except ImportError:
-        import logging
         logging.debug("Could not import common module")
 
 try:
-    from . import model_constants
 except ImportError:
     try:
-        import ollama_toolkit.utils.model_constants as model_constants
+        import ollama_toolkit.helpers.model_constants as model_constants
     except ImportError:
-        import logging
         logging.debug("Could not import model_constants module")
 
 try:
-    from . import embedding
 except ImportError:
     try:
-        import ollama_toolkit.utils.embedding as embedding
+        import ollama_toolkit.helpers.embedding as embedding
     except ImportError:
-        import logging
         logging.debug("Could not import embedding module")
 
+# Explicitly define what's available for import with "from helpers import *"
 __all__ = [
     # Formatting utilities
     "print_header", "print_success", "print_error",
@@ -176,7 +190,7 @@ __all__ = [
     "DEFAULT_EMBEDDING_MODEL", "BACKUP_EMBEDDING_MODEL",
     
     # Model utilities
-    "resolve_model_alias", "get_fallback_model",
+    "resolve_model_alias", "get_fallback_model", "get_model_recommendation",
     
     # Embedding utilities
     "calculate_similarity", "normalize_vector", 

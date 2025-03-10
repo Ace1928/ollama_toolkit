@@ -5,7 +5,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Documentation Status](https://readthedocs.org/projects/ollama-forge/badge/?version=latest)](https://ollama-forge.readthedocs.io/en/latest/?badge=latest)
 
-Welcome to the Ollama Forge Python Client! This toolkit provides a comprehensive Python client library and command-line tools for interacting with [Ollama](https://ollama.ai/), delivering powerful capabilities with elegant simplicity. 🚀
+Welcome to the Ollama Forge Python Client! This toolkit provides a comprehensive Python client library and command-line helpers for interacting with [Ollama](https://ollama.ai/), delivering powerful capabilities with elegant simplicity. 🚀
 
 ## Features
 
@@ -15,7 +15,7 @@ Welcome to the Ollama Forge Python Client! This toolkit provides a comprehensive
 - **Automatic Installation**: Can detect, install, and manage Ollama server
 - **Comprehensive Error Handling**: Precise exception hierarchy for better error handling
 - **Asynchronous Support**: Both sync and async methods for all operations
-- **CLI Tools**: Command-line interface for all operations
+- **CLI Helpers**: Command-line interface for all operations
 - **Embedding Utilities**: Vector operations for semantic search and similarity
 - **Extensive Documentation**: Clear examples, tutorials, and API references
 
@@ -38,7 +38,7 @@ Every aspect of Ollama Forge embodies the ten Eidosian principles:
 
 - **Zero friction**: Works out-of-the-box for both beginners and experts
 - **Developer flexibility**: Configure everything or accept perfect defaults
-- **Research ready**: Tools for experimenting with large language models
+- **Research ready**: Helpers for experimenting with large language models
 - **Production quality**: Robust error handling and reliability features
 - **Universally applicable**: From simple text generation to complex AI workflows
 
@@ -68,7 +68,7 @@ pip install -e ".[dev]"
 One command to handle everything:
 
 ```python
-from ollama_forge.utils.common import ensure_ollama_running
+from ollama_forge.helpers.common import ensure_ollama_running
 
 # This will install Ollama if needed and start the server
 is_running, message = ensure_ollama_running()

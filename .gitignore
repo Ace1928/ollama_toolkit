@@ -1,9 +1,18 @@
-# Python
+# Python bytecode and cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+
+# Distribution / packaging
 build/
 develop-eggs/
 dist/
@@ -20,22 +29,62 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
-.pypirc/
 .pypirc
 *.pypirc*
+pip-wheel-metadata/
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Virtual environments
 venv/
 env/
 ENV/
+.env/
+.venv/
+env.bak/
+venv.bak/
+pythonenv*
 
 # IDE specific files
 .idea/
 .vscode/
 *.swp
 *.swo
+*~
+.spyderproject
+.spyproject
+.ropeproject
+.project
+.pydevproject
+.settings/
 
-# Project specific
+# Documentation
+docs/_build/
+docs/generated/
+_build/
+_autosummary/
+
+# Package specific
 .env
 wheelhouse/
+.backup_*/
+.history/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Backup files
+*.bak
+*.tmp
+*.temp
 

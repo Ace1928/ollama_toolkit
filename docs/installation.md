@@ -43,7 +43,7 @@ pip install -e .
 Ollama Forge can automatically install and manage Ollama for you:
 
 ```python
-from ollama_forge.utils.common import ensure_ollama_running
+from ollama_forge.helpers.common import ensure_ollama_running
 
 # This will install Ollama if needed and start the server
 is_running, message = ensure_ollama_running()

@@ -89,15 +89,15 @@ echo "Package version: $VERSION"
 echo -e "\n${BLUE}Step 3: Running code quality checks${NC}"
 # Run code formatting
 echo "Running Black..."
-black --check ollama_forge utils examples tests || { 
+black --check ollama_forge helpers examples tests || { 
     echo -e "${YELLOW}Code formatting issues detected. Running autoformat...${NC}"
-    black ollama_forge utils examples tests
+    black ollama_forge helpers examples tests
 }
 
 echo "Running isort..."
-isort --check --profile black ollama_forge utils examples tests || { 
+isort --check --profile black ollama_forge helpers examples tests || { 
     echo -e "${YELLOW}Import sorting issues detected. Running autoformat...${NC}"
-    isort --profile black ollama_forge utils examples tests
+    isort --profile black ollama_forge helpers examples tests
 }
 
 if [[ "$SKIP_TESTS" -eq 0 ]]; then

@@ -167,7 +167,7 @@ Ollama Forge v0.1.9 recommends these models for different use cases:
 The toolkit provides constants for commonly used models:
 
 ```python
-from ollama_forge.utils.model_constants import (
+from ollama_forge.helpers.model_constants import (
     DEFAULT_CHAT_MODEL,
     BACKUP_CHAT_MODEL,
     DEFAULT_EMBEDDING_MODEL,
@@ -185,7 +185,7 @@ print(f"Backup embedding model: {BACKUP_EMBEDDING_MODEL}")
 Helper functions for model management:
 
 ```python
-from ollama_forge.utils.model_constants import resolve_model_alias, get_fallback_model
+from ollama_forge.helpers.model_constants import resolve_model_alias, get_fallback_model
 
 # Resolve a model alias to its full name
 model_name = resolve_model_alias("chat")  # Returns DEFAULT_CHAT_MODEL

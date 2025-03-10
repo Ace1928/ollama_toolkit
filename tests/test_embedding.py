@@ -20,7 +20,7 @@ try:
         calculate_similarity,
         create_embedding,
     )
-    from ollama_forge.utils.model_constants import (
+    from ollama_forge.helpers.model_constants import (
         BACKUP_EMBEDDING_MODEL,
         DEFAULT_EMBEDDING_MODEL,
     )

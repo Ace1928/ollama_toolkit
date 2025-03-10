@@ -8,7 +8,7 @@ The main class for interacting with the Ollama Forge, designed with contextual i
 
 ```python
 from ollama_forge import OllamaClient
-from ollama_forge.utils.model_constants import DEFAULT_CHAT_MODEL, DEFAULT_EMBEDDING_MODEL
+from ollama_forge.helpers.model_constants import DEFAULT_CHAT_MODEL, DEFAULT_EMBEDDING_MODEL
 
 # Initialize with optimal defaults - each parameter carefully calibrated
 client = OllamaClient(
@@ -380,7 +380,7 @@ The package provides precisely engineered exception types for clear error handli
 
 ## Utility Functions
 
-The package provides several utility functions in `ollama_forge.utils.common`:
+The package provides several utility functions in `ollama_forge.helpers.common`:
 
 ### Display Functions
 
@@ -406,7 +406,7 @@ The package provides several utility functions in `ollama_forge.utils.common`:
 
 ### Model Constants
 
-The `ollama_forge.utils.model_constants` module provides:
+The `ollama_forge.helpers.model_constants` module provides:
 
 - `DEFAULT_CHAT_MODEL`: Default model for chat completions
 - `BACKUP_CHAT_MODEL`: Fallback model for chat completions
