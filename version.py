@@ -20,7 +20,7 @@ VERSION_RELEASE_DATE = "2023-10-15"
 # Version components for programmatic access
 VERSION_MAJOR = 0
 VERSION_MINOR = 1
-VERSION_PATCH = 8
+VERSION_PATCH = 9  # Updated from 8 to 9 to match __version__
 
 def get_version_tuple():
     """Return version as a tuple of (major, minor, patch)."""

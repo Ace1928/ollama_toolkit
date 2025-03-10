@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ollama Toolkit Documentation &mdash; Ollama Toolkit 0.1.8 documentation</title>
+  <title>Ollama Toolkit Documentation &mdash; Ollama Toolkit 0.1.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=22607128"></script>
+      <script src="_static/documentation_options.js?v=8618f531"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -131,7 +131,7 @@
 <li><p>💪 <strong>Self-Aware Error Handling</strong>: Comprehensive error types that explain precisely what went wrong</p></li>
 <li><p>📊 <strong>Velocity-Optimized Embeddings</strong>: Create and manipulate embeddings with maximum efficiency</p></li>
 <li><p>🧪 <strong>Recursively Refined Testing</strong>: Every function proven robust through iterative improvement</p></li>
-<li><p>🔍 <strong>Version-Aware</strong>: Full compatibility with Ollama 0.1.8 and beyond</p></li>
+<li><p>🔍 <strong>Version-Aware</strong>: Full compatibility with Ollama 0.1.9 and beyond</p></li>
 </ul>
 </section>
 <section id="getting-started">
@@ -141,7 +141,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">ollama_toolkit.utils.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_ollama_running</span>
 
 <span class="c1"># Display toolkit version – foundational awareness</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ollama Toolkit version: </span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Should be 0.1.8</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ollama Toolkit version: </span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Should be 0.1.9</span>
 
 <span class="c1"># Ensure Ollama is installed and running – structurally sound foundation</span>
 <span class="n">is_running</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="n">ensure_ollama_running</span><span class="p">()</span>
@@ -177,7 +177,7 @@
 <section id="installation-guide">
 <h2>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Install via PyPI: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ollama-toolkit==0.1.8</span></code></p></li>
+<li><p>Install via PyPI: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ollama-toolkit==0.1.9</span></code></p></li>
 <li><p>Or install locally in editable mode:</p></li>
 </ul>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>/path/to/ollama_toolkit
@@ -342,7 +342,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#current">0.1.8 (Current)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#current">0.1.9 (Current)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#id1">0.1.7</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#id4">0.1.6</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#id8">0.1.5</a></li>
@@ -351,15 +351,6 @@
 </ul>
 </div>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">🧩 API Endpoints</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="version.html">Version Endpoint</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generate.html">Generate a Completion</a></li>
-<li class="toctree-l1"><a class="reference internal" href="chat.html">Generate a Chat Completion</a></li>
-<li class="toctree-l1"><a class="reference internal" href="embed.html">Generate Embeddings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="models_api.html">Models API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="system_api.html">System API</a></li>
-</ul>
 </div>
 </section>
 <section id="examples">
@@ -382,7 +373,7 @@
 <section id="version-history">
 <h2>Version History<a class="headerlink" href="#version-history" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>0.1.8</strong> (Current) - Enhanced embedding operations, improved async support, expanded CLI</p></li>
+<li><p><strong>0.1.9</strong> (Current) - Enhanced embedding operations, improved async support, expanded CLI</p></li>
 <li><p><strong>0.1.7</strong> - Added comprehensive error handling and model fallbacks</p></li>
 <li><p><strong>0.1.6</strong> - Introduced caching and optimization for embeddings</p></li>
 <li><p><strong>0.1.5</strong> - Initial public release with basic functionality</p></li>
