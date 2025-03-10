@@ -22,7 +22,7 @@ Following the Eidosian approach, each step is minimized yet thorough:
 Install the package directly from PyPI:
 
 ```bash
-pip install ollama-toolkit
+pip install ollama-forge
 ```
 
 ## Development Installation

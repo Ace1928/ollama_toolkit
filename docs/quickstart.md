@@ -7,7 +7,7 @@ This guide will help you get started with Ollama Forge in minutes—following Ei
 Install from PyPI with a single command:
 
 ```bash
-pip install ollama-toolkit
+pip install ollama-forge
 ```
 
 ## 🔍 Verify Installation
