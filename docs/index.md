@@ -2,7 +2,17 @@
 
 # Ollama Forge Documentation
 
-Welcome to the Ollama Forge documentation. This toolkit provides a comprehensive Python client library and command-line tools for interacting with the [Ollama](https://ollama.ai/) API. 🚀
+Welcome to the Ollama Forge documentation! This toolkit provides a comprehensive Python client library and command-line tools for interacting with [Ollama](https://ollama.ai/), delivering both power and simplicity in one elegant package. 🚀
+
+## Features at a Glance
+
+- **Complete API Coverage**: Every Ollama endpoint fully implemented
+- **Dual Interface**: Both high-level and low-level API access
+- **Universal Design**: Simple enough for beginners, powerful enough for experts
+- **Mathematical Precision**: Following Eidosian principles for elegant code
+- **Self-Installing**: Can bootstrap Ollama installation and setup
+- **Recursive Intelligence**: Self-optimizing with fallback mechanisms
+- **Structural Control**: Clean architecture and error handling
 
 ## Contents
 

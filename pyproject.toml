@@ -3,7 +3,7 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ollama-toolkit"
+name = "ollama-forge"
 version = "0.1.9"
 description = "Python client library and CLI for Ollama"
 readme = "README.md"
@@ -20,6 +20,7 @@ urls = {repository = "https://github.com/Ace1928/ollama_forge"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
@@ -27,23 +28,27 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-keywords = ["ollama", "ai", "llm", "language models", "toolkit", "eidos"]
+keywords = ["ollama", "ai", "llm", "language models", "toolkit", "eidos", "forge"]
 
 dependencies = [
     "requests>=2.26.0,<3.0.0",
     "aiohttp>=3.8.0,<4.0.0",
     "colorama>=0.4.4",
-"pytest>=6.2.5"
-    "pytest>=6.2.5"
+    "pytest>=6.2.5",
+    "numpy>=1.19.0",
+    "packaging>=20.0",
 ]
 
 [project.urls]
 "Homepage" = "https://github.com/Ace1928/ollama_forge"
 "Bug Tracker" = "https://github.com/Ace1928/ollama_forge/issues"
+"Documentation" = "https://ollama-forge.readthedocs.io"
 
 [project.scripts]
-ollama-toolkit = "ollama_forge.cli:main"
+ollama-forge = "ollama_forge.cli:main"
 
 [project.optional-dependencies]
 dev = [
@@ -52,7 +57,16 @@ dev = [
     "mypy",
     "pytest-cov",
     "sphinx",
+    "sphinx-rtd-theme",
+    "myst-parser",
     "twine",
+    "build",
+]
+
+docs = [
+    "sphinx>=4.0.0",
+    "sphinx-rtd-theme>=1.0.0",
+    "myst-parser>=0.15.0",
 ]
 
 [tool.black]
@@ -73,5 +87,7 @@ disallow_untyped_defs = true
 disallow_incomplete_defs = true
 
 [tool.pytest.ini_options]
-# Add this line to your existing pytest config
+asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+python_files = "test_*.py"
