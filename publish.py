@@ -8,8 +8,7 @@ import os
 import subprocess
 import sys
 from typing import List
-# Import after fixing version.py to avoid the syntax error
-from ollama_toolkit.version import update_version_universally
+from version import update_version_universally
 
 def run_command(cmd: List[str]) -> None:
     """Run a command and exit if it fails."""
@@ -62,9 +61,9 @@ def main() -> None:
     print("Building package documentation...")
     subprocess.run(["bash", "build_docs.sh"], check=True)
     
-    # Upload to PyPI using config from .pypirc
-    print("Uploading to PyPI using credentials from .pypirc...")
-    run_command(["python", "-m", "twine", "upload", "--config-file", "~/.pypirc", "dist/*"])
+    # Upload to PyPI
+    print("Uploading to PyPI...")
+    run_command(["python", "-m", "twine", "upload", "dist/*"])
     
     print("Package published successfully!")
 
