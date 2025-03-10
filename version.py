@@ -55,3 +55,43 @@ def is_compatible_ollama_version(version_str):
     except (IndexError, ValueError):
         # If there's any error parsing the version, assume incompatible
         return False
+
+import re
+import os
+
+def update_version_universally(new_version: str) -> None:
+    """
+    Scans the repository for references to the old version and replaces them
+    with new_version, ensuring everything is kept consistent.
+    """
+    current_version = __version__
+    if current_version == new_version:
+        print(f"No version change needed. Current version is already {new_version}.")
+        return
+
+    replaced_any = False
+
+    for root, dirs, files in os.walk(os.path.dirname(__file__)):
+        # Skip hidden/system directories
+        if any(ignored in root for ignored in [".git", "__pycache__"]):
+            continue
+        for name in files:
+            if not any(name.endswith(ext) for ext in [".py", ".md", ".rst", ".txt"]):
+                continue
+            filepath = os.path.join(root, name)
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
+            new_content = content.replace(current_version, new_version)
+            if new_content != content:
+                replaced_any = True
+                with open(filepath, "w", encoding="utf-8") as f:
+                    f.write(new_content)
+                print(f"Updated version in {filepath}")
+
+    if replaced_any:
+        # Also update our own __version__ in memory
+        global __version__
+        __version__ = new_version
+        print(f"Global __version__ updated to {new_version}")
+    else:
+        print("No version references found. Nothing updated.")

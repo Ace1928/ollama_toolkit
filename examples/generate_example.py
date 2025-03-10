@@ -19,32 +19,14 @@ from colorama import Fore, Style, init
 # Initialize colorama for cross-platform colored terminal output
 init()
 
-# Try to import as a package first, then try relative imports
-try:
-    from ollama_toolkit.utils.common import (
-        DEFAULT_OLLAMA_API_URL,
-        print_error, print_header, print_info, print_success
-    )
-    from ollama_toolkit.utils.model_constants import (
-        DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL
-    )
-except ImportError:
-    # Add parent directory to path for direct execution
-    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-    if parent_dir not in sys.path:
-        sys.path.insert(0, parent_dir)
-    try:
-        from ollama_toolkit.utils.common import (
-            DEFAULT_OLLAMA_API_URL,
-            print_error, print_header, print_info, print_success
-        )
-        from ollama_toolkit.utils.model_constants import (
-            DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL
-        )
-    except ImportError as e:
-        print(f"Error importing required modules: {e}")
-        print("Please install the package using: pip install -e /path/to/ollama_toolkit")
-        sys.exit(1)
+# Use absolute imports only
+from ollama_toolkit.utils.common import (
+    DEFAULT_OLLAMA_API_URL,
+    print_error, print_header, print_info, print_success
+)
+from ollama_toolkit.utils.model_constants import (
+    DEFAULT_CHAT_MODEL, BACKUP_CHAT_MODEL
+)
 
 
 def generate_streaming(

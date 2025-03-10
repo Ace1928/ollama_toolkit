@@ -39,10 +39,3 @@ ENV/
 .env
 wheelhouse/
 
-# Developer-specific scripts (these won't be included in the package distribution)
-publish.py
-publish_to_pypi.sh
-init_repo.sh
-update_parent_gitignore.sh
-activate_venv.sh
-development.sh

@@ -15,11 +15,6 @@ QuickstartMainType = Callable[[], Optional[int]]
 
 # Handle different execution contexts
 if __name__ == "__main__":
-    # Direct execution - add parent directory to path
-    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    if parent_dir not in sys.path:
-        sys.path.insert(0, parent_dir)
-    
     try:
         # Now import the CLI module using absolute import
         from ollama_toolkit.cli import main as cli_main
@@ -30,27 +25,6 @@ if __name__ == "__main__":
     except ImportError as e:
         print(f"Error importing modules: {e}")
         sys.exit(1)
-else:
-    # Module execution path
-    try:
-        # Try relative imports first
-        from .cli import main as cli_main
-        from .examples.quickstart import main as quickstart_main
-        # Cast to help with type checking
-        cli_main = cast(CliMainType, cli_main)
-        quickstart_main = cast(QuickstartMainType, quickstart_main)
-    except ImportError:
-        try:
-            # Fall back to absolute imports if relative imports fail
-            # This helps in certain execution contexts
-            from ollama_toolkit.cli import main as cli_main
-            from ollama_toolkit.examples.quickstart import main as quickstart_main
-            # Cast to help with type checking
-            cli_main = cast(CliMainType, cli_main)
-            quickstart_main = cast(QuickstartMainType, quickstart_main)
-        except ImportError as e:
-            print(f"Error importing modules: {e}")
-            sys.exit(1)
 
 def main() -> None:
     """Entry point for the module."""

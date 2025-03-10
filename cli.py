@@ -325,7 +325,7 @@ def main() -> None:
         "--verbose", "-v", action="store_true", help="Enable verbose output"
     )
     parser.add_argument(
-        "--version", action="store_true", help="Show ollama-api version"
+        "--version", action="store_true", help="Show ollama_toolkit version"
     )
 
     # Create subparsers with better help formatting
@@ -419,7 +419,7 @@ def main() -> None:
     if args.version:
         from ollama_toolkit import __version__
 
-        print(f"ollama-api version {__version__}")
+        print(f"ollama_toolkit version {__version__}")
         return
 
     setup_logging(args.verbose)

@@ -2,7 +2,7 @@
 
 set -e  # Exit on error
 
-echo "Building Ollama Toolkit documentation..."
+echo "Building documentation..."
 
 # Clean previous builds
 rm -rf docs/_build/html
@@ -16,6 +16,8 @@ fi
 # Build the documentation
 cd "$(dirname "$0")"
 sphinx-build -b html docs docs/_build/html
+
+echo "Docs build complete!"
 
 # Report success and next steps
 echo ""
