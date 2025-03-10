@@ -1,6 +1,6 @@
 # Version Endpoint
 
-This document explains how to retrieve the current version of the Ollama server and confirms the Ollama Toolkit client is at v0.1.8.
+This document explains how to retrieve the current version of the Ollama server and confirms the Ollama Toolkit client is at v0.1.9.
 
 ## Endpoint
 
@@ -22,7 +22,7 @@ Expected output:
 }
 ```
 
-(Ollama Toolkit v0.1.8 is compatible with Ollama server >= 0.1.11.)
+(Ollama Toolkit v0.1.9 is compatible with Ollama server >= 0.1.11.)
 
 ### Python Usage Example
 

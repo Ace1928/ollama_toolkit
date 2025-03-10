@@ -1,6 +1,6 @@
 # Error Handling
 
-This document details the error handling capabilities in Ollama Toolkit v0.1.8, following Eidosian principles of self-awareness and structural robustness.
+This document details the error handling capabilities in Ollama Toolkit v0.1.9, following Eidosian principles of self-awareness and structural robustness.
 
 ## Exception Hierarchy
 
@@ -53,7 +53,7 @@ except OllamaAPIError as e:
 
 ## Advanced Fallback Mechanisms
 
-Version 0.1.8 introduces sophisticated fallback mechanisms that operate at multiple levels:
+Version 0.1.9 introduces sophisticated fallback mechanisms that operate at multiple levels:
 
 ### Model Fallback
 

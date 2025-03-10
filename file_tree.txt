@@ -730,8 +730,8 @@
  [97m📄 client.py[0m [2m(-rw-rw-r--, 21141 bytes)[0m
  [32m🚀 development.sh[0m [2m(-rwxrwxr-x, 2199 bytes)[0m
  [34m📂 [1mdist/[0m [2m(drwxrwxr-x)[0m
-├── [97m📄 ollama_toolkit-0.1.8.tar.gz[0m [2m(-rw-rw-r--, 155386 bytes)[0m
-└── [97m📄 ollama_toolkit-0.1.8-py3-none-any.whl[0m [2m(-rw-rw-r--, 36041 bytes)[0m
+├── [97m📄 ollama_toolkit-0.1.9.tar.gz[0m [2m(-rw-rw-r--, 155386 bytes)[0m
+└── [97m📄 ollama_toolkit-0.1.9-py3-none-any.whl[0m [2m(-rw-rw-r--, 36041 bytes)[0m
  [34m📂 [1mdocs/[0m [2m(drwxrwxr-x)[0m
 ├── [97m📄 Makefile[0m [2m(-rw-rw-r--, 634 bytes)[0m
 ├── [97m📄 README.md[0m [2m(-rw-rw-r--, 1618 bytes)[0m

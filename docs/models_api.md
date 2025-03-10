@@ -1,6 +1,6 @@
 # Models API
 
-This document details the model management endpoints in Ollama Toolkit v0.1.8, providing interfaces for listing, pulling, modifying, and deleting models.
+This document details the model management endpoints in Ollama Toolkit v0.1.9, providing interfaces for listing, pulling, modifying, and deleting models.
 
 ## Endpoints Overview
 

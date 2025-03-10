@@ -5,7 +5,7 @@ This package provides a comprehensive interface to interact with the Ollama API,
 following Eidosian principles of elegance, efficiency, and contextual integrity.
 """
 
-__version__ = "0.1.8"
+__version__ = "0.1.9"
 __author__ = "Lloyd Handyside, Eidos"
 __email__ = "ace1928@gmail.com, eidos@gmail.com"
 

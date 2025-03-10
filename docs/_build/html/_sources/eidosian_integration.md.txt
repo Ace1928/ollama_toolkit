@@ -1,6 +1,6 @@
 # Eidosian Integration
 
-This document explores how Ollama Toolkit v0.1.8 embodies the ten Eidosian principles, creating a development experience of unparalleled excellence.
+This document explores how Ollama Toolkit v0.1.9 embodies the ten Eidosian principles, creating a development experience of unparalleled excellence.
 
 ## Principles in Action
 
@@ -53,7 +53,7 @@ embedding = client.create_embedding("your unique text here")
 Each release builds upon the last through iterative improvements.
 
 ```python
-# 0.1.5 → 0.1.6 → 0.1.7 → 0.1.8
+# 0.1.5 → 0.1.6 → 0.1.7 → 0.1.9
 # v0.1.5: Basic embedding
 # v0.1.6: Embedding with caching
 # v0.1.7: Embedding with caching and optimization

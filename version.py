@@ -4,12 +4,12 @@ Version information for the Ollama Toolkit package.
 This file contains version constants and version-related utilities
 to ensure consistency across the project.
 
-Client version: 0.1.8
+Client version: 0.1.9
 Minimum Ollama server version: 0.1.11
 """
 
 # Current version of the Ollama Toolkit package
-__version__ = "0.1.8"             # Ollama Toolkit client version
+__version__ = "0.1.9"             # Ollama Toolkit client version
 
 # Minimum compatible Ollama server version
 MINIMUM_OLLAMA_VERSION = "0.1.11"  # Confirmed minimum Ollama server version
@@ -64,6 +64,7 @@ def update_version_universally(new_version: str) -> None:
     Scans the repository for references to the old version and replaces them
     with new_version, ensuring everything is kept consistent.
     """
+    global __version__  # Moved to top of function before any usage of __version__
     current_version = __version__
     if current_version == new_version:
         print(f"No version change needed. Current version is already {new_version}.")
@@ -90,7 +91,6 @@ def update_version_universally(new_version: str) -> None:
 
     if replaced_any:
         # Also update our own __version__ in memory
-        global __version__
         __version__ = new_version
         print(f"Global __version__ updated to {new_version}")
     else:

@@ -8,8 +8,8 @@ sys.path.insert(0, os.path.abspath('..'))  # Add project root to path
 project = 'Ollama Toolkit'
 copyright = '2025, Lloyd Handyside'
 author = 'Lloyd Handyside'
-version = '0.1.8'
-release = '0.1.8'
+version = '0.1.9'
+release = '0.1.9'
 
 # Extensions
 extensions = [

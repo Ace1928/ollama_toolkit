@@ -25,7 +25,7 @@ Ollama Toolkit gives you programmatic access to:
 - 💪 **Self-Aware Error Handling**: Comprehensive error types that explain precisely what went wrong
 - 📊 **Velocity-Optimized Embeddings**: Create and manipulate embeddings with maximum efficiency
 - 🧪 **Recursively Refined Testing**: Every function proven robust through iterative improvement
-- 🔍 **Version-Aware**: Full compatibility with Ollama 0.1.8 and beyond
+- 🔍 **Version-Aware**: Full compatibility with Ollama 0.1.9 and beyond
 
 ## Getting Started
 
@@ -35,7 +35,7 @@ from ollama_toolkit import OllamaClient, __version__
 from ollama_toolkit.utils.common import ensure_ollama_running
 
 # Display toolkit version – foundational awareness
-print(f"Ollama Toolkit version: {__version__}")  # Should be 0.1.8
+print(f"Ollama Toolkit version: {__version__}")  # Should be 0.1.9
 
 # Ensure Ollama is installed and running – structurally sound foundation
 is_running, message = ensure_ollama_running()
@@ -69,7 +69,7 @@ else:
 
 ## Installation Guide
 
-- Install via PyPI: `pip install ollama-toolkit==0.1.8`
+- Install via PyPI: `pip install ollama-toolkit==0.1.9`
 - Or install locally in editable mode:
 
 ```bash
@@ -152,7 +152,7 @@ python -m ollama_toolkit.examples.<example_file>
 
 ## Version History
 
-- **0.1.8** (Current) - Enhanced embedding operations, improved async support, expanded CLI
+- **0.1.9** (Current) - Enhanced embedding operations, improved async support, expanded CLI
 - **0.1.7** - Added comprehensive error handling and model fallbacks
 - **0.1.6** - Introduced caching and optimization for embeddings
 - **0.1.5** - Initial public release with basic functionality

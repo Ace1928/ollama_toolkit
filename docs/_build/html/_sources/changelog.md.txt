@@ -2,9 +2,9 @@
 
 A detailed record of changes to the Ollama Toolkit, following Eidosian principles of recursive refinement and self-awareness.
 
-## 0.1.8 (Current)
+## 0.1.9 (Current)
 
-- Ensured all documentation references align with client version 0.1.8.
+- Ensured all documentation references align with client version 0.1.9.
 - Clarified minimum recommended Ollama server version is 0.1.11.
 - Enhanced embedding operations with batch processing.
 - Comprehensive error handling documentation.

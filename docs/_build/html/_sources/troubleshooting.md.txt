@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-This document provides structured solutions for common issues encountered when using Ollama Toolkit v0.1.8, organized by problem domain with Eidosian precision and recursion.
+This document provides structured solutions for common issues encountered when using Ollama Toolkit v0.1.9, organized by problem domain with Eidosian precision and recursion.
 
 ## Connection Issues
 

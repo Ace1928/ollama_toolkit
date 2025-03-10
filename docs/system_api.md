@@ -1,6 +1,6 @@
 # System API
 
-This document details system-related endpoints in Ollama Toolkit v0.1.8 for checking server status, version information, and system operations.
+This document details system-related endpoints in Ollama Toolkit v0.1.9 for checking server status, version information, and system operations.
 
 ## Endpoints Overview
 

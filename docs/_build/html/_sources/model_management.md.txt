@@ -1,6 +1,6 @@
 # Model Management
 
-This document details the model management capabilities in Ollama Toolkit v0.1.8, following Eidosian principles of structural control and recursive refinement.
+This document details the model management capabilities in Ollama Toolkit v0.1.9, following Eidosian principles of structural control and recursive refinement.
 
 ## Overview
 
@@ -153,7 +153,7 @@ for update in client.push_model("my-custom-model", stream=True):
 
 ## Recommended Models
 
-Ollama Toolkit v0.1.8 recommends these models for different use cases:
+Ollama Toolkit v0.1.9 recommends these models for different use cases:
 
 | Purpose | Model | Size | Description |
 |---------|-------|------|-------------|

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Core client functionality for interacting with the Ollama Toolkit v0.1.8.
+Core client functionality for interacting with the Ollama Toolkit v0.1.9.
 
 This module provides a fully typed, self-documenting client interface to
 all core Ollama API endpoints including model management, generation, chat,
