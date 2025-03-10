@@ -11,69 +11,25 @@ import sys
 import time
 from typing import List, Callable
 
-# Add parent directory to path for direct script execution
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-
 # Import OllamaClient
 from ollama_forge import OllamaClient
+
+# Import constants from model_constants
+from ollama_forge.helpers.model_constants import (
+    DEFAULT_CHAT_MODEL,
+    DEFAULT_EMBEDDING_MODEL
+)
 
 # Define printer function type for strict typing
 PrinterFunc = Callable[[str], None]
 
-# Define fallback functions first with proper types
-def _print_header(title: str) -> None: print(f"=== {title} ===")
-def _print_success(message: str) -> None: print(f"✓ {message}")
-def _print_error(message: str) -> None: print(f"✗ {message}")
-def _print_info(message: str) -> None: print(f"ℹ {message}")
-def _print_warning(message: str) -> None: print(f"⚠ {message}")
-
-# Initialize print functions with fallbacks
-print_header: PrinterFunc = _print_header
-print_success: PrinterFunc = _print_success
-print_error: PrinterFunc = _print_error
-print_info: PrinterFunc = _print_info
-print_warning: PrinterFunc = _print_warning
-
-# Try to load helper functions from the package - use a more robust approach
-try:
-    # First attempt direct import
-    try:
-        from ollama_forge.helpers.common import (
-            print_header as pkg_print_header,
-            print_success as pkg_print_success,
-            print_error as pkg_print_error,
-            print_info as pkg_print_info,
-            print_warning as pkg_print_warning
-        )
-        # Override with package functions if available
-        print_header = pkg_print_header
-        print_success = pkg_print_success
-        print_error = pkg_print_error
-        print_info = pkg_print_info
-        print_warning = pkg_print_warning
-    except ImportError:
-        # Try relative import if helpers might be directly under examples
-        from ..helpers.common import (
-            print_header as pkg_print_header,
-            print_success as pkg_print_success,
-            print_error as pkg_print_error,
-            print_info as pkg_print_info,
-            print_warning as pkg_print_warning
-        )
-        print_header = pkg_print_header
-        print_success = pkg_print_success
-        print_error = pkg_print_error
-        print_info = pkg_print_info
-        print_warning = pkg_print_warning
-except (ImportError, AttributeError):
-    # Already using fallbacks, so nothing to do
-    pass
-
-# Define constants for model names
-DEFAULT_CHAT_MODEL: str = "llama2"
-DEFAULT_EMBEDDING_MODEL: str = "llama2-embedding"
+from ollama_forge.helpers.common import (
+    print_header,
+    print_success,
+    print_error,
+    print_info,
+    print_warning
+)
 
 def basic_client_setup() -> OllamaClient:
     """Basic client initialization with default settings."""
@@ -236,26 +192,17 @@ def create_embeddings(client: OllamaClient, model: str = DEFAULT_EMBEDDING_MODEL
                 mag2 = sum(b*b for b in v2) ** 0.5
                 return dot / (mag1 * mag2) if mag1 * mag2 > 0 else 0.0
             
-            # Initialize the similarity function with our defined function
+            # Use our simple similarity function by default
             calc_sim: Callable[[List[float], List[float]], float] = simple_similarity
-                
-            try:
-                # Try to import from the package with better error handling
-                try:
-                    # Direct import
-                    from ollama_forge.helpers.embedding import calculate_similarity
-                    calc_sim = calculate_similarity
-                except ImportError:
-                    # Try relative import
-                    try:
-                        from ..helpers.embedding import calculate_similarity
-                        calc_sim = calculate_similarity
-                    except ImportError:
-                        print_warning("Using fallback similarity calculation")
-            except Exception:
-                print_warning("Using fallback similarity calculation due to import error")
             
-            # Calculate similarities with proper typing
+            # Try to use the helper function if available
+            try:
+                from ollama_forge.helpers.embedding import calculate_similarity
+                calc_sim = calculate_similarity  # type: Callable[[List[float], List[float]], float]
+            except ImportError:
+                print_warning("Using fallback similarity calculation")
+            
+            # Calculate similarities
             sim_1_2: float = calc_sim(embeddings[0], embeddings[1])
             sim_1_3: float = calc_sim(embeddings[0], embeddings[2])
             
@@ -303,8 +250,8 @@ def main() -> None:
         
         # Run examples
         models = list_available_models(client)
-        # Fix the partially unknown type with explicit type check and conversion
-        model_name: str = models[0] if models and isinstance(models[0], str) else DEFAULT_CHAT_MODEL
+        # Choose first model if available, otherwise use default
+        model_name: str = models[0] if models else DEFAULT_CHAT_MODEL
         
         generate_text(client, model_name)
         chat_completion(client, model_name)

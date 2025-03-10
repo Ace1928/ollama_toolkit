@@ -1,50 +1,34 @@
-#!/usr/bin/env python3
-"""
-Ollama Forge client implementation.
-
-This module provides a comprehensive client for interacting with the Ollama API,
-featuring streaming support, robust error handling, and elegant fallbacks.
-It follows Eidosian principles of precision, modularity, and efficiency.
-"""
-
 import json
 import time
 import threading
-from typing import Any, Dict, Generator, Iterator, List, Optional, Union, Tuple, cast
+from typing import Any, Dict, Generator, Iterator, List, Optional, Union, AsyncIterator
 import logging
 import requests
-from functools import wraps
+import httpx
+import asyncio  # Added to fix "asyncio is not defined" warning
 from contextlib import contextmanager
-
-try:
-    from tqdm import tqdm
-    TQDM_AVAILABLE = True
-except ImportError:
-    TQDM_AVAILABLE = False
+from tqdm.auto import tqdm  # Explicit import from tqdm.auto
 
 # Internal imports
 from .exceptions import (
     OllamaAPIError, ConnectionError, ModelNotFoundError,
-    ServerError, InvalidRequestError, TimeoutError,
-    StreamingError, ParseError, ValidationError,
+    ServerError, TimeoutError,
+    StreamingError,
     get_exception_for_status
 )
 from .config import (
     DEFAULT_OLLAMA_API_URL, DEFAULT_TIMEOUT,
-    DEFAULT_CHAT_MODEL, DEFAULT_EMBEDDING_MODEL,
-    BACKUP_CHAT_MODEL, BACKUP_EMBEDDING_MODEL,
     API_ENDPOINTS, DISABLE_PROGRESS_BARS,
     DEBUG_MODE
 )
+from helpers.model_constants import (
+    resolve_model_alias, get_fallback_model
+)
 
-# Standard helpers import attempt
-try:
-    from ..helpers.common import make_api_request, print_error, print_warning
-    from ..helpers.model_constants import get_fallback_model, resolve_model_alias
-    HELPERS_AVAILABLE = True
-except (ImportError, ValueError):
-    HELPERS_AVAILABLE = False
-
+# Utility flags and functions
+TQDM_AVAILABLE = True
+HELPERS_AVAILABLE = True # Set to True if helper functions are available
+    
 # Set up module logger
 logger = logging.getLogger(__name__)
 
@@ -92,7 +76,7 @@ class OllamaClient:
         data: Optional[Dict[str, Any]] = None,
         stream: bool = False,
         headers: Optional[Dict[str, str]] = None,
-    ) -> requests.Response:
+    ) -> Optional[requests.Response]:
         """
         Make an HTTP request with retry logic.
         
@@ -127,29 +111,31 @@ class OllamaClient:
                 if DEBUG_MODE and attempt > 0:
                     logger.debug(f"Retry attempt {attempt} for request to {url}")
                     
-                response = self.session.request(
+                # Type-annotate response and ignore "json" param warning
+                response: requests.Response = self.session.request(  
                     method=method,
                     url=url,
-                    json=data,
+                    json=data,  # type: ignore [call-arg]
                     headers=request_headers,
                     timeout=self.timeout,
                     stream=stream,
                 )
                 
-                if response.status_code >= 400:
-                    # Detailed error handling
-                    error_message = f"HTTP {response.status_code}"
+                status_code: int = response.status_code  # Force known int type
+                if status_code >= 400:
+                    text: str = response.text  # Force known string type
+                    error_message = f"HTTP {status_code}"
                     try:
                         error_data = response.json()
                         if "error" in error_data:
                             error_message = error_data["error"]
                     except (ValueError, KeyError):
                         # If JSON parsing fails, use the response text
-                        error_message = response.text or error_message
+                        error_message = text or error_message
                         
                     # Raise specific exception based on status code
                     exception = get_exception_for_status(
-                        response.status_code, error_message, response.json() if "json" in response.headers.get("content-type", "") else None
+                        status_code, error_message, response.json() if "json" in response.headers.get("content-type", "") else None
                     )
                     raise exception
                     
@@ -163,17 +149,77 @@ class OllamaClient:
                 if attempt == self.max_retries:
                     raise ConnectionError(f"Connection to Ollama server failed: {str(e)}")
                 
-            except OllamaAPIError:
-                # Re-raise API errors directly without retry
-                raise
-                
             except Exception as e:
                 if attempt == self.max_retries:
                     raise OllamaAPIError(f"Unexpected error: {str(e)}")
                     
-            # Exponential backoff before retry
-            wait_time = backoff_factor * (2 ** attempt)
-            time.sleep(wait_time)
+                # Exponential backoff before retry
+                wait_time = backoff_factor * (2 ** attempt)
+                time.sleep(wait_time)
+                
+            # If we get here, all retries failed but no exception was raised
+            return None  # Return None if we couldn't get a valid response
+
+    async def _with_async_retry(
+        self,
+        method: str,
+        endpoint: str,
+        data: Optional[Dict[str, Any]] = None,
+        stream: bool = False,
+        headers: Optional[Dict[str, str]] = None,
+    ) -> Optional[httpx.Response]:
+        url = f"{self.base_url}{endpoint}"
+        request_headers = {"Content-Type": "application/json"}
+        if headers:
+            request_headers.update(headers)
+
+        backoff_factor = 0.5
+        for attempt in range(self.max_retries + 1):
+            try:
+                async with httpx.AsyncClient(timeout=self.timeout) as client:
+                    if method == "POST":
+                        response: httpx.Response = await client.post(  # Type-annotate
+                            url,
+                            json=data,  # type: ignore [call-arg]
+                            headers=request_headers,
+                            timeout=self.timeout,
+                            follow_redirects=True
+                        )
+                    elif method == "GET":
+                        response = await client.get(
+                            url,
+                            params=data,
+                            headers=request_headers,
+                            timeout=self.timeout,
+                            follow_redirects=True
+                        )
+                    elif method == "DELETE":
+                        response = await client.delete(
+                            url,
+                            json=data,  # type: ignore [call-arg]
+                            headers=request_headers,
+                            timeout=self.timeout,
+                            follow_redirects=True
+                        )
+                    else:
+                        raise OllamaAPIError(f"Unsupported method: {method}")
+
+                    status_code: int = response.status_code
+                    if 200 <= status_code < 300:
+                        return response
+                    elif status_code == 404:
+                        raise ModelNotFoundError(f"Model not found at {url}")
+                    elif 400 <= response.status_code < 500:
+                        raise OllamaAPIError(f"Client error {status_code}: {response.text}")
+                    else:
+                        raise ServerError(f"Server error {status_code}: {response.text}")
+
+            except (httpx.TimeoutException, httpx.RequestError) as e:
+                if attempt == self.max_retries:
+                    raise ConnectionError(f"Connection failed after retries: {e}")
+                await asyncio.sleep(backoff_factor * (2 ** attempt))
+
+        return None
     
     def get_version(self) -> Dict[str, Any]:
         """
@@ -184,9 +230,12 @@ class OllamaClient:
             
         Raises:
             ConnectionError: If cannot connect to Ollama server
+            OllamaAPIError: If the response is invalid
         """
         endpoint = API_ENDPOINTS["version"]
         response = self._with_retry("GET", endpoint)
+        if response is None:
+            raise OllamaAPIError("Failed to get Ollama version: No response received")
         return response.json()
     
     def list_models(self) -> Dict[str, List[Dict[str, Any]]]:
@@ -198,9 +247,12 @@ class OllamaClient:
             
         Raises:
             ConnectionError: If cannot connect to Ollama server
+            OllamaAPIError: If the response is invalid
         """
         endpoint = API_ENDPOINTS["tags"]
         response = self._with_retry("GET", endpoint)
+        if response is None:
+            raise OllamaAPIError("Failed to list models: No response received")
         return response.json()
     
     def pull_model(
@@ -222,18 +274,23 @@ class OllamaClient:
         Raises:
             ConnectionError: If cannot connect to Ollama server
             InvalidRequestError: If the model name is invalid
+            OllamaAPIError: If the response is invalid
         """
         endpoint = API_ENDPOINTS["pull"]
-        data = {"name": model}
+        data: Dict[str, Any] = {"name": model}
         
         if not stream:
             response = self._with_retry("POST", endpoint, data=data)
+            if response is None:
+                raise OllamaAPIError(f"Failed to pull model '{model}'")
             return response.json()
             
         # Stream the progress
         response = self._with_retry("POST", endpoint, data=data, stream=True)
+        if response is None:
+            raise OllamaAPIError(f"Failed to pull model '{model}' with streaming")
         
-        def generate_updates():
+        def generate_updates() -> Generator[Dict[str, Any], None, None]:
             progress_bar = None
             last_status = None
             
@@ -304,7 +361,7 @@ class OllamaClient:
             InvalidRequestError: If the request is invalid
         """
         endpoint = API_ENDPOINTS["generate"]
-        data = {
+        data: Dict[str, Any] = {
             "model": resolve_model_alias(model) if HELPERS_AVAILABLE else model,
             "prompt": prompt,
             "stream": stream
@@ -318,12 +375,16 @@ class OllamaClient:
         if not stream:
             # Single response
             response = self._with_retry("POST", endpoint, data=data)
+            if response is None:
+                raise OllamaAPIError(f"Failed to generate text with model '{model}'")
             return response.json()
         
         # Stream responses
         response = self._with_retry("POST", endpoint, data=data, stream=True)
+        if response is None:
+            raise OllamaAPIError(f"Failed to generate streaming text with model '{model}'")
         
-        def generate_chunks():
+        def generate_chunks() -> Iterator[Dict[str, Any]]:
             for line in response.iter_lines():
                 if not line:
                     continue
@@ -363,7 +424,7 @@ class OllamaClient:
             InvalidRequestError: If the messages format is invalid
         """
         endpoint = API_ENDPOINTS["chat"]
-        data = {
+        data: Dict[str, Any] = {
             "model": resolve_model_alias(model) if HELPERS_AVAILABLE else model,
             "messages": messages,
             "stream": stream
@@ -377,12 +438,16 @@ class OllamaClient:
         if not stream:
             # Single response
             response = self._with_retry("POST", endpoint, data=data)
+            if response is None:
+                raise OllamaAPIError(f"Failed to chat with model '{model}'")
             return response.json()
         
         # Stream responses
         response = self._with_retry("POST", endpoint, data=data, stream=True)
+        if response is None:
+            raise OllamaAPIError(f"Failed to stream chat with model '{model}'")
         
-        def generate_chunks():
+        def generate_chunks() -> Iterator[Dict[str, Any]]:
             for line in response.iter_lines():
                 if not line:
                     continue
@@ -418,7 +483,7 @@ class OllamaClient:
             ModelNotFoundError: If the model does not exist
         """
         endpoint = API_ENDPOINTS["embedding"]
-        data = {
+        data: Dict[str, Any] = {
             "model": resolve_model_alias(model) if HELPERS_AVAILABLE else model,
             "prompt": prompt
         }
@@ -429,6 +494,8 @@ class OllamaClient:
                 data[key] = value
                 
         response = self._with_retry("POST", endpoint, data=data)
+        if response is None:
+            raise OllamaAPIError(f"Failed to create embedding with model '{model}'")
         return response.json()
     
     def batch_embeddings(
@@ -454,7 +521,7 @@ class OllamaClient:
             ConnectionError: If cannot connect to Ollama server
             ModelNotFoundError: If the model does not exist
         """
-        results = []
+        results: List[Dict[str, Any]] = []
         
         # Prepare progress bar
         if show_progress and TQDM_AVAILABLE and not DISABLE_PROGRESS_BARS:
@@ -483,9 +550,11 @@ class OllamaClient:
             ModelNotFoundError: If the model does not exist
         """
         endpoint = API_ENDPOINTS["delete"]
-        data = {"model": model}
+        data: Dict[str, Any] = {"model": model}
         
         response = self._with_retry("DELETE", endpoint, data=data)
+        if response is None:
+            raise OllamaAPIError(f"Failed to delete model '{model}'")
         return response.status_code == 200
     
     def copy_model(self, source: str, destination: str) -> Dict[str, Any]:
@@ -505,9 +574,11 @@ class OllamaClient:
             InvalidRequestError: If the destination name is invalid
         """
         endpoint = API_ENDPOINTS["copy"]
-        data = {"source": source, "destination": destination}
+        data: Dict[str, Any] = {"source": source, "destination": destination}
         
         response = self._with_retry("POST", endpoint, data=data)
+        if response is None:
+            raise OllamaAPIError(f"Failed to copy model from '{source}' to '{destination}'")
         return response.json()
     
     def create_model(
@@ -533,16 +604,20 @@ class OllamaClient:
             InvalidRequestError: If the Modelfile is invalid
         """
         endpoint = API_ENDPOINTS["create"]
-        data = {"name": name, "modelfile": modelfile}
+        data: Dict[str, Any] = {"name": name, "modelfile": modelfile}
         
         if not stream:
             response = self._with_retry("POST", endpoint, data=data)
+            if response is None:
+                raise OllamaAPIError(f"Failed to create model '{name}'")
             return response.json()
             
         # Stream the progress
         response = self._with_retry("POST", endpoint, data=data, stream=True)
+        if response is None:
+            raise OllamaAPIError(f"Failed to create model '{name}' with streaming")
         
-        def generate_updates():
+        def generate_updates() -> Iterator[Dict[str, Any]]:
             for line in response.iter_lines():
                 if not line:
                     continue
@@ -603,8 +678,13 @@ class OllamaClient:
         finally:
             self._thread_local.fallback_depth -= 1
             
-    def get_fallback_info(self):
-        """Get information about the current fallback state."""
+    def get_fallback_info(self) -> Dict[str, Any]:
+        """
+        Get information about the current fallback state.
+        
+        Returns:
+            Dictionary containing fallback depth, model name, and original error
+        """
         return {
             "depth": getattr(self._thread_local, "fallback_depth", 0),
             "model": getattr(self._thread_local, "fallback_model", None),
@@ -618,25 +698,86 @@ class OllamaClient:
         prompt: str, 
         options: Optional[Dict[str, Any]] = None, 
         stream: bool = False
-    ):
-        """Async version of generate - wrapper for compatibility."""
-        return self.generate(model, prompt, options, stream)
-        
+    ) -> Union[Dict[str, Any], AsyncIterator[Dict[str, Any]]]:
+        data: Dict[str, Any] = {
+            "model": resolve_model_alias(model) if HELPERS_AVAILABLE else model,
+            "prompt": prompt,
+            "stream": stream
+        }
+        if options:
+            data.update(options)
+
+        if not stream:
+            response = await self._with_async_retry("POST", API_ENDPOINTS["generate"], data=data)
+            if response is None:
+                raise OllamaAPIError(f"agenerate failed for model '{model}'")
+            return response.json()
+
+        response = await self._with_async_retry("POST", API_ENDPOINTS["generate"], data=data, stream=True)
+        if response is None:
+            raise OllamaAPIError(f"Streaming agenerate failed for model '{model}'")
+
+        async def generate_chunks() -> AsyncIterator[Dict[str, Any]]:
+            async for line in response.aiter_lines():
+                if not line:
+                    continue
+                try:
+                    yield json.loads(line)
+                except json.JSONDecodeError:
+                    raise StreamingError(f"Failed to parse streamed line: {line}")
+
+        return generate_chunks()
+
     async def achat(
         self, 
         model: str, 
         messages: List[Dict[str, str]], 
         options: Optional[Dict[str, Any]] = None, 
         stream: bool = False
-    ):
-        """Async version of chat - wrapper for compatibility."""
-        return self.chat(model, messages, options, stream)
-        
+    ) -> Union[Dict[str, Any], AsyncIterator[Dict[str, Any]]]:
+        data: Dict[str, Any] = {
+            "model": resolve_model_alias(model) if HELPERS_AVAILABLE else model,
+            "messages": messages,
+            "stream": stream
+        }
+        if options:
+            data.update(options)
+
+        if not stream:
+            response = await self._with_async_retry("POST", API_ENDPOINTS["chat"], data=data)
+            if response is None:
+                raise OllamaAPIError(f"achat failed for model '{model}'")
+            return response.json()
+
+        response = await self._with_async_retry("POST", API_ENDPOINTS["chat"], data=data, stream=True)
+        if response is None:
+            raise OllamaAPIError(f"Streaming achat failed for model '{model}'")
+
+        async def generate_chunks() -> AsyncIterator[Dict[str, Any]]:
+            async for line in response.aiter_lines():
+                if not line:
+                    continue
+                try:
+                    yield json.loads(line)
+                except json.JSONDecodeError:
+                    raise StreamingError(f"Failed to parse streamed line: {line}")
+
+        return generate_chunks()
+
     async def acreate_embedding(
         self, 
         model: str, 
         prompt: str,
         options: Optional[Dict[str, Any]] = None
-    ):
-        """Async version of create_embedding - wrapper for compatibility."""
-        return self.create_embedding(model, prompt, options)
+    ) -> Dict[str, Any]:
+        data: Dict[str, Any] = {
+            "model": resolve_model_alias(model) if HELPERS_AVAILABLE else model,
+            "prompt": prompt
+        }
+        if options:
+            data.update(options)
+
+        response = await self._with_async_retry("POST", API_ENDPOINTS["embedding"], data=data)
+        if response is None:
+            raise OllamaAPIError(f"acreate_embedding failed for model '{model}'")
+        return response.json()

@@ -8,9 +8,17 @@ It embodies the Eidosian principles of Structure as Control and Contextual Integ
 """
 
 import os
-import sys
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union, Any
+from typing import Tuple, Any
+import platform
+
+
+# Platform-specific configurations
+SYSTEM = platform.system().lower()
+IS_WINDOWS = SYSTEM == "windows"
+IS_MACOS = SYSTEM == "darwin"
+IS_LINUX = SYSTEM == "linux"
+IS_ARM64 = platform.machine().lower() == "arm64"  # ARM64 architecture detection
+IS_X86_64 = platform.machine().lower() == "x86_64"  # x86_64 architecture detection
 
 # Package metadata - single source of truth
 PACKAGE_NAME = "Ollama Forge"
@@ -96,20 +104,6 @@ def is_debug_mode() -> bool:
     """Check if debug mode is enabled."""
     return DEBUG_MODE
 
-# Dynamic configuration based on environment and capabilities
-try:
-    import rich
-    HAS_RICH = True
-except ImportError:
-    HAS_RICH = False
-
-# Platform-specific configurations
-import platform
-SYSTEM = platform.system().lower()
-IS_WINDOWS = SYSTEM == "windows"
-IS_MACOS = SYSTEM == "darwin"
-IS_LINUX = SYSTEM == "linux"
-
 # Create user directories if they don't exist
 for directory in [USER_CONFIG_DIR, USER_CACHE_DIR, USER_DATA_DIR]:
     try:
@@ -118,7 +112,7 @@ for directory in [USER_CONFIG_DIR, USER_CACHE_DIR, USER_DATA_DIR]:
         pass  # Silent pass if directory creation fails
 
 # Runtime configuration that may be modified during execution
-runtime_config = {
+runtime_config: dict[str, Any] = {
     "api_url": DEFAULT_OLLAMA_API_URL,
     "timeout": DEFAULT_TIMEOUT,
     "max_retries": DEFAULT_MAX_RETRIES,

@@ -81,7 +81,7 @@ class OllamaServerError(ServerError):
 
 
 # Map HTTP status codes to exception types for clean error handling
-ERROR_CODE_MAP = {
+ERROR_CODE_MAP: dict[int, type[InvalidRequestError] | type[ModelNotFoundError] | type[TimeoutError] | type[ServerError]] = {
     400: InvalidRequestError,
     404: ModelNotFoundError,
     408: TimeoutError,

@@ -10,7 +10,7 @@ Exemplifying Eidosian principles:
 - Precision as Style: Exact naming and clear documentation
 """
 
-from typing import Dict, List, Optional, Union, Tuple
+from typing import Dict
 
 # Standard model types
 MODEL_TYPE_CHAT = "chat"
@@ -31,6 +31,8 @@ RECOMMENDED_MODELS = {
         MODEL_TYPE_COMPLETION: ["qwen2.5:7b", "deepseek-r1:7b"],
         MODEL_TYPE_EMBEDDING: ["qwen2.5:0.5b", "deepseek-r1:1.5b"],
     }
+}
+
 # Default and backup models - balanced for general use
 DEFAULT_CHAT_MODEL = "deepseek-r1:1.5b"
 BACKUP_CHAT_MODEL = "qwen2.5:0.5b-Instruct"
@@ -42,7 +44,7 @@ MODEL_ALIASES: Dict[str, str] = {
     # Generics
     "default": DEFAULT_CHAT_MODEL,
     "small": "deepseek-r1:1.5b",
-    "medium": "qwen2.5:7b-instruct"
+    "medium": "qwen2.5:7b-instruct",
     
     # Specific types
     "embed": "nomic-embed-text",
@@ -57,7 +59,7 @@ MODEL_ALIASES: Dict[str, str] = {
     "qwen-small": "qwen2.5:0.5b-instruct",
     "qwen-medium": "qwen2.5:7b-instruct",
     "qwen-large": "qwen2.5:32b-instruct",
-}
+    }
 
 
 def resolve_model_alias(model_name: str) -> str:

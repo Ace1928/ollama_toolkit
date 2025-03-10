@@ -2,22 +2,15 @@
 """
 Common utilities for Ollama Toolkit examples and client.
 """
-from typing import Any, Dict, Optional, Tuple, TypeVar, cast
+from typing import Any, Dict, Optional, Tuple, TypeVar
 import os
-import sys
 import json
 import logging
 import platform
 import subprocess
 import requests
-import asyncio
 import aiohttp
 from colorama import Fore, Style
-
-try:
-    import numpy as np
-except ImportError:
-    np = None
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -115,7 +108,7 @@ def make_api_request(
         
         # For timeouts, add specific error data
         if isinstance(e, requests.exceptions.Timeout):
-            error_data["timeout"] = timeout
+            error_data["timeout"] = str(timeout)  # Convert int to str
             error_data["suggestion"] = "Consider increasing the timeout value"
             
         logger.debug(f"Structured error: {error_data}")
@@ -252,7 +245,7 @@ def install_ollama(target_dir: Optional[str] = None) -> Tuple[bool, str]:
     try:
         if system == "linux":
             # Use the official install script for Linux
-            result = subprocess.run(
+            subprocess.run(
                 ["curl", "-fsSL", "https://ollama.com/install.sh", "|", "sh"],
                 shell=True,
                 check=True,
@@ -264,7 +257,7 @@ def install_ollama(target_dir: Optional[str] = None) -> Tuple[bool, str]:
             
         elif system == "darwin":  # macOS
             # Use the official install script for macOS
-            result = subprocess.run(
+            subprocess.run(
                 ["curl", "-fsSL", "https://ollama.com/install.sh", "|", "sh"],
                 shell=True,
                 check=True,
@@ -296,7 +289,7 @@ def ensure_ollama_running() -> Tuple[bool, str]:
         Tuple of (is_ready, message)
     """
     # First check if already running
-    is_running, message = check_ollama_running()
+    is_running, _ = check_ollama_running()  # Changed to _ to avoid unused variable
     if is_running:
         return True, "Ollama is ready"
     
@@ -321,7 +314,7 @@ def ensure_ollama_running() -> Tuple[bool, str]:
             
             # Wait for it to be ready
             for _ in range(5):  # Try 5 times
-                is_running, msg = check_ollama_running()
+                is_running, _ = check_ollama_running()  # Changed to _ to avoid unused variable
                 if is_running:
                     return True, "Ollama started successfully"
                 # Wait a bit before checking again
