@@ -21,191 +21,166 @@ OllamaAPIError (base)
 └── StreamingTimeoutError
 ```
 
-Each exception type serves a specific purpose, allowing for precise handling of different error scenarios.
+## Using Exceptions
 
-## Basic Error Handling Pattern
+### Basic Error Handling
 
 ```python
 from ollama_forge import OllamaClient
-from ollama_forge.exceptions import ModelNotFoundError, ConnectionError, TimeoutError, OllamaAPIError
+from ollama_forge.exceptions import ModelNotFoundError, ConnectionError, TimeoutError
 
 client = OllamaClient()
 
 try:
-    response = client.generate(
-        model="nonexistent-model",
-        prompt="This won't work",
-        stream=False
-    )
+    response = client.generate(model="non-existent-model", prompt="Hello")
 except ModelNotFoundError as e:
     print(f"Model not found: {e}")
-    # Handle missing model (e.g., suggest alternatives)
+    # Respond with available models
+    models = client.list_models()
+    print(f"Available models: {[m['name'] for m in models.get('models', [])]}")
 except ConnectionError as e:
     print(f"Connection error: {e}")
-    # Handle connection issues (e.g., check if server is running)
+    print("Check if Ollama server is running with: ollama serve")
 except TimeoutError as e:
     print(f"Request timed out: {e}")
-    # Handle timeout (e.g., suggest using a smaller model)
-except OllamaAPIError as e:
-    print(f"API error: {e}")
-    # Generic error handling
+    print("Try a shorter prompt or increase the timeout")
 ```
 
-## Advanced Fallback Mechanisms
+### Custom Error Handlers
 
-Version 0.1.9 introduces sophisticated fallback mechanisms that operate at multiple levels:
-
-### Model Fallback
+Create reusable error handlers for consistent handling across your application:
 
 ```python
-from ollama_forge import OllamaClient
-from ollama_forge.helpers.model_constants import get_fallback_model
-
-client = OllamaClient()
-
-def generate_with_fallback(model, prompt):
-    try:
-        return client.generate(model=model, prompt=prompt)
-    except ModelNotFoundError:
-        fallback_model = get_fallback_model(model)
-        print(f"Model '{model}' not found. Using fallback model: {fallback_model}")
-        return client.generate(model=fallback_model, prompt=prompt)
-
-# Example usage
-response = generate_with_fallback("missing-model", "Hello, world!")
-print(response.get("response", ""))
-```
-
-### Comprehensive Fallback Strategy
-
-```python
-from ollama_forge import OllamaClient
-from ollama_forge.exceptions import *
-from ollama_forge.helpers.model_constants import get_fallback_model
-
-client = OllamaClient()
-
-def safe_generate(model, prompt, max_attempts=3):
-    """Recursively refined error handling approach with multiple fallback levels"""
-    attempts = 0
-    current_model = model
+def handle_ollama_errors(func):
+    """Decorator for handling common Ollama API errors."""
+    from functools import wraps
+    from ollama_forge.exceptions import (
+        ModelNotFoundError, ConnectionError, 
+        TimeoutError, StreamingError
+    )
     
-    while attempts < max_attempts:
+    @wraps(func)
+    def wrapper(*args, **kwargs):
         try:
-            return client.generate(model=current_model, prompt=prompt, stream=False)
+            return func(*args, **kwargs)
         except ModelNotFoundError as e:
             print(f"Model not found: {e}")
-            current_model = get_fallback_model(current_model)
-            print(f"Trying fallback model: {current_model}")
+            return {"error": "model_not_found", "message": str(e)}
         except ConnectionError as e:
             print(f"Connection error: {e}")
-            print("Attempting to restart connection...")
-            time.sleep(1)  # Brief pause before retry
+            return {"error": "connection_error", "message": str(e)}
         except TimeoutError as e:
             print(f"Request timed out: {e}")
-            if "llama" in current_model or "deepseek" in current_model:
-                current_model = "tinyllama"  # Try smaller model
-                print(f"Trying lighter model: {current_model}")
-            else:
-                print("Reducing complexity and trying again...")
-                prompt = prompt[:len(prompt)//2]  # Simplify prompt
-        except OllamaAPIError as e:
-            print(f"API error: {e}")
-            return {"error": str(e), "response": "Error occurred during generation"}
-        
-        attempts += 1
+            return {"error": "timeout", "message": str(e)}
+        except StreamingError as e:
+            print(f"Streaming error: {e}")
+            return {"error": "streaming_error", "message": str(e)}
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return {"error": "unknown", "message": str(e)}
     
-    return {"error": "Maximum retry attempts reached", "response": "Failed to generate response"}
+    return wrapper
+
+# Usage
+@handle_ollama_errors
+def generate_text(client, prompt, model="deepseek-r1:1.5b"):
+    return client.generate(model=model, prompt=prompt)
 ```
 
-## Exception Details
+### Exception Reference
 
-### ModelNotFoundError
+#### OllamaAPIError
+Base exception for all Ollama API errors.
 
-Raised when a requested model cannot be found in the Ollama server.
+#### ConnectionError
+Raised when connection to the Ollama API server fails.
+- Common causes: Server not running, network issues, incorrect API URL
+
+#### TimeoutError
+Raised when an API request times out.
+- Common causes: Large prompt, complex generation, server overload
+
+#### ModelNotFoundError
+Raised when the requested model is not available.
+- Common causes: Typo in model name, model not downloaded
+
+#### ServerError
+Raised when the Ollama API server returns a 5xx error.
+- Common causes: Server crash, internal server error
+
+#### InvalidRequestError
+Raised when the Ollama API server returns a 4xx error.
+- Common causes: Invalid parameters, malformed request
+
+#### StreamingError
+Raised when there's an error during streaming responses.
+- Common causes: Connection interruption, server timeout
+
+#### ParseError
+Raised when there's an error parsing API responses.
+- Common causes: Malformed JSON, unexpected response format
+
+#### AuthenticationError
+Raised when authentication fails.
+- Common causes: Invalid API key (for future use with secured APIs)
+
+#### EndpointNotFoundError
+Raised when an API endpoint is not found.
+- Common causes: Using an API endpoint that doesn't exist, API version mismatch
+
+#### ModelCompatibilityError
+Raised when a model doesn't support the requested operation.
+- Common causes: Using chat with an embedding-only model
+
+#### StreamingTimeoutError
+Raised when a streaming response times out.
+- Common causes: Long generations, slow network connection
+
+## Error Handling Best Practices
+
+1. **Always catch specific exceptions first**, then broader ones
+2. **Provide informative error messages** to users
+3. **Implement appropriate fallbacks** for critical operations
+4. **Log errors** with sufficient context for debugging
+5. **Consider retry strategies** for transient errors like connection issues
+
+## Example: Robust Client with Fallbacks
 
 ```python
-try:
-    client.generate(model="nonexistent-model", prompt="Hello")
-except ModelNotFoundError as e:
-    print(f"Error: {e}")  # "Error: Model 'nonexistent-model' not found"
-    print(f"Available models: {[m['name'] for m in client.list_models().get('models', [])]}")
-```
-
-### ConnectionError
-
-Raised when the client cannot connect to the Ollama server.
-
-```python
-try:
-    client = OllamaClient(base_url="http://incorrect-url:11434")
-    client.get_version()
-except ConnectionError as e:
-    print(f"Connection failed: {e}")
-    print("Please ensure the Ollama server is running with: 'ollama serve'")
-```
-
-### TimeoutError
-
-Raised when a request takes longer than the specified timeout.
-
-```python
-try:
-    client = OllamaClient(timeout=1)  # Very short timeout
-    client.generate(model="llama2", prompt="Write a novel", stream=False)
-except TimeoutError as e:
-    print(f"Request timed out: {e}")
-    print("Try increasing the timeout or using a smaller model")
-```
-
-### StreamingError
-
-Raised when there's an error during a streaming response.
-
-```python
-try:
-    for chunk in client.generate(model="llama2", prompt="Hello", stream=True):
-        print(chunk.get("response", ""), end="", flush=True)
-except StreamingError as e:
-    print(f"\nStreaming error: {e}")
-```
-
-## Error Logging
-
-Ollama Forge provides comprehensive logging for error diagnosis:
-
-```python
-import logging
 from ollama_forge import OllamaClient
+from ollama_forge.exceptions import ModelNotFoundError, ConnectionError
+from ollama_forge.helpers.model_constants import get_fallback_model
+import logging
 
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.FileHandler("ollama_debug.log"), logging.StreamHandler()]
-)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-client = OllamaClient()
-try:
-    client.generate(model="nonexistent-model", prompt="Test")
-except Exception as e:
-    logging.error(f"Generation failed: {e}", exc_info=True)
+def get_robust_completion(prompt, model="deepseek-r1:1.5b", max_attempts=3):
+    """Get completion with robust error handling and fallbacks."""
+    client = OllamaClient()
+    
+    # Try primary model
+    try:
+        logger.info(f"Attempting generation with {model}")
+        return client.generate(model=model, prompt=prompt)
+    except ModelNotFoundError:
+        fallback = get_fallback_model(model)
+        logger.warning(f"Model {model} not found, falling back to {fallback}")
+        return client.generate(model=fallback, prompt=prompt)
+    except ConnectionError as e:
+        logger.error(f"Connection error: {e}")
+        
+        # Try to start Ollama service
+        from ollama_forge.helpers.common import ensure_ollama_running
+        is_running, message = ensure_ollama_running()
+        
+        if is_running:
+            logger.info(f"Started Ollama service: {message}")
+            # Retry with the original model
+            return client.generate(model=model, prompt=prompt)
+        else:
+            logger.error(f"Failed to start Ollama: {message}")
+            return {"error": "service_unavailable", "message": str(e)}
 ```
 
-## Eidosian Error Messages
-
-Following the principle of "Humor as Cognitive Leverage," error messages are designed to be informative and memorable:
-
-- When a model isn't found: "Model 'nonexistent-model' not found. Like searching for unicorns—majestic but absent. Try 'llama2' instead."
-- When a connection fails: "Connection refused—like knocking on a door with no one home. Is Ollama running with 'ollama serve'?"
-- When a request times out: "Time waits for no one, and neither does your request. Consider a smaller model or a larger timeout."
-
-## Best Practices
-
-1. **Always handle specific exceptions before generic ones**
-2. **Implement fallback mechanisms for critical operations**
-3. **Use proper timeout values based on model size and task complexity**
-4. **Log errors with sufficient context for debugging**
-5. **Provide helpful feedback to users when errors occur**
-
-By following these patterns, your applications will achieve a level of robustness and resilience that embodies the Eidosian principle of "Self-Awareness as Foundation."
+By using this structured approach to error handling, your applications will be more robust, user-friendly, and easier to maintain.

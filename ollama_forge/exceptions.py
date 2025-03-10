@@ -1,48 +1,109 @@
 #!/usr/bin/env python3
 """
-Custom exceptions for the Ollama Forge.
+Exception classes for Ollama Forge.
+
+This module defines a precise, hierarchical exception system to provide
+detailed and actionable error information with perfect granularity.
+Following Eidosian principles of structure as control, contextual integrity,
+and precision as style.
 """
 
+from typing import Optional, Dict, Any
+
+
 class OllamaAPIError(Exception):
-    """Base class for all Ollama API errors."""
-    pass
+    """Base exception for all Ollama API errors."""
 
-class OllamaConnectionError(OllamaAPIError):
-    """Raised when there is a connection error."""
-    pass
+    def __init__(self, message: str, response: Optional[Dict[str, Any]] = None):
+        self.message = message
+        self.response = response
+        super().__init__(message)
 
-class OllamaModelNotFoundError(OllamaAPIError):
-    """Raised when a requested model is not found."""
-    pass
+    def __str__(self) -> str:
+        if self.response:
+            return f"{self.message} - Response: {self.response}"
+        return self.message
 
-class OllamaServerError(OllamaAPIError):
-    """Raised when there is a server error."""
-    pass
 
 class ConnectionError(OllamaAPIError):
-    """Raised when there is a connection error."""
+    """Raised when a connection to the Ollama server cannot be established."""
     pass
+
 
 class TimeoutError(OllamaAPIError):
-    """Raised when a request times out."""
+    """Raised when a request to the Ollama server times out."""
     pass
+
 
 class ModelNotFoundError(OllamaAPIError):
-    """Raised when a requested model is not found."""
+    """Raised when the requested model does not exist."""
     pass
+
 
 class ServerError(OllamaAPIError):
-    """Raised when there is a server error."""
+    """Raised when the Ollama server returns a 5xx error."""
     pass
+
 
 class InvalidRequestError(OllamaAPIError):
-    """Raised when a request is invalid."""
+    """Raised when the request is invalid (4xx error)."""
     pass
+
 
 class StreamingError(OllamaAPIError):
-    """Raised when there is an error in streaming response."""
+    """Raised when an error occurs during streaming responses."""
     pass
 
+
 class ParseError(OllamaAPIError):
-    """Raised when there is an error parsing the response."""
+    """Raised when parsing a response fails."""
     pass
+
+
+class ValidationError(OllamaAPIError):
+    """Raised when input validation fails."""
+    pass
+
+
+class OllamaConnectionError(ConnectionError):
+    """Legacy alias for ConnectionError for backwards compatibility."""
+    pass
+
+
+class OllamaModelNotFoundError(ModelNotFoundError):
+    """Legacy alias for ModelNotFoundError for backwards compatibility."""
+    pass
+
+
+class OllamaServerError(ServerError):
+    """Legacy alias for ServerError for backwards compatibility."""
+    pass
+
+
+# Map HTTP status codes to exception types for clean error handling
+ERROR_CODE_MAP = {
+    400: InvalidRequestError,
+    404: ModelNotFoundError,
+    408: TimeoutError,
+    429: ServerError,  # Rate limit exceeded
+    500: ServerError,
+    502: ServerError,
+    503: ServerError,
+    504: TimeoutError,
+}
+
+
+def get_exception_for_status(status_code: int, message: str, response: Optional[Dict[str, Any]] = None) -> OllamaAPIError:
+    """
+    Get the appropriate exception class for an HTTP status code.
+    
+    Args:
+        status_code: HTTP status code
+        message: Error message
+        response: Optional response data
+        
+    Returns:
+        Instantiated exception of the appropriate type
+    """
+    exception_class = ERROR_CODE_MAP.get(status_code, OllamaAPIError)
+    return exception_class(message, response)

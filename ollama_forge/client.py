@@ -1,577 +1,642 @@
 #!/usr/bin/env python3
 """
-Core client functionality for interacting with the Ollama Forge v0.1.9.
+Ollama Forge client implementation.
 
-This module provides a fully typed, self-documenting client interface to
-all core Ollama API endpoints including model management, generation, chat,
-embeddings, and more—aligned with Eidosian principles of recursive
-refinement, structural integrity, and contextual excellence.
-
-Features:
-- Complete API coverage with both synchronous and asynchronous interfaces
-- Comprehensive error handling with precise exception types
-- Advanced fallback mechanisms for model availability
-- Optimized embedding operations including batch processing
-- Streaming support for all compatible endpoints
+This module provides a comprehensive client for interacting with the Ollama API,
+featuring streaming support, robust error handling, and elegant fallbacks.
+It follows Eidosian principles of precision, modularity, and efficiency.
 """
 
-import logging
-import time
 import json
+import time
+import threading
+from typing import Any, Dict, Generator, Iterator, List, Optional, Union, Tuple, cast
+import logging
 import requests
-import aiohttp
+from functools import wraps
+from contextlib import contextmanager
 
-from typing import (
-    Any, Dict, List, Optional, Iterator, Union,
-    Callable, TypeVar, Tuple, Generator, AsyncIterator, cast
-)
-from requests.adapters import HTTPAdapter
+try:
+    from tqdm import tqdm
+    TQDM_AVAILABLE = True
+except ImportError:
+    TQDM_AVAILABLE = False
 
-from .helpers.common import (
-    DEFAULT_OLLAMA_API_URL,
-    make_api_request,
-    async_make_api_request
-)
+# Internal imports
 from .exceptions import (
-    ConnectionError,
-    TimeoutError,
-    OllamaAPIError,
-    ModelNotFoundError,
-    InvalidRequestError,
-    StreamingError,
-    ParseError
+    OllamaAPIError, ConnectionError, ModelNotFoundError,
+    ServerError, InvalidRequestError, TimeoutError,
+    StreamingError, ParseError, ValidationError,
+    get_exception_for_status
 )
-from .helpers.model_constants import (
-    DEFAULT_CHAT_MODEL,
-    BACKUP_CHAT_MODEL,
-    DEFAULT_EMBEDDING_MODEL,
-    BACKUP_EMBEDDING_MODEL,
-    resolve_model_alias,
-    get_fallback_model
+from .config import (
+    DEFAULT_OLLAMA_API_URL, DEFAULT_TIMEOUT,
+    DEFAULT_CHAT_MODEL, DEFAULT_EMBEDDING_MODEL,
+    BACKUP_CHAT_MODEL, BACKUP_EMBEDDING_MODEL,
+    API_ENDPOINTS, DISABLE_PROGRESS_BARS,
+    DEBUG_MODE
 )
 
+# Standard helpers import attempt
+try:
+    from ..helpers.common import make_api_request, print_error, print_warning
+    from ..helpers.model_constants import get_fallback_model, resolve_model_alias
+    HELPERS_AVAILABLE = True
+except (ImportError, ValueError):
+    HELPERS_AVAILABLE = False
+
+# Set up module logger
 logger = logging.getLogger(__name__)
-
-T = TypeVar('T')
-CacheKey = str
-CacheValue = Tuple[float, Any]
-APIResponse = Union[Dict[str, Any], requests.Response]
 
 
 class OllamaClient:
     """
-    Client for interacting with the Ollama Forge.
+    Client for interacting with the Ollama API.
+    
+    This class provides a comprehensive interface to all Ollama API endpoints,
+    with support for both synchronous and asynchronous requests, streaming responses,
+    and robust error handling.
+    
+    Attributes:
+        base_url: Base URL for the Ollama API
+        timeout: Request timeout in seconds
+        max_retries: Maximum number of retries for failed requests
     """
-
+    
     def __init__(
         self,
         base_url: str = DEFAULT_OLLAMA_API_URL,
-        timeout: int = 300,
+        timeout: int = DEFAULT_TIMEOUT,
         max_retries: int = 3,
-        retry_delay: float = 1.0,
-        cache_enabled: bool = False,
-        cache_ttl: float = 300.0
+        session: Optional[requests.Session] = None,
     ):
-        self.base_url = base_url
+        """
+        Initialize the Ollama client.
+        
+        Args:
+            base_url: Base URL for the Ollama API
+            timeout: Request timeout in seconds
+            max_retries: Maximum number of retries for failed requests
+            session: Optional requests.Session to use
+        """
+        self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.max_retries = max_retries
-        self.retry_delay = retry_delay
-        self.cache_enabled = cache_enabled
-        self.cache_ttl = cache_ttl
-        self._response_cache: Dict[CacheKey, CacheValue] = {}
-
-    def _with_retry(self, func: Callable[[], T]) -> T:
-        last_exception = None
-        for attempt in range(self.max_retries):
+        self.session = session or requests.Session()
+        self._thread_local = threading.local()
+    
+    def _with_retry(
+        self,
+        method: str,
+        endpoint: str,
+        data: Optional[Dict[str, Any]] = None,
+        stream: bool = False,
+        headers: Optional[Dict[str, str]] = None,
+    ) -> requests.Response:
+        """
+        Make an HTTP request with retry logic.
+        
+        Args:
+            method: HTTP method (GET, POST, etc.)
+            endpoint: API endpoint to call
+            data: Request data
+            stream: Whether to stream the response
+            headers: Optional request headers
+            
+        Returns:
+            Response object
+            
+        Raises:
+            ConnectionError: If connection fails after all retries
+            ModelNotFoundError: If the model is not found
+            ServerError: If the server returns a 5xx error
+            InvalidRequestError: If the request is invalid
+            TimeoutError: If the request times out
+            OllamaAPIError: For other API errors
+        """
+        url = f"{self.base_url}{endpoint}"
+        request_headers = {"Content-Type": "application/json"}
+        if headers:
+            request_headers.update(headers)
+            
+        # Exponential backoff parameters
+        backoff_factor = 0.5
+        
+        for attempt in range(self.max_retries + 1):
             try:
-                return func()
-            except (ConnectionError, TimeoutError) as e:
-                last_exception = e
-                if attempt < self.max_retries - 1:
-                    time.sleep(self.retry_delay)
-                else:
-                    raise e
-        if last_exception:
-            raise last_exception
-        raise RuntimeError("Retry logic failed without an exception")
-
-    def get_version(self) -> Dict[str, Any]:
-        response = make_api_request(
-            "GET",
-            "/api/version",
-            base_url=self.base_url,
-            timeout=self.timeout,
-        )
-        return self._handle_response(response)
-
-    async def aget_version(self) -> Dict[str, Any]:
-        response = await async_make_api_request(
-            "GET",
-            "/api/version",
-            base_url=self.base_url,
-            timeout=self.timeout,
-        )
-        return response.json()
-
-    def generate(
-        self,
-        model: str = DEFAULT_CHAT_MODEL,
-        prompt: str,
-        options: Optional[Dict[str, Any]] = None,
-        stream: bool = False
-    ) -> Union[Dict[str, Any], Generator[Dict[str, Any], None, None]]:
-        data: Dict[str, Any] = {"model": model, "prompt": prompt, "stream": stream}
-        if options:
-            data.update(options)
-        if stream:
-            response = self._with_retry(lambda: requests.post(
-                f"{self.base_url.rstrip('/')}/api/generate",
-                json=data,
-                stream=True,
-                timeout=self.timeout
-            ))
-            def response_generator() -> Generator[Dict[str, Any], None, None]:
-                for line in response.iter_lines():
-                    if line:
-                        try:
-                            yield json.loads(line.decode('utf-8').strip())
-                        except json.JSONDecodeError as e:
-                            yield {"error": f"JSON decode error: {str(e)}"}
-            return response_generator()
-        else:
-            response = make_api_request(
-                "POST",
-                "/api/generate",
-                data=data,
-                base_url=self.base_url,
-                timeout=self.timeout
-            )
-            return self._ensure_dict(response)
-
-    async def agenerate(
-        self,
-        model: str,
-        prompt: str,
-        options: Optional[Dict[str, Any]] = None,
-        stream: bool = False
-    ) -> Union[Dict[str, Any], AsyncIterator[Dict[str, Any]]]:
-        data: Dict[str, Any] = {"model": model, "prompt": prompt, "stream": stream}
-        if options:
-            data.update(options)
-        if not stream:
-            response = await async_make_api_request(
-                "POST",
-                "/api/generate",
-                data=data,
-                base_url=self.base_url,
-                timeout=self.timeout
-            )
-            if hasattr(response, 'json'):
-                yield await response.json()
-            else:
-                yield response
-        else:
-            url = f"{self.base_url.rstrip('/')}/api/generate"
-            timeout_obj = aiohttp.ClientTimeout(total=float(self.timeout))
-            async with aiohttp.ClientSession(timeout=timeout_obj) as session:
-                async with session.post(url, json=data) as resp:
-                    while True:
-                        line = await resp.content.readline()
-                        if not line:
-                            break
-                        try:
-                            chunk = json.loads(line.decode('utf-8').strip())
-                            yield chunk
-                            if chunk.get("done"):
-                                break
-                        except json.JSONDecodeError as e:
-                            yield {"error": f"JSON decode error: {str(e)}"}
-
-    def chat(
-        self,
-        model: str = DEFAULT_CHAT_MODEL,
-        messages: List[Dict[str, str]],
-        stream: bool = True,
-        options: Optional[Dict[str, Any]] = None
-    ) -> Union[Dict[str, Any], Generator[Dict[str, Any], None, None]]:
-        opt: Dict[str, Any] = options.copy() if options else {}
-        timeout = min(opt.get("timeout", self.timeout), 600)
-        if self._is_likely_embedding_model(model):
-            msg = (f"Model '{model}' appears to be an embedding-only model "
-                   "and doesn't support chat.")
-            logger.error(msg)
-            return self._error_generator(msg)
-
-        data: Dict[str, Any] = {"model": model, "messages": messages, "stream": stream}
-        data.update(opt)
-        if stream:
-            try:
-                session = requests.Session()
-                session.mount('http://', HTTPAdapter(max_retries=1))
-                response = session.post(
-                    f"{self.base_url.rstrip('/')}/api/chat",
+                if DEBUG_MODE and attempt > 0:
+                    logger.debug(f"Retry attempt {attempt} for request to {url}")
+                    
+                response = self.session.request(
+                    method=method,
+                    url=url,
                     json=data,
-                    stream=True,
-                    timeout=(30.0, timeout - 30.0)
+                    headers=request_headers,
+                    timeout=self.timeout,
+                    stream=stream,
                 )
-                if response.status_code == 400:
-                    err_msg = "Bad request - the model may not support chat functionality"
+                
+                if response.status_code >= 400:
+                    # Detailed error handling
+                    error_message = f"HTTP {response.status_code}"
                     try:
-                        err_data = json.loads(response.content)
-                        if "error" in err_data:
-                            err_msg = err_data["error"]
-                    except Exception:
-                        pass
-                    logger.error(f"Chat API error: {err_msg}")
-                    return self._error_generator(err_msg)
-                if response.status_code != 200:
-                    logger.error(f"Chat API error: HTTP {response.status_code}")
-                    return self._error_generator(f"HTTP error {response.status_code}")
-                return self._safe_stream_generator(response, timeout)
+                        error_data = response.json()
+                        if "error" in error_data:
+                            error_message = error_data["error"]
+                    except (ValueError, KeyError):
+                        # If JSON parsing fails, use the response text
+                        error_message = response.text or error_message
+                        
+                    # Raise specific exception based on status code
+                    exception = get_exception_for_status(
+                        response.status_code, error_message, response.json() if "json" in response.headers.get("content-type", "") else None
+                    )
+                    raise exception
+                    
+                return response
+                
+            except requests.exceptions.Timeout:
+                if attempt == self.max_retries:
+                    raise TimeoutError(f"Request to {url} timed out after {self.timeout}s and {self.max_retries} retries")
+            
+            except requests.exceptions.ConnectionError as e:
+                if attempt == self.max_retries:
+                    raise ConnectionError(f"Connection to Ollama server failed: {str(e)}")
+                
+            except OllamaAPIError:
+                # Re-raise API errors directly without retry
+                raise
+                
             except Exception as e:
-                logger.error(f"Chat request error: {str(e)}")
-                return self._error_generator(str(e))
-        else:
-            try:
-                response = make_api_request(
-                    "POST",
-                    "/api/chat",
-                    data=data,
-                    base_url=self.base_url,
-                    timeout=min(timeout, 300)
-                )
-                return self._ensure_dict(response)
-            except Exception as e:
-                logger.error(f"Chat request error: {str(e)}")
-                return {"error": str(e)}
-
-    async def achat(
-        self,
-        model: str,
-        messages: List[Dict[str, str]],
-        options: Optional[Dict[str, Any]] = None,
-        stream: bool = False
-    ) -> Union[Dict[str, Any], AsyncIterator[Dict[str, Any]]]:
-        data: Dict[str, Any] = {"model": model, "messages": messages, "stream": stream}
-        if options:
-            data.update(options)
-        if not stream:
-            response = await async_make_api_request(
-                "POST",
-                "/api/chat",
-                data=data,
-                base_url=self.base_url,
-                timeout=self.timeout
-            )
-            yield await response.json()
-        else:
-            url = f"{self.base_url.rstrip('/')}/api/chat"
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=data, timeout=self.timeout) as resp:
-                    while True:
-                        line = await resp.content.readline()
-                        if not line:
-                            break
-                        try:
-                            chunk = json.loads(line.decode('utf-8').strip())
-                            yield chunk
-                            if chunk.get("done"):
-                                break
-                        except json.JSONDecodeError as e:
-                            yield {"error": f"JSON decode error: {str(e)}"}
-
-    def create_embedding(
-        self,
-        model: str = DEFAULT_EMBEDDING_MODEL,
-        prompt: str,
-        options: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
-        data: Dict[str, Any] = {"model": model, "prompt": prompt}
-        if options:
-            data.update(options)
-        response = make_api_request(
-            "POST",
-            "/api/embed",
-            data=data,
-            base_url=self.base_url,
-            timeout=self.timeout
-        )
-        return self._ensure_dict(response)
-
-    async def acreate_embedding(
-        self,
-        model: str,
-        prompt: str,
-        options: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
-        data: Dict[str, Any] = {"model": model, "prompt": prompt}
-        if options:
-            data.update(options)
-        response = await async_make_api_request(
-            "POST",
-            "/api/embed",
-            data=data,
-            base_url=self.base_url,
-            timeout=self.timeout
-        )
+                if attempt == self.max_retries:
+                    raise OllamaAPIError(f"Unexpected error: {str(e)}")
+                    
+            # Exponential backoff before retry
+            wait_time = backoff_factor * (2 ** attempt)
+            time.sleep(wait_time)
+    
+    def get_version(self) -> Dict[str, Any]:
+        """
+        Get the Ollama server version.
+        
+        Returns:
+            Dictionary with version information
+            
+        Raises:
+            ConnectionError: If cannot connect to Ollama server
+        """
+        endpoint = API_ENDPOINTS["version"]
+        response = self._with_retry("GET", endpoint)
         return response.json()
-
-    def batch_embeddings(
-        self,
-        model: str = DEFAULT_EMBEDDING_MODEL,
-        prompts: List[str],
-        options: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
-        data: Dict[str, Any] = {"model": model, "input": prompts}
-        if options:
-            data.update(options)
-        response = make_api_request(
-            "POST",
-            "/api/embed",
-            data=data,
-            base_url=self.base_url,
-            timeout=self.timeout
-        )
-        return self._ensure_dict(response)
-
-    def list_models(self) -> Dict[str, Any]:
-        try:
-            response = make_api_request(
-                "GET",
-                "/api/tags",
-                base_url=self.base_url,
-                timeout=self.timeout,
-            )
-            return self._ensure_dict(response)
-        except Exception as e:
-            logger.error(f"Error listing models: {str(e)}")
-            return {"error": str(e)}
-
-    def list_running_models(self) -> Dict[str, Any]:
-        try:
-            response = make_api_request(
-                "GET",
-                "/api/ps",
-                base_url=self.base_url,
-                timeout=self.timeout,
-            )
-            return self._ensure_dict(response)
-        except Exception as e:
-            logger.error(f"Error listing running models: {str(e)}")
-            return {"error": str(e)}
-
-    def get_model_info(self, model: str) -> Dict[str, Any]:
-        try:
-            response = make_api_request(
-                "GET",
-                f"/api/show?name={model}",
-                base_url=self.base_url,
-                timeout=self.timeout,
-            )
-            return self._ensure_dict(response)
-        except Exception as e:
-            logger.error(f"Error getting model info for {model}: {str(e)}")
-            return {"error": str(e)}
-
+    
+    def list_models(self) -> Dict[str, List[Dict[str, Any]]]:
+        """
+        List available models.
+        
+        Returns:
+            Dictionary with models information
+            
+        Raises:
+            ConnectionError: If cannot connect to Ollama server
+        """
+        endpoint = API_ENDPOINTS["tags"]
+        response = self._with_retry("GET", endpoint)
+        return response.json()
+    
     def pull_model(
-        self,
-        model: str,
+        self, 
+        model: str, 
+        stream: bool = True
+    ) -> Union[Dict[str, Any], Generator[Dict[str, Any], None, None]]:
+        """
+        Pull a model from the Ollama registry.
+        
+        Args:
+            model: Name of the model to pull
+            stream: Whether to stream the progress
+            
+        Returns:
+            If stream=True, a generator yielding progress updates
+            If stream=False, a dictionary with pull result
+            
+        Raises:
+            ConnectionError: If cannot connect to Ollama server
+            InvalidRequestError: If the model name is invalid
+        """
+        endpoint = API_ENDPOINTS["pull"]
+        data = {"name": model}
+        
+        if not stream:
+            response = self._with_retry("POST", endpoint, data=data)
+            return response.json()
+            
+        # Stream the progress
+        response = self._with_retry("POST", endpoint, data=data, stream=True)
+        
+        def generate_updates():
+            progress_bar = None
+            last_status = None
+            
+            try:
+                for line in response.iter_lines():
+                    if not line:
+                        continue
+                        
+                    try:
+                        progress = json.loads(line)
+                        
+                        # Update progress bar if available
+                        if TQDM_AVAILABLE and not DISABLE_PROGRESS_BARS:
+                            if "total" in progress and "completed" in progress:
+                                if progress_bar is None:
+                                    progress_bar = tqdm(
+                                        total=progress["total"], 
+                                        desc=f"Pulling {model}",
+                                        unit="B", 
+                                        unit_scale=True
+                                    )
+                                
+                                # Update progress    
+                                if progress["completed"] > progress_bar.n:
+                                    progress_bar.update(progress["completed"] - progress_bar.n)
+                                    
+                        # Only yield status changes to avoid flooding logs
+                        if "status" in progress:
+                            if progress["status"] != last_status:
+                                last_status = progress["status"]
+                                yield progress
+                        else:
+                            yield progress
+                            
+                    except json.JSONDecodeError:
+                        logger.warning(f"Failed to parse progress line: {line}")
+                        
+            finally:
+                # Clean up progress bar
+                if progress_bar is not None:
+                    progress_bar.close()
+                
+        return generate_updates()
+    
+    def generate(
+        self, 
+        model: str, 
+        prompt: str, 
+        options: Optional[Dict[str, Any]] = None, 
         stream: bool = False
     ) -> Union[Dict[str, Any], Iterator[Dict[str, Any]]]:
-        data: Dict[str, Any] = {"model": model}
-        if stream:
-            try:
-                response = self._with_retry(lambda: requests.post(
-                    f"{self.base_url.rstrip('/')}/api/pull",
-                    json=data,
-                    stream=True,
-                    timeout=self.timeout
-                ))
-                def response_generator() -> Generator[Dict[str, Any], None, None]:
-                    try:
-                        for line in response.iter_lines():
-                            if line:
-                                try:
-                                    yield json.loads(line.decode('utf-8').strip())
-                                except json.JSONDecodeError as e:
-                                    logger.warning(f"Skipping invalid JSON: {e}")
-                                    yield {"status": "parsing_error", "error": str(e)}
-                    except Exception as ex:
-                        logger.error(f"Error in pull stream: {str(ex)}")
-                        yield {"status": "error", "error": str(ex)}
-                return response_generator()
-            except Exception as e:
-                logger.error(f"Error pulling model {model}: {str(e)}")
-                def error_generator() -> Generator[Dict[str, Any], None, None]:
-                    yield {"status": "error", "error": str(e)}
-                return error_generator()
-        else:
-            try:
-                response = make_api_request(
-                    "POST",
-                    "/api/pull",
-                    data=data,
-                    base_url=self.base_url,
-                    timeout=self.timeout
-                )
-                return self._ensure_dict(response)
-            except Exception as e:
-                logger.error(f"Error pulling model {model}: {str(e)}")
-                return {"status": "error", "error": str(e)}
-
-    def delete_model(self, model: str) -> bool:
-        response = make_api_request(
-            "DELETE",
-            "/api/delete",
-            data={"model": model},
-            base_url=self.base_url,
-            timeout=self.timeout,
-        )
-        return hasattr(response, "status_code") and response.status_code == 200
-
-    def copy_model(self, source: str, destination: str) -> Dict[str, Any]:
-        data: Dict[str, Any] = {"source": source, "destination": destination}
-        try:
-            response = make_api_request(
-                "POST",
-                "/api/copy",
-                data=data,
-                base_url=self.base_url,
-                timeout=self.timeout
-            )
-            return self._ensure_dict(response)
-        except Exception as e:
-            logger.error(f"Error copying model from {source} to {destination}: {str(e)}")
-            return {"error": str(e)}
-
-    def create_model(
-        self,
-        name: str,
-        modelfile: str,
-        stream: bool = False
-    ) -> Union[Dict[str, Any], Generator[Dict[str, Any], None, None]]:
-        data: Dict[str, Any] = {"name": name, "modelfile": modelfile, "stream": stream}
-        if stream:
-            response = self._with_retry(lambda: requests.post(
-                f"{self.base_url.rstrip('/')}/api/create",
-                json=data,
-                stream=True,
-                timeout=self.timeout
-            ))
-            def response_generator() -> Generator[Dict[str, Any], None, None]:
-                for line in response.iter_lines():
-                    if line:
-                        try:
-                            yield json.loads(line.decode('utf-8').strip())
-                        except json.JSONDecodeError as e:
-                            yield {"error": f"JSON decode error: {str(e)}"}
-            return response_generator()
-        else:
-            response = make_api_request(
-                "POST",
-                "/api/create",
-                data=data,
-                base_url=self.base_url,
-                timeout=self.timeout
-            )
-            return self._ensure_dict(response)
-
-    def push_model(
-        self,
-        name: str,
-        stream: bool = False
-    ) -> Union[Dict[str, Any], Generator[Dict[str, Any], None, None]]:
-        data: Dict[str, Any] = {"model": name, "stream": stream}
-        if stream:
-            response = self._with_retry(lambda: requests.post(
-                f"{self.base_url.rstrip('/')}/api/push",
-                json=data,
-                stream=True,
-                timeout=self.timeout
-            ))
-            def response_generator() -> Generator[Dict[str, Any], None, None]:
-                for line in response.iter_lines():
-                    if line:
-                        try:
-                            yield json.loads(line.decode('utf-8').strip())
-                        except json.JSONDecodeError as e:
-                            yield {"error": f"JSON decode error: {str(e)}"}
-            return response_generator()
-        else:
-            response = make_api_request(
-                "POST",
-                "/api/push",
-                data=data,
-                base_url=self.base_url,
-                timeout=self.timeout
-            )
-            return self._ensure_dict(response)
-
-    def _is_likely_embedding_model(self, model_name: str) -> bool:
-        patterns = [
-            "embed", "embedding", "text-embedding", "nomic-embed",
-            "all-minilm", "e5-", "bge-", "instructor-", "sentence-"
-        ]
-        mn = model_name.lower()
-        return any(pattern in mn for pattern in patterns)
-
-    def _error_generator(self, error_msg: str) -> Generator[Dict[str, Any], None, None]:
-        yield {"error": error_msg}
-        yield {"done": True}
-
-    def _safe_stream_generator(
-        self, response: requests.Response, timeout: int
-    ) -> Generator[Dict[str, Any], None, None]:
-        start_time = time.time()
-        i = 0
-        for line in response.iter_lines():
-            if i % 20 == 0 and (time.time() - start_time) > timeout:
-                yield {"error": "Response timeout exceeded", "timeout": True}
-                return
-            if not line:
-                continue
-            try:
-                chunk = json.loads(line.decode('utf-8').strip())
-                yield chunk
-                if chunk.get("done", False):
-                    return
-            except json.JSONDecodeError:
+        """
+        Generate text from a prompt.
+        
+        Args:
+            model: Name of the model to use
+            prompt: The prompt to generate from
+            options: Dictionary of generation options
+            stream: Whether to stream the response
+            
+        Returns:
+            If stream=True, a generator yielding response chunks
+            If stream=False, a dictionary with the complete response
+            
+        Raises:
+            ConnectionError: If cannot connect to Ollama server
+            ModelNotFoundError: If the model does not exist
+            InvalidRequestError: If the request is invalid
+        """
+        endpoint = API_ENDPOINTS["generate"]
+        data = {
+            "model": resolve_model_alias(model) if HELPERS_AVAILABLE else model,
+            "prompt": prompt,
+            "stream": stream
+        }
+        
+        # Add optional parameters
+        if options:
+            for key, value in options.items():
+                data[key] = value
+        
+        if not stream:
+            # Single response
+            response = self._with_retry("POST", endpoint, data=data)
+            return response.json()
+        
+        # Stream responses
+        response = self._with_retry("POST", endpoint, data=data, stream=True)
+        
+        def generate_chunks():
+            for line in response.iter_lines():
+                if not line:
+                    continue
+                    
                 try:
-                    text = line.decode('utf-8', errors='replace')
-                    yield {"message": {"content": text}, "raw": True}
-                except Exception as e:
-                    logger.error(f"Stream decoding error: {str(e)}")
-            i += 1
-        yield {"done": True}
-
-    def _messages_to_prompt(self, messages: List[Dict[str, str]]) -> str:
-        prompt_parts: List[str] = []
-        for m in messages:
-            role = m.get("role", "").upper()
-            content = m.get("content", "")
-            prompt_parts.append(f"[{role}]: {content}")
-        prompt_parts.append("[ASSISTANT]:")
-        return "\n\n".join(prompt_parts)
-
-    def _handle_response(self, response: APIResponse) -> Dict[str, Any]:
-        if hasattr(response, "json"):
-            try:
-                return response.json()
-            except json.JSONDecodeError:
-                return {"error": "Failed to parse API response"}
-        elif isinstance(response, dict):
-            return response
+                    chunk = json.loads(line)
+                    yield chunk
+                except json.JSONDecodeError:
+                    logger.error(f"Failed to parse response chunk: {line}")
+                    raise StreamingError("Failed to parse streaming response")
+        
+        return generate_chunks()
+    
+    def chat(
+        self, 
+        model: str, 
+        messages: List[Dict[str, str]], 
+        options: Optional[Dict[str, Any]] = None, 
+        stream: bool = False
+    ) -> Union[Dict[str, Any], Iterator[Dict[str, Any]]]:
+        """
+        Chat with a model.
+        
+        Args:
+            model: Name of the model
+            messages: List of message dictionaries (role, content)
+            options: Chat options
+            stream: Whether to stream the response
+            
+        Returns:
+            If stream=True, a generator yielding response chunks
+            If stream=False, a dictionary with the complete response
+            
+        Raises:
+            ConnectionError: If cannot connect to Ollama server
+            ModelNotFoundError: If the model does not exist
+            InvalidRequestError: If the messages format is invalid
+        """
+        endpoint = API_ENDPOINTS["chat"]
+        data = {
+            "model": resolve_model_alias(model) if HELPERS_AVAILABLE else model,
+            "messages": messages,
+            "stream": stream
+        }
+        
+        # Add optional parameters
+        if options:
+            for key, value in options.items():
+                data[key] = value
+        
+        if not stream:
+            # Single response
+            response = self._with_retry("POST", endpoint, data=data)
+            return response.json()
+        
+        # Stream responses
+        response = self._with_retry("POST", endpoint, data=data, stream=True)
+        
+        def generate_chunks():
+            for line in response.iter_lines():
+                if not line:
+                    continue
+                    
+                try:
+                    chunk = json.loads(line)
+                    yield chunk
+                except json.JSONDecodeError:
+                    logger.error(f"Failed to parse chat response chunk: {line}")
+                    raise StreamingError("Failed to parse streaming chat response")
+        
+        return generate_chunks()
+    
+    def create_embedding(
+        self, 
+        model: str, 
+        prompt: str,
+        options: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Create an embedding vector for a text prompt.
+        
+        Args:
+            model: Name of the model
+            prompt: Text to create embedding for
+            options: Optional embedding parameters
+            
+        Returns:
+            Dictionary with the embedding vector
+            
+        Raises:
+            ConnectionError: If cannot connect to Ollama server
+            ModelNotFoundError: If the model does not exist
+        """
+        endpoint = API_ENDPOINTS["embedding"]
+        data = {
+            "model": resolve_model_alias(model) if HELPERS_AVAILABLE else model,
+            "prompt": prompt
+        }
+        
+        # Add optional parameters
+        if options:
+            for key, value in options.items():
+                data[key] = value
+                
+        response = self._with_retry("POST", endpoint, data=data)
+        return response.json()
+    
+    def batch_embeddings(
+        self, 
+        model: str, 
+        prompts: List[str],
+        options: Optional[Dict[str, Any]] = None,
+        show_progress: bool = False
+    ) -> List[Dict[str, Any]]:
+        """
+        Create embeddings for multiple prompts.
+        
+        Args:
+            model: Name of the model
+            prompts: List of texts to create embeddings for
+            options: Optional embedding parameters
+            show_progress: Whether to show a progress bar
+            
+        Returns:
+            List of embedding vectors
+            
+        Raises:
+            ConnectionError: If cannot connect to Ollama server
+            ModelNotFoundError: If the model does not exist
+        """
+        results = []
+        
+        # Prepare progress bar
+        if show_progress and TQDM_AVAILABLE and not DISABLE_PROGRESS_BARS:
+            iterator = tqdm(prompts, desc=f"Creating embeddings with {model}")
         else:
-            return {"error": f"Unexpected response type: {type(response)}"}
+            iterator = prompts
+            
+        for prompt in iterator:
+            embedding = self.create_embedding(model, prompt, options)
+            results.append(embedding)
+            
+        return results
+    
+    def delete_model(self, model: str) -> bool:
+        """
+        Delete a model.
+        
+        Args:
+            model: Name of the model to delete
+            
+        Returns:
+            True if successful
+            
+        Raises:
+            ConnectionError: If cannot connect to Ollama server
+            ModelNotFoundError: If the model does not exist
+        """
+        endpoint = API_ENDPOINTS["delete"]
+        data = {"model": model}
+        
+        response = self._with_retry("DELETE", endpoint, data=data)
+        return response.status_code == 200
+    
+    def copy_model(self, source: str, destination: str) -> Dict[str, Any]:
+        """
+        Copy a model.
+        
+        Args:
+            source: Source model name
+            destination: Destination model name
+            
+        Returns:
+            Dictionary with operation result
+            
+        Raises:
+            ConnectionError: If cannot connect to Ollama server
+            ModelNotFoundError: If the source model does not exist
+            InvalidRequestError: If the destination name is invalid
+        """
+        endpoint = API_ENDPOINTS["copy"]
+        data = {"source": source, "destination": destination}
+        
+        response = self._with_retry("POST", endpoint, data=data)
+        return response.json()
+    
+    def create_model(
+        self, 
+        name: str, 
+        modelfile: str,
+        stream: bool = True
+    ) -> Union[Dict[str, Any], Iterator[Dict[str, Any]]]:
+        """
+        Create a new model from a Modelfile.
+        
+        Args:
+            name: Name for the new model
+            modelfile: Modelfile content
+            stream: Whether to stream the creation progress
+            
+        Returns:
+            If stream=True, a generator yielding progress updates
+            If stream=False, a dictionary with creation result
+            
+        Raises:
+            ConnectionError: If cannot connect to Ollama server
+            InvalidRequestError: If the Modelfile is invalid
+        """
+        endpoint = API_ENDPOINTS["create"]
+        data = {"name": name, "modelfile": modelfile}
+        
+        if not stream:
+            response = self._with_retry("POST", endpoint, data=data)
+            return response.json()
+            
+        # Stream the progress
+        response = self._with_retry("POST", endpoint, data=data, stream=True)
+        
+        def generate_updates():
+            for line in response.iter_lines():
+                if not line:
+                    continue
+                    
+                try:
+                    update = json.loads(line)
+                    yield update
+                except json.JSONDecodeError:
+                    logger.error(f"Failed to parse creation progress: {line}")
+                    raise StreamingError("Failed to parse streaming response")
+        
+        return generate_updates()
 
-    def _ensure_dict(self, response: APIResponse) -> Dict[str, Any]:
-        if isinstance(response, dict):
-            return response
-        elif hasattr(response, 'json'):
-            try:
-                return cast(requests.Response, response).json()
-            except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse JSON: {e}")
-                return {"error": f"JSON decode error: {str(e)}"}
-        logger.warning(f"Unexpected response type: {type(response)}")
-        return {"error": f"Unexpected response type: {type(response)}"}
+    @contextmanager
+    def fallback_context(self, operation: str):
+        """
+        Context manager for automatic model fallback.
+        
+        Args:
+            operation: Operation type ("chat", "generate", "embedding")
+            
+        Yields:
+            None
+            
+        Example:
+            ```
+            with client.fallback_context("chat"):
+                response = client.chat(model, messages)
+            ```
+        """
+        if not hasattr(self._thread_local, "fallback_depth"):
+            self._thread_local.fallback_depth = 0
+            
+        self._thread_local.fallback_depth += 1
+        
+        try:
+            yield
+        except (ModelNotFoundError, ServerError) as e:
+            # Only attempt fallback if not already in a fallback operation
+            if self._thread_local.fallback_depth <= 1 and HELPERS_AVAILABLE:
+                model = e.response.get("model") if hasattr(e, "response") and e.response else None
+                
+                if model:
+                    fallback_model = get_fallback_model(model, operation)
+                    
+                    # Log the fallback
+                    logger.warning(f"Falling back from {model} to {fallback_model}")
+                    
+                    # Store the original exception for reference
+                    self._thread_local.original_error = e
+                    
+                    # The calling code should handle fallback by checking thread_local
+                    self._thread_local.fallback_model = fallback_model
+                    return
+                    
+            # Re-raise the exception if we can't handle the fallback
+            raise
+        finally:
+            self._thread_local.fallback_depth -= 1
+            
+    def get_fallback_info(self):
+        """Get information about the current fallback state."""
+        return {
+            "depth": getattr(self._thread_local, "fallback_depth", 0),
+            "model": getattr(self._thread_local, "fallback_model", None),
+            "original_error": getattr(self._thread_local, "original_error", None)
+        }
+
+    # Async convenience methods for easy transition to AsyncOllamaClient
+    async def agenerate(
+        self, 
+        model: str, 
+        prompt: str, 
+        options: Optional[Dict[str, Any]] = None, 
+        stream: bool = False
+    ):
+        """Async version of generate - wrapper for compatibility."""
+        return self.generate(model, prompt, options, stream)
+        
+    async def achat(
+        self, 
+        model: str, 
+        messages: List[Dict[str, str]], 
+        options: Optional[Dict[str, Any]] = None, 
+        stream: bool = False
+    ):
+        """Async version of chat - wrapper for compatibility."""
+        return self.chat(model, messages, options, stream)
+        
+    async def acreate_embedding(
+        self, 
+        model: str, 
+        prompt: str,
+        options: Optional[Dict[str, Any]] = None
+    ):
+        """Async version of create_embedding - wrapper for compatibility."""
+        return self.create_embedding(model, prompt, options)
